@@ -1,0 +1,39 @@
+https://stackoverflow.com/questions/29640685/how-do-i-detect-collision-in-pygame
+
+https://www.pygame.org/docs/ref/rect.html
+
+for mouse hovering:
+
+get mouse position using
+pygame.mouse.get_pos()
+check collide using [object].collidepoint([mouse position]), return boolean value
+
+ex:
+mouse = pygame.mouse.get_pos()
+rect = pygame.Rect(100, 100, 100, 100)
+collide = rect.collidepoint(mouse) #returns true or false
+
+
+for mouse hovering using rectangle collision
+
+set a rectangle's position to the center using 
+[object1].center = pygame.mouse.get_pos()
+check collide using [object2].colliderect([object1]), returns boolean value
+
+ex:
+rect = pygame.Rect(100, 100, 100, 100)
+mouseRect = pygame.Rect(0, 0, 100, 100)
+mouseRect.center = pygame.mouse.get_pos()
+collide = rect.colliderect(mouseRect)
+
+The above 2 can be used for if we want to interact with objects via hovering by mouse. Along with the following methods (pygame.Rect.collidelist and pygame.Rect.collidelistall)
+
+
+https://www.pygame.org/docs/ref/sprite.html
+
+
+pygame.sprite.spritecollide(player, block_list, True/False)
+returns a list of all of all sprites in a group (block_list) that intersects with another sprite (player)
+
+pygame.sprite.collide_rect(sprite1, sprite2)
+returns a boolean value for if the two sprites collided if the sprite has a rect attribute representing their collisions. Think super mario enemy hitboxes
