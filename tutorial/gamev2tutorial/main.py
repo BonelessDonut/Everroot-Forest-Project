@@ -17,6 +17,7 @@ class Game():
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH,HEIGHT))
         self.clock = pygame.time.Clock()
+        
         #self.font = pygame.font.Font('Arial', 32)
         self.running = True
 
@@ -27,7 +28,7 @@ class Game():
                 if (tilemap[row])[col] == "B":
                     Block(self, col, row)
                 if (tilemap[row])[col] == "P":
-                    Player(self, col, row)
+                    Player(self, col, row, self.clock)
                 #print(f"{col}", end="")
             #print()
     def new(self):
