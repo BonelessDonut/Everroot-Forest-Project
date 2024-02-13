@@ -42,14 +42,15 @@ class Player(pygame.sprite.Sprite):
         self.movement()
 
         self.rect.x += self.x_change
+        self.collide_blocks('x')
         self.rect.y += self.y_change
+        self.collide_blocks('y')
 
         self.timepassed += self.clock.get_time()/1000
         self.image = pygame.transform.scale(pygame.image.load(self.imagelist[self.imgindex]), (self.width, self.height))
 
         self.x_change = 0
         self.y_change = 0
-
 
     def movement(self):
         #The key press segments came from viewing this tutorial
@@ -90,6 +91,32 @@ class Player(pygame.sprite.Sprite):
             self.y_change += PLAYER_SPEED
             self.facing = 'down'
             self.imgindex = not self.imgindex if ((self.timepassed)//(0.35)%2 == self.imgindex) else self.imgindex
+
+    def collide_blocks(self, direction):
+        if direction == 'x':
+            hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
+            x_diff = 0
+            if hits:
+                if self.x_change > 0:
+                    x_diff = (hits[0].rect.left-self.rect.width)-self.rect.x
+                    self.rect.x = hits[0].rect.left - self.rect.width
+                if self.x_change < 0:
+                    x_diff = hits[0].rect.right - self.rect.x
+                    self.rect.x = hits[0].rect.right
+                for sprite in self.game.all_sprites:
+                    sprite.rect.x -= x_diff
+        else:
+            hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
+            y_diff = 0
+            if hits:
+                if self.y_change > 0:
+                    y_diff = (hits[0].rect.top - self.rect.height) - self.rect.y
+                    self.rect.y = hits[0].rect.top - self.rect.height
+                if self.y_change < 0:
+                    y_diff = hits[0].rect.bottom - self.rect.y
+                    self.rect.y = hits[0].rect.bottom
+                for sprite in self.game.all_sprites:
+                    sprite.rect.y -= y_diff
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
