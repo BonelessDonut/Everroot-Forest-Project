@@ -4,13 +4,12 @@ import math
 import random
 
 class Player(pygame.sprite.Sprite):
-    imagelist = []
+    rightImgList = []
     imgindex = 0
     clock = None
     timepassed = 0
 
     def __init__(self, game, x, y, clock):
-
         self.game = game
         self._layer = PLAYER_LAYER
         self.groups = self.game.all_sprites
@@ -24,10 +23,10 @@ class Player(pygame.sprite.Sprite):
         self.y_change = 0
 
         self.facing = 'down'
-        self.imagelist = ['../../protagLattern(1).png', '../../protagLatternAlt(2).png']
+        self.rightImgList = ['../../protagLattern(1).png', '../../protagLatternAlt(2).png']
         self.clock = clock
 
-        self.image = pygame.image.load(self.imagelist[self.imgindex])
+        self.image = pygame.image.load(self.rightImgList[self.imgindex])
         self.image = pygame.transform.scale(self.image, (self.width, self.height))
 
 
@@ -47,7 +46,7 @@ class Player(pygame.sprite.Sprite):
         self.collide_blocks('y')
 
         self.timepassed += self.clock.get_time()/1000
-        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[self.imgindex]), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width, self.height))
 
         self.x_change = 0
         self.y_change = 0
