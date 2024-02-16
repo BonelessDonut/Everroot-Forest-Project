@@ -56,10 +56,8 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]), (self.width, self.height))
         elif self.facing == 'up':
             self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width, self.height))
-            print(self.upImgList[self.imgindex])
         else: # self.facing == 'down':
             self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width, self.height))
-            print(self.downImgList[self.imgindex])
         self.x_change = 0
         self.y_change = 0
 
