@@ -1,0 +1,189 @@
+pip install pygame
+PygameRPG - create three files. 
+
+- main.py
+import pygame
+from sprites import *
+from config import *
+import sys #system
+
+class Game:
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+#set_mode creates the game for us
+
+        self.clock = pygame.time.Clock()
+#allows us to set framerate of game, how many times game updates per second
+        self.font = pygame.font.Font('Arial', 32)
+        self.running = True
+
+    def new(self):
+    #a new game starts
+        self.playing = True
+    #helpful to see if a player has died or not, or if the player has quit the game
+
+        self.all_sprites = pygame.sprite.LayeredUpdates()
+        #groups all the sprites, allows us to update them all at once
+        self.blocks = pygame.sprite.LayeredUpdates() #walls
+        self.enemies = pygame.sprite.LayeredUpdates() 
+        #contain all the enemies
+        self.attacks = pygame.sprite.LayeredUpdates()
+        #attack sprites, ex. animation when we attack the enemy
+
+        self.player = Player(self, 1, 2)
+        #x coordinate of 1 and y coordinate of 2 
+
+    def events(self):
+        #game loop events
+        for event in pygame.event.get():
+            if event.type = pygame.QUIT
+                self.playing = False
+                self.running = False
+
+    def update(self):
+        #game loop updates
+        self.all_sprites.update()
+
+    def draw(self):
+        #game loop draw
+        self.screen.fill(BLACK)
+        self.all_sprites.draw(self.screen)
+        self.clock.tick(FPS)
+        pygame.display.update()
+
+    def main(self):
+        #game loop
+        while self.playing:
+            self.events()
+            self.update()
+            self.draw()
+        self.running = False
+
+    def game_over(self):
+        pass
+
+    def intro_screen(self):
+        pass
+
+g = Game()
+g.intro_screen()
+g.new()
+while g.running:
+    g.main()
+    g.game_over()
+
+pygame.quit()
+sys.exit()
+
+
+
+
+
+
+- config.py 
+WIN_WIDTH = 640
+WIN_HEIGHT = 480
+TILESIZE = 32
+FPS = 60
+
+PLAYER_LAYER = 1
+PLAYER_SPEED = 3
+RED = (255,0 ,0)  #RGB - red, green, blue scale of 0 to 255
+BLACK = (0, 0, 0)
+
+
+
+
+
+- sprites.py
+import pygame
+from config import *
+import math
+import random
+
+class Player(pygame.sprite.Sprite)
+        #a class in the pygame module that makes it easier to make sprites
+    def __init__(self, game, x, y):
+
+        self.game = game
+        self._layer = PLAYER_LAYER
+        #we can tell what layer of the screen we want the sprite to appear, ex. grass on the bottom, rocks, player on top 
+        self.groups = self.game.all_sprites
+        #adding the player into the all sprites groups, we can access the all sprites group because we're going to be passing in 'game' as an object 
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+
+        self.x_change = 0
+        self.y_change = 0 
+        # temporary variables that will store the change in movement during one loop
+
+        self.facing = 'down'
+
+        self.image = pygame.Surface([self.width, self.height])
+        #what the sprite looks like
+        self.image.fill(RED)
+
+        self.rect = self.image.get_rect()
+        #rect, where its positioned, hitbox , set rect = to image 
+        self.rect.x = self.x
+        self.rect.y = self.y
+        #coordinate of the sprite
+
+    def update(self):
+        self.movement()
+
+        self.rect.x += self.x_change
+        self.rect.y += self.y_change
+
+        self.x_change = 0
+        self.y_change = 0
+
+    def movement(self):
+        keys = pygames.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.x_change -= PLAYER_SPEED
+            self.facing = 'left'
+        if keys【pygame.K_RIGHT]:
+            self.x_change += PLAYER_SPEED
+            self.facing = 'right'
+        if keys【pygame.K_UP]:
+            self.y_change -= PLAYER_SPEED
+            self.facing = 'up'
+        if keys【pygame.K_DOWN]:
+            self.y_change += PLAYER_SPEED
+            self.facing = 'down'
+    #y axis starts at the top as 0, as you go down, it becomes larger
+    #thats why you need to take away when going up
+        
+images folder
+
+
+
+
+class Animal:
+    
+    def new(self):
+        self.name = ''
+        self.species = ''
+        self.legNumber = ''
+        self.noise = ''
+
+    def new(self, n, s, l , nois):
+        self.name = n
+        self.species = s
+        self.legNumber = l
+        self.noise = nois
+
+        
+
+
+
+if __name__ == '__main__':
+    dog = Animal('Spot', 'Dog', '4', 'Bark')
+    cat = Animal('Whiskers', 'Cat', '5', 'Meow')
+

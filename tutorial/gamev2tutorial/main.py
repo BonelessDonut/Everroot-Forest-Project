@@ -52,6 +52,7 @@ class Game():
     def update(self):
         #game loop updates
         self.all_sprites.update()
+
     def draw(self):
         self.screen.fill(BLACK)
         self.all_sprites.draw(self.screen)
@@ -65,7 +66,6 @@ class Game():
             self.update()
             self.draw()
         self.running = False
-
 
     def game_over(self):
         #Play the game over screen
