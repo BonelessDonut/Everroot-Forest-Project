@@ -23,7 +23,7 @@ class Player(pygame.sprite.Sprite):
         self.y_change = 0
 
         self.facing = 'down'
-        self.rightImgList = ['../../protagLattern(1).png', '../../protagLatternAlt(2).png']
+        self.rightImgList = ['../../Sprites/protagLattern(1).png', '../../Sprites/protagLatternAlt(2).png']
         self.clock = clock
 
         self.image = pygame.image.load(self.rightImgList[self.imgindex])
