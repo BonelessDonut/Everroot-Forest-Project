@@ -23,10 +23,12 @@ class Player(pygame.sprite.Sprite):
         self.y_change = 0
 
         self.facing = 'down'
-        self.rightImgList = ['../../Sprites/protagLattern(1).png', '../../Sprites/protagLatternAlt(2).png', '../../Sprites/protagLattern(1).png', '../../Sprites/protagLatternAlt(2).png']
-        self.leftImgList = ['../../Sprites/protagBlobLeft.png', '../../Sprites/protagBlobLeftAlt.png', '../../Sprites/protagBlobLeft.png', '../../Sprites/protagBlobLeftAlt.png']
-        self.upImgList = ['../../Sprites/protagBlobUpAlt.png', '../../Sprites/protagBlobUpLeftAlt.png', '../../Sprites/protagBlobUpAlt.png', '../../Sprites/protagBlobUpRight.png']
-        self.downImgList = ['../../Sprites/protagBlobDown.png', '../../Sprites/protagBlobDownLeftAlt.png', '../../Sprites/protagBlobDown.png', '../../Sprites/protagBlobDownRightAlt.png',]
+        self.rightImgList = ['Sprites/protagLattern(1).png', 'Sprites/protagLatternAlt(2).png', 'Sprites/protagLattern(1).png', 'Sprites/protagLatternAlt(2).png']
+        self.leftImgList = ['Sprites/protagBlobLeft.png', 'Sprites/protagBlobLeftAlt.png', 'Sprites/protagBlobLeft.png', 'Sprites/protagBlobLeftAlt.png']
+        self.upImgList = ['Sprites/protagBlobUpAlt.png', 'Sprites/protagBlobUpLeftAlt.png', 'Sprites/protagBlobUpAlt.png', 'Sprites/protagBlobUpRight.png']
+        #READ ME: FIX 'Sprites/protagBlobDown.png' being compressed too much by player size and looking weird as a result
+        #Potential fixes: scale the image down in pygame before loading, or edit the sprite images to make them all the same resolution for more consistency (Using photoshop or smth)
+        self.downImgList = ['Sprites/protagBlobDown.png', 'Sprites/protagBlobDownLeftAlt.png', 'Sprites/protagBlobDown.png', 'Sprites/protagBlobDownRightAlt.png',]
         self.clock = clock
 
         self.image = pygame.image.load(self.downImgList[self.imgindex])
