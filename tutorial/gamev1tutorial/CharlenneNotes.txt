@@ -1,0 +1,185 @@
+"Pygame RPG Tutorial # 1 - Pygame Tutorial" https://www.youtube.com/watch?v=crUF36OkGDw&list=PLkkm3wcQHjT7gn81Wn-e78cAyhwBW3FIc&index=1
+Lines 1-180
+FOCUS:
+- create main directory
+- make three more files + images folder
+- - main.py
+- - config.py (has the settings / variables for the app)
+- - sprites.py
+- - img (folder)
+
+```python
+
+# main.py file
+import pygame
+from sprites import * # * imports all, everything in the file
+from config import *
+import sys # system
+# sprites.py
+import pygame
+from config import *
+import math # module from python to do math
+import random # module from python (to do randomized things ig)
+# config.py just has static variables
+
+```
+
+```python
+
+# config.py for self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT)) line
+WIN_WIDTH = 640 # set window (a variable), measured in pixels
+WIN_HEIGHT = 480
+# main.py
+class Game: # main class that brings all the code for the game together | name: "Game"
+	def __init__(self):
+		pygame.init() # pygame.init is a function in pygame, needed whenever running any pygame program
+    self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT)) # create the screen and set the display to the width in config.py
+    self.clock = pygame.time.Clock() # set framerate
+    self.font = pygame.font.Font('Arial', 32) # set font, will not work bc a font file needs to be added
+    self.running = True # a boolean used to stop playing the game
+
+
+	## main.py file
+	## list of functions/methods(?) to be used in main.py:
+	## def events(self):
+	## def new(self)
+	## def update(self):
+	## def draw (self):
+	## def main(self):
+	## def game_over():
+	## def intro_screen(self):
+```
+
+```python
+
+ # main.py
+	def new(self): # a new game starts
+    self.playing = True # helpful to tell when a player has died or quit the game
+		# set up group (sprite).
+		# There are all objects: contains all sprites (characters, walls, enemies) that can be updated all at once
+		self.all_sprites = pygame.sprite.LayerdUpdate()
+		self.blocks = pygame.sprite.LayerdUpdate() # the walls
+		self.enemies = pygame.sprite.LayerdUpdate() # the enemies
+		self.attacks = pygame.sprite.LayerdUpdate() # all the animations
+
+		self.player = Player(self, 1, 2) # no game bc it's in game class? and 1 = 32 pixels and 2 = 64 pixels
+```
+
+```python
+# config.py for self._layer = PLAYER_LAYER line
+PLAYER_LAYER = 1 # currently only layer
+	# could be PLAYER_LAYER = 2 \n GROUND_LAYER = 1
+TILESIZE = 32 #set each tile
+RED = (255, 0, 0) # RGB values
+# sprites.py for self.player = Player(self, 1, 2) line
+class Player(pygame.sprite.Sprite) # a class in pygame module that makes sprites easier to make
+	def __init__(self, game, x, y): #access Game class in main.py
+		self.game = game
+		self._layer = PLAYER_LAYER # able to tell pygame what layer we want the sprite to appear on (ie. grass:bottom, rock:middle, player: top)
+		self.groups = self.game.all_sprites # adding player to all_sprites group (MAIN), accessible bc we're passing in game as an object (classPlayer < def __init__)
+		pygrame.sprite.Sprite._init__(self, self.groups)
+
+		self.x = x * TILESIZE # set player to the right an amount of pixels from left side of screen
+		self.y = y * TILESIZE # set player down an amount of pixels from top of screen
+		self.width = TILESIZE # sets player width
+		self.height = TILESIZE # sets player height
+
+		# every sprite has an image (what it looks like) and a rect (where it's positioned/how big it is: the hitbox)
+		self.image = pygame.Surface([self.width, self.height]) # set image of player class as a rectangle
+		self.image.fill(RED) # the rectangle will be visibly red
+
+		self.rect =  self.image.get_rect() # set rect to the same as image
+		self.rect.x = self.x # tell pygamethe character coords
+		self.rect.y = self.y
+
+	def update(self):
+		pass # later?
+```
+
+```python
+def events(self):
+	#game loop events
+	for event in pygame.events.get(): # get and reiterate every single event in pygame
+		if event.type == pygame.QUIT: # pygame.QUIT checks if we pressed close button
+			self.playing = False
+			self.running = False
+```
+
+```python
+#main.py
+def update(self):
+	# game loop
+	# (v) in new(self) function, looks at (self.all_sprites = pygame.sprite.LayerdUpdate()) line, iterates over every sprite and calls update function
+	self.all_sprites.update()
+```
+
+```python
+# config.py
+FPS = 60 # 60 frames per second
+BLACK = (0, 0, 0)
+# main.py
+def draw(self):
+	# game loop draw
+	self.screen.fill(BLACK) # fill screen with black
+	# (v) in new(self) function, (self.all_sprites = pygame.sprite.LayerdUpdate()) line, to Player class in config.py, self.image and self.rect
+	self.all_sprites.draw(self.screen) # draws image and rect on the window
+	self.clock.tick(FPS) # update screen FPS times a second
+	pygame.display.update() # update the screen
+```
+
+```python
+# main.py
+def main(self):
+	# game loop
+	while self.playing: # three parts to main method: events, updates, draw (the above functions)
+		self.events() # contains keyboard presses
+		self.updates() # updates the game so its not a static image
+		self.draw() # draws all the sprites onto the screen
+	self.running = False # when not self.playing, game ends
+```
+
+```python
+# main.py
+def game_over(self):
+	pass #((later))?
+```
+
+```python
+#main.py
+def intro_screen(self):
+	pass #((later))?
+```
+
+```python
+# main.py
+# as soon as the game is opened, it'll created the Game object and run the intro_screen
+g = Game() # convert Game class into an object; () cause no parameters
+g.intro_screen()
+g.new() # run the (def new(self):) line
+while g.running:
+	g.main()
+	g.game_over()
+
+pygame.quit()
+sys.exit()
+```
+
+To redo config.py:
+
+```python
+#config.py file
+WIN_WIDTH = 640
+WIN_HEIGHT = 480
+TILESIZE = 32
+FPS = 60
+
+PLAYER_LATER = 1
+
+RED = (255, 0, 0)
+BLACK = (0, 0, 0)
+```
+
+------------------------------------------------------------------------------------------------------
+"Pygame RPG Tutorial # 2" https://www.youtube.com/watch?v=GakNgbiAxzs&list=PLkkm3wcQHjT7gn81Wn-e78cAyhwBW3FIc&index=2
+FOCUS: Character Movement
+

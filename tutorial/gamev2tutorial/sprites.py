@@ -23,10 +23,13 @@ class Player(pygame.sprite.Sprite):
         self.y_change = 0
 
         self.facing = 'down'
-        self.rightImgList = ['../../protagLattern(1).png', '../../protagLatternAlt(2).png']
+        self.rightImgList = ['../../Sprites/protagLattern(1).png', '../../Sprites/protagLatternAlt(2).png']
+        self.leftImgList = ['../../Sprites/protagBlobLeft.png', '../../Sprites/protagBlobLeftAlt.png']
+        self.upImgList = ['../../Sprites/protagBlobUpAlt.png', '../../Sprites/protagBlobUpLeftAlt.png', '../..Sprites/protagBlobUpAlt.png', '../..Sprites/protagBlobUpRight.png']
+        self.downImgList = ['../../Sprites/protagBlobDown.png', '../../Sprites/protagBlobDownLeftAlt.png', '../../Sprites/protagBlobDown.png', '../../Sprites/protagBlobDownRightAlt.png',]
         self.clock = clock
 
-        self.image = pygame.image.load(self.rightImgList[self.imgindex])
+        self.image = pygame.image.load(self.downImgList[self.imgindex])
         self.image = pygame.transform.scale(self.image, (self.width, self.height))
 
 
@@ -46,7 +49,15 @@ class Player(pygame.sprite.Sprite):
         self.collide_blocks('y')
 
         self.timepassed += self.clock.get_time()/1000
-        self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width, self.height))
+        #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
+        if self.facing == 'right':
+            self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width, self.height)) #HERE
+        elif self.facing == 'left':
+            self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]), (self.width, self.height))
+        elif self.facing == 'up':
+            self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width, self.height))
+        else: # self.facing == 'down':
+            self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width, self.height))
 
         self.x_change = 0
         self.y_change = 0
@@ -62,7 +73,7 @@ class Player(pygame.sprite.Sprite):
                 sprite.rect.x += PLAYER_SPEED
             self.x_change -= PLAYER_SPEED
             self.facing = 'left'
-            self.imgindex = not self.imgindex if ((self.timepassed)//(0.35)%2 == self.imgindex) else self.imgindex
+            self.imgindex = not self.imgindex if ((self.timepassed)//(0.35)%2 == self.imgindex) else self.imgindex #HERE
             
         if keys[pygame.K_d]:
             # Two lines below change camera to move around player character, moving all other sprites
@@ -71,7 +82,7 @@ class Player(pygame.sprite.Sprite):
                 sprite.rect.x -= PLAYER_SPEED
             self.x_change += PLAYER_SPEED
             self.facing = 'right'
-            self.imgindex = not self.imgindex if ((self.timepassed)//(0.35)%2 == self.imgindex) else self.imgindex
+            self.imgindex = not self.imgindex if ((self.timepassed)//(0.35)%2 == self.imgindex) else self.imgindex #HERE
             
         if keys[pygame.K_w]:
             # Two lines below change camera to move around player character, moving all other sprites
@@ -80,7 +91,7 @@ class Player(pygame.sprite.Sprite):
                 sprite.rect.y += PLAYER_SPEED
             self.y_change -= PLAYER_SPEED
             self.facing = 'up'
-            self.imgindex = not self.imgindex if ((self.timepassed)//(0.35)%2 == self.imgindex) else self.imgindex
+            self.imgindex = not self.imgindex if ((self.timepassed)//(0.35)%2 == self.imgindex) else self.imgindex #HERE
             
         if keys[pygame.K_s]:
             #Two lines below change camera to move around player character, moving all other sprites
@@ -89,7 +100,7 @@ class Player(pygame.sprite.Sprite):
                 sprite.rect.y -= PLAYER_SPEED
             self.y_change += PLAYER_SPEED
             self.facing = 'down'
-            self.imgindex = not self.imgindex if ((self.timepassed)//(0.35)%2 == self.imgindex) else self.imgindex
+            self.imgindex = not self.imgindex if ((self.timepassed)//(0.35)%2 == self.imgindex) else self.imgindex #HERE
 
     def collide_blocks(self, direction):
         if direction == 'x':
