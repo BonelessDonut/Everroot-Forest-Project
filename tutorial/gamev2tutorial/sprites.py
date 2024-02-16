@@ -24,12 +24,9 @@ class Player(pygame.sprite.Sprite):
 
         self.facing = 'down'
         self.rightImgList = ['../../Sprites/protagLattern(1).png', '../../Sprites/protagLatternAlt(2).png']
-<<<<<<< HEAD
         self.leftImgList = ['../../Sprites/protagBlobLeft.png', '../../Sprites/protagBlobLeftAlt.png']
         self.upImgList = ['../../Sprites/protagBlobUpAlt.png', '../../Sprites/protagBlobUpLeftAlt.png', '../..Sprites/protagBlobUpAlt.png', '../..Sprites/protagBlobUpRight.png']
         self.downImgList = ['../../Sprites/protagBlobDown.png', '../../Sprites/protagBlobDownLeftAlt.png', '../../Sprites/protagBlobDown.png', '../../Sprites/protagBlobDownRightAlt.png',]
-=======
->>>>>>> e0ad6560210af753e3dc159742c4d6f781fdde25
         self.clock = clock
 
         self.image = pygame.image.load(self.downImgList[self.imgindex])
