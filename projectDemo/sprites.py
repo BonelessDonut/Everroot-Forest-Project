@@ -4,10 +4,6 @@ import math
 import random
 
 class Player(pygame.sprite.Sprite):
-    rightImgList = []
-    imgindex = 0
-    clock = None
-    timepassed = 0
 
     def __init__(self, game, x, y, clock):
         self.game = game
@@ -22,17 +18,20 @@ class Player(pygame.sprite.Sprite):
         self.x_change = 0
         self.y_change = 0
 
+        self.imgindex = 0
         self.facing = 'down'
+        #Shows the file paths for each image, depending on which direction the player is facing
         self.rightImgList = ['Sprites/protagLattern(1).png', 'Sprites/protagLatternAlt(2).png', 'Sprites/protagLattern(1).png', 'Sprites/protagLatternAlt(2).png']
         self.leftImgList = ['Sprites/protagBlobLeft.png', 'Sprites/protagBlobLeftAlt.png', 'Sprites/protagBlobLeft.png', 'Sprites/protagBlobLeftAlt.png']
         self.upImgList = ['Sprites/protagBlobUpAlt.png', 'Sprites/protagBlobUpLeftAlt.png', 'Sprites/protagBlobUpAlt.png', 'Sprites/protagBlobUpRight.png']
         #READ ME: FIX 'Sprites/protagBlobDown.png' being compressed too much by player size and looking weird as a result
         #Potential fixes: scale the image down in pygame before loading, or edit the sprite images to make them all the same resolution for more consistency (Using photoshop or smth)
         self.downImgList = ['Sprites/protagBlobDown.png', 'Sprites/protagBlobDownLeftAlt.png', 'Sprites/protagBlobDown.png', 'Sprites/protagBlobDownRightAlt.png',]
+        
         self.clock = clock
+        self.timepassed = 0
 
-        self.image = pygame.image.load(self.downImgList[self.imgindex])
-        self.image = pygame.transform.scale(self.image, (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width, self.height))
 
 
         #self.image = pygame.Surface([self.width, self.height])
@@ -75,7 +74,6 @@ class Player(pygame.sprite.Sprite):
             self.x_change -= PLAYER_SPEED
             self.facing = 'left'
             self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.35)%4 == self.imgindex) else self.imgindex 
-            #0.35//0.35%2
 
 
         if keys[pygame.K_d]:
