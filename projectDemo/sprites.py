@@ -21,12 +21,12 @@ class Player(pygame.sprite.Sprite):
         self.imgindex = 0
         self.facing = 'down'
         #Shows the file paths for each image, depending on which direction the player is facing
-        self.rightImgList = ['Sprites/protagLattern(1).png', 'Sprites/protagLatternAlt(2).png', 'Sprites/protagLattern(1).png', 'Sprites/protagLatternAlt(2).png']
-        self.leftImgList = ['Sprites/protagBlobLeft.png', 'Sprites/protagBlobLeftAlt.png', 'Sprites/protagBlobLeft.png', 'Sprites/protagBlobLeftAlt.png']
-        self.upImgList = ['Sprites/protagBlobUpAlt.png', 'Sprites/protagBlobUpLeftAlt.png', 'Sprites/protagBlobUpAlt.png', 'Sprites/protagBlobUpRight.png']
+        self.rightImgList = ['Sprites/protag/protagLattern(1).png', 'Sprites/protag/protagLatternAlt(2).png', 'Sprites/protag/protagLattern(1).png', 'Sprites/protag/protagLatternAlt(2).png']
+        self.leftImgList = ['Sprites/protag/protagBlobLeft.png', 'Sprites/protag/protagBlobLeftAlt.png', 'Sprites/protag/protagBlobLeft.png', 'Sprites/protag/protagBlobLeftAlt.png']
+        self.upImgList = ['Sprites/protag/protagBlobUpAlt.png', 'Sprites/protag/protagBlobUpLeftAlt.png', 'Sprites/protag/protagBlobUpAlt.png', 'Sprites/protag/protagBlobUpRight.png']
         #READ ME: FIX 'Sprites/protagBlobDown.png' being compressed too much by player size and looking weird as a result
         #Potential fixes: scale the image down in pygame before loading, or edit the sprite images to make them all the same resolution for more consistency (Using photoshop or smth)
-        self.downImgList = ['Sprites/protagBlobDown.png', 'Sprites/protagBlobDownLeftAlt.png', 'Sprites/protagBlobDown.png', 'Sprites/protagBlobDownRightAlt.png',]
+        self.downImgList = ['Sprites/protag/protagBlobDown.png', 'Sprites/protag/protagBlobDownLeftAlt.png', 'Sprites/protag/protagBlobDown.png', 'Sprites/protag/protagBlobDownRightAlt.png',]
         
         self.clock = clock
         self.timepassed = 0
@@ -43,6 +43,7 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         #pass
         self.movement()
+        self.interact()
 
         self.rect.x += self.x_change
         self.collide_blocks('x')
@@ -61,6 +62,23 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width, self.height))
         self.x_change = 0
         self.y_change = 0
+
+    def interact(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_e]:
+            interactRect = None
+            if self.facing == 'right':
+                interactRect = pygame.Rect(self.rect.right, self.rect.top, TILESIZE, TILESIZE)
+            elif self.facing == 'left':
+                interactRect = pygame.Rect(self.rect.left-self.width, self.rect.top, TILESIZE, TILESIZE)
+            elif self.facing == 'up':
+                interactRect = pygame.Rect(self.rect.left, self.rect.top-self.height, TILESIZE, TILESIZE)
+            else:
+                interactRect = pygame.Rect(self.rect.left, self.rect.bottom, TILESIZE, TILESIZE)
+            index = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
+            if index != -1:
+                self.game.flowers.get_sprite(index).kill()
+
 
     def movement(self):
         #The key press segments came from viewing this tutorial
@@ -149,3 +167,23 @@ class Block(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
+class Flower(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = BLOCK_LAYER
+        self.groups = self.game.all_sprites, self.game.flowers
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        self.x = x*TILESIZE
+        self.y = y*TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+        
+        self.image = pygame.Surface([self.width, self.height])
+        self.image.fill(BLUE)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+

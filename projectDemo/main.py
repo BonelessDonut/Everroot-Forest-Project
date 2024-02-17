@@ -33,6 +33,8 @@ class Game():
                     Block(self, col, row)
                 if (tilemap[row])[col] == "P":
                     Player(self, col, row, self.clock)
+                if (tilemap[row])[col] == "F":
+                    Flower(self, col, row)
                 #print(f"{col}", end="")
             #print()
     def new(self):
@@ -40,6 +42,7 @@ class Game():
         self.playing = True
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.blocks = pygame.sprite.LayeredUpdates()
+        self.flowers = pygame.sprite.LayeredUpdates()
         self.enemies = pygame.sprite.LayeredUpdates()
         self.attacks = pygame.sprite.LayeredUpdates()
         self.createTilemap()
