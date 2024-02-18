@@ -9,11 +9,11 @@ BLUE = (0, 0, 255)
 
 FPS = 60
 
-TEXT_LAYER = 1
+TEXT_LAYER = 4
 PLAYER_LAYER = 2
 PLAYER_SPEED = 5
-BLOCK_LAYER = 3
-GROUND_LAYER = 4
+BLOCK_LAYER = 1
+GROUND_LAYER = 3
 
 #tiles to represent the world, each 'B' represents a block, the 'P' is the player's position
 #There are 32 horizontal tiles (width of 1280 / 40) and 18 vertical tiles (height of 720 / 40))

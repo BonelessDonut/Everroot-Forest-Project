@@ -22,6 +22,8 @@ class Game():
         pygame.font.init()
         self.screen = pygame.display.set_mode((WIDTH,HEIGHT))
         self.clock = pygame.time.Clock()
+
+        self.state = 'explore'
         
         #self.font = pygame.font.Font('Arial', 32)
         self.running = True

@@ -80,9 +80,12 @@ class Player(pygame.sprite.Sprite):
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
             if npcIndex != -1:
                 self.game.npcs.get_sprite(npcIndex).interaction()
+                pygame.time.wait(250)
 
 
     def movement(self):
+        if self.game.state != 'explore':
+            return
         #The key press segments came from viewing this tutorial
         #https://www.youtube.com/watch?v=GakNgbiAxzs&list=PLkkm3wcQHjT7gn81Wn-e78cAyhwBW3FIc&index=2
         keys = pygame.key.get_pressed()
@@ -206,6 +209,7 @@ class NPC(pygame.sprite.Sprite):
         self.imagelist = ['Sprites/npcs/sampleNPC/hkprotagdown.jpg', 'Sprites/npcs/sampleNPC/hkprotagleft.jpg', 'Sprites/npcs/sampleNPC/hkprotagright.jpg', 'Sprites/npcs/sampleNPC/hkprotagdown.jpg']
         self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]), (self.width, self.height))
 
+        self.TextBox = None
 
         #self.image = pygame.Surface([self.width, self.height])
         #self.image.fill(GREEN)
@@ -216,11 +220,32 @@ class NPC(pygame.sprite.Sprite):
     def interaction(self):
         boxFont = pygame.font.SysFont('Times New Roman', 30)
         #text_surface = boxFont.render('Test', False, (0,0,0), (255,255,255))
-        testSprite = pygame.sprite.Sprite(self.game.all_sprites)
-        testSprite.image = pygame.Surface((200, 200))
-        testSprite.x, testSprite.y = 200, 200
-        testSprite.rect = self.image.get_rect()
-        testSprite._layer = TEXT_LAYER
-        testSprite.image.fill(GREEN)
+        if self.game.state == 'explore':
+            self.TextBox = TextBox(self.game, 420, 500)
+            self.game.state = 'dialogue'
+        else:
+            self.TextBox.kill()
+            self.game.state = 'explore'
+            
+        
+        
+
+class TextBox(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = TEXT_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x
+        self.y = y
+        self.width = 440
+        self.height = 170
+
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/SVTextboxTemplate.png'), (self.width, self.height))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+    
+
 
         
