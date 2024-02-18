@@ -73,7 +73,7 @@ class Player(pygame.sprite.Sprite):
                 #sprite.rect.x += PLAYER_SPEED
             self.x_change -= PLAYER_SPEED
             self.facing = 'left'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.25)%4 == self.imgindex) else self.imgindex
+            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.18)%4 == self.imgindex) else self.imgindex
 
 
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
@@ -83,7 +83,7 @@ class Player(pygame.sprite.Sprite):
                 #sprite.rect.x -= PLAYER_SPEED
             self.x_change += PLAYER_SPEED
             self.facing = 'right'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.25)%4 == self.imgindex) else self.imgindex
+            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.18)%4 == self.imgindex) else self.imgindex
             
         if keys[pygame.K_w] or keys[pygame.K_UP]:
             # Two lines below change camera to move around player character, moving all other sprites
@@ -102,7 +102,7 @@ class Player(pygame.sprite.Sprite):
                 #sprite.rect.y -= PLAYER_SPEED
             self.y_change += PLAYER_SPEED
             self.facing = 'down'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.18)%4 == self.imgindex) else self.imgindex
+            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.25)%4 == self.imgindex) else self.imgindex
 
     def collide_blocks(self, direction):
         if direction == 'x':
