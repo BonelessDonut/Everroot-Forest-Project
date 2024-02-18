@@ -221,7 +221,7 @@ class NPC(pygame.sprite.Sprite):
         boxFont = pygame.font.SysFont('Times New Roman', 30)
         #text_surface = boxFont.render('Test', False, (0,0,0), (255,255,255))
         if self.game.state == 'explore':
-            self.TextBox = TextBox(self.game, 420, 500)
+            self.TextBox = TextBox(self.game)
             self.game.state = 'dialogue'
         else:
             self.TextBox.kill()
@@ -231,13 +231,13 @@ class NPC(pygame.sprite.Sprite):
         
 
 class TextBox(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game):
         self.game = game
         self._layer = TEXT_LAYER
         self.groups = self.game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = x
-        self.y = y
+        self.x = 420
+        self.y = 500
         self.width = 440
         self.height = 170
 
