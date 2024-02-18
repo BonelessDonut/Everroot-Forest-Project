@@ -185,8 +185,8 @@ class Flower(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
         
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(BLUE)
+        self.imageList = ['Sprites/items/hyacinth.png', 'Sprites/items/sunflower.png']
+        self.image = pygame.transform.scale(pygame.image.load(self.imageList[random.randint(0, 1)]), (self.width, self.height))
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
