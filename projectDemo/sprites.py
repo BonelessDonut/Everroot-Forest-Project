@@ -67,16 +67,19 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_e]:
             interactRect = None
             if self.facing == 'right':
-                interactRect = pygame.Rect(self.rect.right, self.rect.top, TILESIZE, TILESIZE)
+                interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE*2, TILESIZE)
             elif self.facing == 'left':
-                interactRect = pygame.Rect(self.rect.left-self.width, self.rect.top, TILESIZE, TILESIZE)
+                interactRect = pygame.Rect(self.rect.left-self.width, self.rect.top, TILESIZE*2, TILESIZE)
             elif self.facing == 'up':
-                interactRect = pygame.Rect(self.rect.left, self.rect.top-self.height, TILESIZE, TILESIZE)
+                interactRect = pygame.Rect(self.rect.left, self.rect.top-self.height, TILESIZE, TILESIZE*2)
             else:
-                interactRect = pygame.Rect(self.rect.left, self.rect.bottom, TILESIZE, TILESIZE)
-            index = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
-            if index != -1:
-                self.game.flowers.get_sprite(index).kill()
+                interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE, TILESIZE*2)
+            flowerIndex = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
+            if flowerIndex != -1:
+                self.game.flowers.get_sprite(flowerIndex).kill()
+            npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
+            if npcIndex != -1:
+                self.game.npcs.get_sprite(npcIndex).interaction()
 
 
     def movement(self):
@@ -123,7 +126,7 @@ class Player(pygame.sprite.Sprite):
 
     def collide_blocks(self, direction):
         if direction == 'x':
-            hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
+            hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False)
             x_diff = 0
             if hits:
                 if self.x_change > 0:
@@ -135,7 +138,7 @@ class Player(pygame.sprite.Sprite):
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.x -= x_diff
         else:
-            hits = pygame.sprite.spritecollide(self, self.game.blocks, False)
+            hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False)
             y_diff = 0
             if hits:
                 if self.y_change > 0:
@@ -186,3 +189,38 @@ class Flower(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+class NPC(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = PLAYER_LAYER
+        self.groups = self.game.all_sprites, self.game.npcs
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+
+        self.x_change = 0
+        self.y_change = 0
+
+        self.imagelist = ['Sprites/npcs/sampleNPC/hkprotagdown.jpg', 'Sprites/npcs/sampleNPC/hkprotagleft.jpg', 'Sprites/npcs/sampleNPC/hkprotagright.jpg', 'Sprites/npcs/sampleNPC/hkprotagdown.jpg']
+        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]), (self.width, self.height))
+
+
+        #self.image = pygame.Surface([self.width, self.height])
+        #self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+    def interaction(self):
+        boxFont = pygame.font.SysFont('Times New Roman', 30)
+        #text_surface = boxFont.render('Test', False, (0,0,0), (255,255,255))
+        testSprite = pygame.sprite.Sprite(self.game.all_sprites)
+        testSprite.image = pygame.Surface((200, 200))
+        testSprite.x, testSprite.y = 200, 200
+        testSprite.rect = self.image.get_rect()
+        testSprite._layer = TEXT_LAYER
+        testSprite.image.fill(GREEN)
+
+        
