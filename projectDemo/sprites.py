@@ -21,12 +21,21 @@ class Player(pygame.sprite.Sprite):
         self.imgindex = 0
         self.facing = 'down'
         #Shows the file paths for each image, depending on which direction the player is facing
+<<<<<<< HEAD
         self.rightImgList = ['Sprites/protag/protagLattern(1).png', 'Sprites/protag/protagLatternAlt(2).png', 'Sprites/protag/protagLattern(1).png', 'Sprites/protag/protagLatternAlt(2).png']
         self.leftImgList = ['Sprites/protag/protagBlobLeft.png', 'Sprites/protag/protagBlobLeftAlt.png', 'Sprites/protag/protagBlobLeft.png', 'Sprites/protag/protagBlobLeftAlt.png']
         self.upImgList = ['Sprites/protag/protagBlobUpAlt.png', 'Sprites/protag/protagBlobUpLeftAlt.png', 'Sprites/protag/protagBlobUpAlt.png', 'Sprites/protag/protagBlobUpRight.png']
         #READ ME: FIX 'Sprites/protagBlobDown.png' being compressed too much by player size and looking weird as a result
         #Potential fixes: scale the image down in pygame before loading, or edit the sprite images to make them all the same resolution for more consistency (Using photoshop or smth)
         self.downImgList = ['Sprites/protag/protagBlobDown.png', 'Sprites/protag/protagBlobDownLeftAlt.png', 'Sprites/protag/protagBlobDown.png', 'Sprites/protag/protagBlobDownRightAlt.png',]
+=======
+        self.rightImgList = ['Sprites/protagLattern(1).png', 'Sprites/protagLatternAlt(2).png', 'Sprites/protagblobRight3.png', 'Sprites/protagLatternAlt(2).png']
+        self.leftImgList = ['Sprites/protagBlobLeft.png', 'Sprites/protagBlobLeftAlt.png', 'Sprites/protagBlobLeft3.png', 'Sprites/protagBlobLeftAlt.png']
+        self.upImgList = ['Sprites/protagBlobUpAlt.png', 'Sprites/protagBlobUpLeftAlt.png', 'Sprites/protagBlobUpAlt.png', 'Sprites/protagBlobUpRight.png']
+        #READ ME: FIX 'Sprites/protagBlobDown.png' being compressed too much by player size and looking weird as a result
+        #Potential fixes: scale the image down in pygame before loading, or edit the sprite images to make them all the same resolution for more consistency (Using photoshop or smth)
+        self.downImgList = ['Sprites/protagBlobDownNew.png', 'Sprites/protagBlobDownLeftAlt.png', 'Sprites/protagBlobDownNew.png', 'Sprites/protagBlobDownRightAltNew.png',]
+>>>>>>> main
         
         self.clock = clock
         self.timepassed = 0
@@ -53,13 +62,13 @@ class Player(pygame.sprite.Sprite):
         self.timepassed += self.clock.get_time()/1000
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
         if self.facing == 'right':
-            self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width, self.height)) 
+            self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
         elif self.facing == 'left':
-            self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]), (self.width, self.height))
+            self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
         elif self.facing == 'up':
-            self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width, self.height))
+            self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
         else: # self.facing == 'down':
-            self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width, self.height))
+            self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
         self.x_change = 0
         self.y_change = 0
 
@@ -94,7 +103,7 @@ class Player(pygame.sprite.Sprite):
                 #sprite.rect.x += PLAYER_SPEED
             self.x_change -= PLAYER_SPEED
             self.facing = 'left'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.35)%4 == self.imgindex) else self.imgindex 
+            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
 
 
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
@@ -104,7 +113,7 @@ class Player(pygame.sprite.Sprite):
                 #sprite.rect.x -= PLAYER_SPEED
             self.x_change += PLAYER_SPEED
             self.facing = 'right'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.35)%4 == self.imgindex) else self.imgindex 
+            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
             
         if keys[pygame.K_w] or keys[pygame.K_UP]:
             # Two lines below change camera to move around player character, moving all other sprites
@@ -113,7 +122,7 @@ class Player(pygame.sprite.Sprite):
                 #sprite.rect.y += PLAYER_SPEED
             self.y_change -= PLAYER_SPEED
             self.facing = 'up'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.25)%4 == self.imgindex) else self.imgindex 
+            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.18)%4 == self.imgindex) else self.imgindex
             
 
         if keys[pygame.K_s] or keys[pygame.K_DOWN]:
@@ -123,7 +132,7 @@ class Player(pygame.sprite.Sprite):
                 #sprite.rect.y -= PLAYER_SPEED
             self.y_change += PLAYER_SPEED
             self.facing = 'down'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.35)%4 == self.imgindex) else self.imgindex 
+            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.25)%4 == self.imgindex) else self.imgindex
 
     def collide_blocks(self, direction):
         if direction == 'x':
