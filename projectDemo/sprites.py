@@ -15,8 +15,8 @@ class Player(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
 
-        self.x_change = 0
-        self.y_change = 0
+        self.xChange = 0
+        self.yChange = 0
 
         self.imgindex = 0
         self.facing = 'down'
@@ -44,10 +44,10 @@ class Player(pygame.sprite.Sprite):
         self.movement()
         self.interact()
 
-        self.rect.x += self.x_change
-        self.collide_blocks('x')
-        self.rect.y += self.y_change
-        self.collide_blocks('y')
+        self.rect.x += self.xChange
+        self.collideBlocks('x')
+        self.rect.y += self.yChange
+        self.collideBlocks('y')
 
         self.timepassed += self.clock.get_time()/1000
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
@@ -59,8 +59,8 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
         else: # self.facing == 'down':
             self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
-        self.x_change = 0
-        self.y_change = 0
+        self.xChange = 0
+        self.yChange = 0
 
     def interact(self):
         keys = pygame.key.get_pressed()
@@ -94,7 +94,7 @@ class Player(pygame.sprite.Sprite):
             # comment them out to create a static camera
             #for sprite in self.game.all_sprites:
                 #sprite.rect.x += PLAYER_SPEED
-            self.x_change -= PLAYER_SPEED
+            self.xChange -= PLAYER_SPEED
             self.facing = 'left'
             self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
 
@@ -104,7 +104,7 @@ class Player(pygame.sprite.Sprite):
             # comment them out to create a static camera
             #for sprite in self.game.all_sprites:
                 #sprite.rect.x -= PLAYER_SPEED
-            self.x_change += PLAYER_SPEED
+            self.xChange += PLAYER_SPEED
             self.facing = 'right'
             self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
             
@@ -113,7 +113,7 @@ class Player(pygame.sprite.Sprite):
             # comment them out to create a static camera
             #for sprite in self.game.all_sprites:
                 #sprite.rect.y += PLAYER_SPEED
-            self.y_change -= PLAYER_SPEED
+            self.yChange -= PLAYER_SPEED
             self.facing = 'up'
             self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.18)%4 == self.imgindex) else self.imgindex
             
@@ -123,35 +123,35 @@ class Player(pygame.sprite.Sprite):
             # comment them out to create a static camera
             #for sprite in self.game.all_sprites:
                 #sprite.rect.y -= PLAYER_SPEED
-            self.y_change += PLAYER_SPEED
+            self.yChange += PLAYER_SPEED
             self.facing = 'down'
             self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.25)%4 == self.imgindex) else self.imgindex
 
-    def collide_blocks(self, direction):
+    def collideBlocks(self, direction):
         if direction == 'x':
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False)
-            x_diff = 0
+            xDiff = 0
             if hits:
-                if self.x_change > 0:
+                if self.xChange > 0:
                     x_diff = (hits[0].rect.left-self.rect.width)-self.rect.x
                     self.rect.x = hits[0].rect.left - self.rect.width
-                if self.x_change < 0:
+                if self.xChange < 0:
                     x_diff = hits[0].rect.right - self.rect.x
                     self.rect.x = hits[0].rect.right
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.x -= x_diff
         else:
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False)
-            y_diff = 0
+            yDiff = 0
             if hits:
-                if self.y_change > 0:
-                    y_diff = (hits[0].rect.top - self.rect.height) - self.rect.y
+                if self.yChange > 0:
+                    yDiff = (hits[0].rect.top - self.rect.height) - self.rect.y
                     self.rect.y = hits[0].rect.top - self.rect.height
-                if self.y_change < 0:
-                    y_diff = hits[0].rect.bottom - self.rect.y
+                if self.yChange < 0:
+                    yDiff = hits[0].rect.bottom - self.rect.y
                     self.rect.y = hits[0].rect.bottom
                 #for sprite in self.game.all_sprites:
-                    #sprite.rect.y -= y_diff
+                    #sprite.rect.y -= yDiff
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -203,8 +203,8 @@ class NPC(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
 
-        self.x_change = 0
-        self.y_change = 0
+        self.xChange = 0
+        self.yChange = 0
 
         self.imagelist = ['Sprites/npcs/sampleNPC/hkprotagdown.jpg', 'Sprites/npcs/sampleNPC/hkprotagleft.jpg', 'Sprites/npcs/sampleNPC/hkprotagright.jpg', 'Sprites/npcs/sampleNPC/hkprotagdown.jpg']
         self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]), (self.width, self.height))
@@ -218,10 +218,9 @@ class NPC(pygame.sprite.Sprite):
         self.rect.y = self.y
 
     def interaction(self):
-        boxFont = pygame.font.SysFont('Times New Roman', 30)
-        #text_surface = boxFont.render('Test', False, (0,0,0), (255,255,255))
         if self.game.state == 'explore':
             self.TextBox = TextBox(self.game)
+            self.TextBox.newText('1234567890_1234567890_1234567890_1234567890_1234567890')
             self.game.state = 'dialogue'
         else:
             self.TextBox.kill()
@@ -241,11 +240,57 @@ class TextBox(pygame.sprite.Sprite):
         self.width = 440
         self.height = 170
 
+        self.area = pygame.Rect(0, 0, self.width*0.55, self.height*0.95)
+
         self.image = pygame.transform.scale(pygame.image.load('Sprites/SVTextboxTemplate.png'), (self.width, self.height))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
     
+    def newText(self, text):
+        fontSize = 30
+        boxFont = pygame.font.SysFont('Times New Roman', fontSize)
+        maxLength = 16
+        countRows = 0
+        while(len(text) > 0):
+            self.image.blit(boxFont.render(text[0:maxLength], False, (0, 0, 0)), (10, 10+countRows*fontSize), self.area)
+            countRows += 1
+            try:
+                text = text[maxLength:]
+            except:
+                break
+        #textSurface = boxFont.render(text, False, (0,0,0))
+        #self.image.blit(textSurface, (10, 10), self.area)
+        #at font 20: 24 letters fit in 242 pixels
+        #at font 30: 16 letters fit in 242 pixels
+        #at font 40: 12 letters fit in 242 pixels
+        #at font 50: 9 letters fit in 242 pixels
+        #num letters = -0.49*fontsize + 31 at 242 pixels
+
+        #at font 20: 33 letters fit in 330 pixels
+        #at font 30: 22 letters fit in 330 pixels
+        #at font 40: 16 letters fit in 330 pixels
+        #at font 50: 13 letters fit in 330 pixels
+        #num letters = -0.66*fontsize + 42 at 330 pixels
+
+        #at font 20: 42 letters fit in 418 pixels
+        #at font 30: 28 letters fit in 418 pixels
+        #at font 40: 21 letters fit in 418 pixels
+        #at font 50: 16 letters fit in 418 pixels
+        #num letters = -0.85*fontsize + 54 at 418 pixels
+
+        #letters ~ width 
+        #at font 20: y = math.ceil(24/440*width)
+        #at font 30: y = math.ceil(16/440*width)
+        #at font 40: y = math.ceil(12/440*width)
+        #at font 50: y = math.ceil(9/440*width)
+
+        #width 440: num letters = -0.49*fontsize + 31 at 242 pixels
+        #width 600: num letters = -0.66*fontsize + 42 at 330 pixels
+        #width 760: num letters = -0.85*fontsize + 54 at 418 pixels
+
+
+        
 
 
         
