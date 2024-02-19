@@ -1,0 +1,12 @@
+in a game, you could potentially make the screen pan when the player is at the edge of the window (gotten by the x and y values being at a certain position threshold, e.g. at the edge of the screen). 
+- When the player is at this threshold and is attempting to move past it, the camera should move in the opposite direction, 
+- until the environment border is at the edge of the screen.
+- ideally, the space outside the environment would not be within the camera view
+- could be done by loading the entire world/loadzone, then zooming into a certain portion with the player in it and panning the screen over when the player moves far enough in a direction where this is stuff off screen.
+- maybe try this idea out, it would likely involve setting up object collision as well.
+- from looking at how the camera in A Link to the Past works, one method of accomplishing what I want could be to have the camera follow the player character and move all the other sprites in the opposite direction when the character moves, until the player has reach either the horizontal or vertical barriers of the current area.
+- If the horizontal barriers are in frame, then the camera will not move any further to show anything outside the intended zone
+	- If up against the left area barrier, the camera won't move any further left by moving the other sprites to the right, and this will continue as long as the player is in the left half of the screen, until they return to the center of the screen's x-axis
+	- If up against the right area barrier, the camera won't move any further right by moving the other sprites to the left, and this will continue as long as the player is in the right half of the screen, until they return to the center of the screen's x-axis
+	- If up against the top area barrier, the camera won't move any further up by moving the other sprites down, and this will continue as long as the player is in the top half of the screen, until they return to the center of the screen's y-axis
+	- If up against the bottom area barrier, the camera won't move any further down by moving the other sprites up, and this will continue as long as the player is in the bottom half of the screen, until they return to the center of the screen's y-axis
