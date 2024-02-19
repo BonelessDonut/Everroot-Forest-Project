@@ -1,0 +1,30 @@
+#at font 20: 24 letters fit in 242 pixels
+#at font 30: 16 letters fit in 242 pixels
+#at font 40: 12 letters fit in 242 pixels
+#at font 50: 9 letters fit in 242 pixels
+#num letters = 477.412/fontsize
+
+#at font 20: 33 letters fit in 330 pixels
+#at font 30: 22 letters fit in 330 pixels
+#at font 40: 16 letters fit in 330 pixels
+#at font 50: 13 letters fit in 330 pixels
+#num letters = 656.441/fontsize
+
+#at font 20: 42 letters fit in 418 pixels
+#at font 30: 28 letters fit in 418 pixels
+#at font 40: 21 letters fit in 418 pixels
+#at font 50: 16 letters fit in 418 pixels
+#num letters = 836.549/fontsize
+
+#letters ~ width 
+#at font 20: num letters = math.ceil(24/440*width)
+#at font 30: num letters = math.ceil(16/440*width)
+#at font 40: num letters = math.ceil(12/440*width)
+#at font 50: num letters = math.ceil(9/440*width)
+
+#letters ~ fontsize
+#width 440: num letters = 477.412/fontsize
+#width 600: num letters = 656.441/fontsize
+#width 760: num letters = 836.549/fontsize
+            
+https://www.desmos.com/calculator/gody7sr9um

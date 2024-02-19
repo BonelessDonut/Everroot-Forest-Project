@@ -220,7 +220,7 @@ class NPC(pygame.sprite.Sprite):
     def interaction(self):
         if self.game.state == 'explore':
             self.TextBox = TextBox(self.game)
-            self.TextBox.newText('1234567890_1234567890_1234567890_1234567890_1234567890')
+            self.TextBox.newText('1234567890_1234567890_1234567890_1234567890_1234567890_1234567890_', 20)
             self.game.state = 'dialogue'
         else:
             self.TextBox.kill()
@@ -235,60 +235,31 @@ class TextBox(pygame.sprite.Sprite):
         self._layer = TEXT_LAYER
         self.groups = self.game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
-        self.x = 420
-        self.y = 500
-        self.width = 440
+        self.width = 600
         self.height = 170
+        self.x = (WIDTH-self.width)//2
+        self.y = (HEIGHT-self.height-50)
 
-        self.area = pygame.Rect(0, 0, self.width*0.55, self.height*0.95)
-
+        self.area = pygame.Rect(0, 0, self.width*0.6, self.height*0.95)
         self.image = pygame.transform.scale(pygame.image.load('Sprites/SVTextboxTemplate.png'), (self.width, self.height))
+        #To see where the area rectangle covers, uncomment below line
+        #pygame.draw.rect(self.image, RED, self.area)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
     
-    def newText(self, text):
-        fontSize = 30
+    def newText(self, text, fontSize):
+        maxLength = int(1.15 * self.width / fontSize)
         boxFont = pygame.font.SysFont('Times New Roman', fontSize)
-        maxLength = 16
         countRows = 0
         while(len(text) > 0):
-            self.image.blit(boxFont.render(text[0:maxLength], False, (0, 0, 0)), (10, 10+countRows*fontSize), self.area)
+            self.image.blit(boxFont.render(text[0:maxLength], False, (0, 0, 0)), (15, 10+countRows*fontSize), self.area)
             countRows += 1
             try:
                 text = text[maxLength:]
             except:
                 break
-        #textSurface = boxFont.render(text, False, (0,0,0))
-        #self.image.blit(textSurface, (10, 10), self.area)
-        #at font 20: 24 letters fit in 242 pixels
-        #at font 30: 16 letters fit in 242 pixels
-        #at font 40: 12 letters fit in 242 pixels
-        #at font 50: 9 letters fit in 242 pixels
-        #num letters = -0.49*fontsize + 31 at 242 pixels
-
-        #at font 20: 33 letters fit in 330 pixels
-        #at font 30: 22 letters fit in 330 pixels
-        #at font 40: 16 letters fit in 330 pixels
-        #at font 50: 13 letters fit in 330 pixels
-        #num letters = -0.66*fontsize + 42 at 330 pixels
-
-        #at font 20: 42 letters fit in 418 pixels
-        #at font 30: 28 letters fit in 418 pixels
-        #at font 40: 21 letters fit in 418 pixels
-        #at font 50: 16 letters fit in 418 pixels
-        #num letters = -0.85*fontsize + 54 at 418 pixels
-
-        #letters ~ width 
-        #at font 20: y = math.ceil(24/440*width)
-        #at font 30: y = math.ceil(16/440*width)
-        #at font 40: y = math.ceil(12/440*width)
-        #at font 50: y = math.ceil(9/440*width)
-
-        #width 440: num letters = -0.49*fontsize + 31 at 242 pixels
-        #width 600: num letters = -0.66*fontsize + 42 at 330 pixels
-        #width 760: num letters = -0.85*fontsize + 54 at 418 pixels
-
+        
 
         
 
