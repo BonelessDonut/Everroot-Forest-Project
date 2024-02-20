@@ -34,7 +34,8 @@ class Player(pygame.sprite.Sprite):
 
         self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width, self.height))
 
-        self.rect = self.image.get_rect()
+        #self.rect = self.image.get_rect().
+        self.rect = pygame.Rect(self.x, self.y, 30, 30)
         self.rect.x = self.x
         self.rect.y = self.y
 
@@ -86,9 +87,10 @@ class Player(pygame.sprite.Sprite):
         interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE, TILESIZE)
         teleportIndex = interactRect.collidelist(list(teleport.rect for teleport in self.game.teleport))
         if teleportIndex != -1:
+            tpSprite = self.game.teleport.get_sprite(teleportIndex)
             self.kill()
-            self.game.createTilemap()
-            pygame.time.wait(500)
+            self.game.createTilemap((tpSprite.x//TILESIZE, tpSprite.y//TILESIZE))
+            #pygame.time.wait(100)
 
 
     def movement(self):
@@ -299,7 +301,7 @@ class TextBox(pygame.sprite.Sprite):
         countRows = 0
         while(len(text) > 0):
             cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9]', text[maxLength-1::-1]).end()+1
-            self.image.blit(boxFont.render(text[0:cutoffIndex], False, (0, 0, 0)), (15, 10+countRows*fontSize), self.area)
+            self.image.blit(boxFont.render(text[0:cutoffIndex].strip(), False, (0, 0, 0)), (15, 10+countRows*fontSize), self.area)
             countRows += 1
             try:
                 text = text[cutoffIndex:]

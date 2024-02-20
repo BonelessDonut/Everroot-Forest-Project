@@ -30,7 +30,7 @@ class Game():
         #self.font = pygame.font.Font('Arial', 32)
         self.running = True
 
-    def createTilemap(self):
+    def createTilemap(self, prevPosition):
         if self.map == 0:
             for row in range(len(settings.currentTilemap)):
                 #print(f"{row} ", end="")d
@@ -67,9 +67,9 @@ class Game():
                         NPC(self, col, row)
                     elif (settings.nextTilemap[row])[col] == 'T':
                         Teleport(self, col, row)
-                        if int(mapNumber) == 1:
+                        if int(mapNumber) == 1 and row == prevPosition[1]:
                             Player(self, col-1, row, self.clock)
-                        else:
+                        elif int(mapNumber) == 2 and row == prevPosition[1]:
                             Player(self, col+1, row, self.clock)
             temp = settings.currentTilemap
             settings.currentTilemap = settings.nextTilemap
@@ -86,7 +86,7 @@ class Game():
         self.teleport = pygame.sprite.LayeredUpdates()
         self.enemies = pygame.sprite.LayeredUpdates()
         self.attacks = pygame.sprite.LayeredUpdates()
-        self.createTilemap()
+        self.createTilemap(None)
         #self.player = Player(self, 1, 2)
 
     def events(self):
