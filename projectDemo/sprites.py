@@ -2,6 +2,7 @@ import pygame
 from settings import *
 import math
 import random
+import re
 
 class Player(pygame.sprite.Sprite):
 
@@ -220,7 +221,7 @@ class NPC(pygame.sprite.Sprite):
     def interaction(self):
         if self.game.state == 'explore':
             self.TextBox = TextBox(self.game)
-            self.TextBox.newText('1234567890_1234567890_1234567890_1234567890_1234567890_1234567890_', 20)
+            self.TextBox.newText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", 20)
             self.game.state = 'dialogue'
         else:
             self.TextBox.kill()
@@ -235,7 +236,7 @@ class TextBox(pygame.sprite.Sprite):
         self._layer = TEXT_LAYER
         self.groups = self.game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
-        self.width = 600
+        self.width = 920
         self.height = 170
         self.x = (WIDTH-self.width)//2
         self.y = (HEIGHT-self.height-50)
@@ -249,14 +250,15 @@ class TextBox(pygame.sprite.Sprite):
         self.rect.y = self.y
     
     def newText(self, text, fontSize):
-        maxLength = int(1.15 * self.width / fontSize)
-        boxFont = pygame.font.SysFont('Times New Roman', fontSize)
+        maxLength = int((float(-2.2835*10**(-7))*self.width**2+0.000411706*self.width+0.767647)*self.width/fontSize)+1
+        boxFont = pygame.font.SysFont('Courier', fontSize)
         countRows = 0
         while(len(text) > 0):
-            self.image.blit(boxFont.render(text[0:maxLength], False, (0, 0, 0)), (15, 10+countRows*fontSize), self.area)
+            cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9]', text[maxLength-1::-1]).end()+1
+            self.image.blit(boxFont.render(text[0:cutoffIndex], False, (0, 0, 0)), (15, 10+countRows*fontSize), self.area)
             countRows += 1
             try:
-                text = text[maxLength:]
+                text = text[cutoffIndex:]
             except:
                 break
         

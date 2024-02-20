@@ -1,26 +1,52 @@
-#at font 20: 24 letters fit in 242 pixels
-#at font 30: 16 letters fit in 242 pixels
-#at font 40: 12 letters fit in 242 pixels
-#at font 50: 9 letters fit in 242 pixels
+Courier, monospaced font
+width: 440 pixels
+at font 20: 20 letters fit
+at font 25: 16 letters fit
+at font 30: 13 letters fit
+at font 40: 10 letters fit
+
+width: 600 pixels
+at font 20: 28 letters fit
+at font 25: 22 letters fit
+at font 30: 19 letters fit
+at font 40: 14 letters fit
+
+width: 760 pixels
+at font 20: 36 letters fit
+at font 25: 29 letters fit
+at font 30: 24 letters fit
+at font 40: 18 letters fit
+
+width: 920 pixels
+at font 20: 44 letters fit
+at font 25: 35 letters fit
+at font 30: 29 letters fit
+at font 40: 22 letters fit
+
+https://www.desmos.com/calculator/b047xsmeqp
+
+
+Times New Roman, not currently used because widths of characters change
+#width: 440 pixels
+#at font 20: 24 letters fit
+#at font 30: 16 letters fit 
+#at font 40: 12 letters fit
+#at font 50: 9 letters fit 
 #num letters = 477.412/fontsize
 
-#at font 20: 33 letters fit in 330 pixels
-#at font 30: 22 letters fit in 330 pixels
-#at font 40: 16 letters fit in 330 pixels
-#at font 50: 13 letters fit in 330 pixels
+#width: 600 pixels
+#at font 20: 33 letters fit 
+#at font 30: 22 letters fit
+#at font 40: 16 letters fit
+#at font 50: 13 letters fit 
 #num letters = 656.441/fontsize
 
-#at font 20: 42 letters fit in 418 pixels
-#at font 30: 28 letters fit in 418 pixels
-#at font 40: 21 letters fit in 418 pixels
-#at font 50: 16 letters fit in 418 pixels
+#width: 760 pixels
+#at font 20: 42 letters fit 
+#at font 30: 28 letters fit 
+#at font 40: 21 letters fit 
+#at font 50: 16 letters fit 
 #num letters = 836.549/fontsize
-
-#letters ~ width 
-#at font 20: num letters = math.ceil(24/440*width)
-#at font 30: num letters = math.ceil(16/440*width)
-#at font 40: num letters = math.ceil(12/440*width)
-#at font 50: num letters = math.ceil(9/440*width)
 
 #letters ~ fontsize
 #width 440: num letters = 477.412/fontsize
