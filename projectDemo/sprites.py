@@ -3,6 +3,7 @@ from settings import *
 import math
 import random
 import re
+import os
 
 class Player(pygame.sprite.Sprite):
 
@@ -36,8 +37,8 @@ class Player(pygame.sprite.Sprite):
 
         #self.rect = self.image.get_rect().
         self.rect = pygame.Rect(self.x, self.y, 30, 30)
-        self.rect.x = self.x
-        self.rect.y = self.y
+        #self.rect.x = self.x
+        #self.rect.y = self.y
 
     def update(self):
         #pass
@@ -64,7 +65,8 @@ class Player(pygame.sprite.Sprite):
 
     def interact(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_e]:
+        mouses = pygame.mouse.get_pressed()
+        if keys[pygame.K_SPACE]:
             interactRect = None
             if self.facing == 'right':
                 interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE*2, TILESIZE)
@@ -84,13 +86,31 @@ class Player(pygame.sprite.Sprite):
             if npcIndex != -1:
                 self.game.npcs.get_sprite(npcIndex).interaction()
                 pygame.time.wait(250)
+        elif mouses[0]:
+            mouseRect = pygame.Rect(0, 0, 40, 40)
+            mouseRect.center = pygame.mouse.get_pos()
+            if abs(mouseRect.x-self.rect.x) <= 60 and abs(mouseRect.y-self.rect.y) <= 60:
+                interactIndex = mouseRect.collidelist(list(ore.rect for ore in self.game.ores))
+                if interactIndex != -1:
+                    self.game.ores.get_sprite(interactIndex).kill()
+                interactIndex = mouseRect.collidelist(list(flower.rect for flower in self.game.flowers))
+                if interactIndex != -1:
+                    self.game.flowers.get_sprite(interactIndex).kill()
+                interactIndex = mouseRect.collidelist(list(npc.rect for npc in self.game.npcs))
+                if interactIndex != -1:
+                    self.game.npcs.get_sprite(interactIndex).interaction()
+                    pygame.time.wait(250)
+
+            
         interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE, TILESIZE)
         teleportIndex = interactRect.collidelist(list(teleport.rect for teleport in self.game.teleport))
         if teleportIndex != -1:
             tpSprite = self.game.teleport.get_sprite(teleportIndex)
             self.kill()
             self.game.createTilemap((tpSprite.x//TILESIZE, tpSprite.y//TILESIZE))
-            #pygame.time.wait(100)
+            pygame.time.wait(100)
+
+    
 
 
     def movement(self):
@@ -286,11 +306,18 @@ class TextBox(pygame.sprite.Sprite):
         self.height = 170
         self.x = (WIDTH-self.width)//2
         self.y = (HEIGHT-self.height-50)
+        self.clock = game.clock
+        self.timepassed = 0
 
         self.area = pygame.Rect(0, 0, self.width*0.6, self.height*0.95)
+        self.avatarBox = pygame.Rect(self.width*0.693, self.height*0.1, self.width*0.219, self.height*0.65)
         self.image = pygame.transform.scale(pygame.image.load('Sprites/SVTextboxTemplate.png'), (self.width, self.height))
-        #To see where the area rectangle covers, uncomment below line
+        self.imagelist = os.listdir('Sprites/npcs/chipichipichapachapa')
+        self.imgindex = 0
+        self.image.blit(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}'), self.avatarBox, self.avatarBox)
+        #To see where the text and avatar area rectangles cover, uncomment below lines
         #pygame.draw.rect(self.image, RED, self.area)
+        #pygame.draw.rect(self.image, RED, self.imageBox)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
@@ -308,7 +335,11 @@ class TextBox(pygame.sprite.Sprite):
             except:
                 break
         
-
+    def update(self):
+        #self.imgindex = (self.imgindex + 1)%392 if ((self.timepassed)//(0.01)%392 == self.imgindex) else self.imgindex
+        self.timepassed += self.clock.get_time()/1000
+        area = self.image.blit(pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[0]}'), (self.avatarBox.width, self.avatarBox.height)), self.avatarBox, self.avatarBox)
+        print(area)
         
 
 

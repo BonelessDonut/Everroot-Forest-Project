@@ -53,6 +53,10 @@ class Game():
         else:
             self.all_sprites.empty()
             self.blocks.empty()
+            self.flowers.empty()
+            self.ores.empty()
+            self.npcs.empty()
+            self.teleport.empty()
             mapNumber = settings.nextTilemap[0][-1]
             for row in range(len(settings.nextTilemap)):
                 #print(f"{row} ", end="")d
