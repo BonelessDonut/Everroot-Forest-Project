@@ -83,6 +83,12 @@ class Player(pygame.sprite.Sprite):
             if npcIndex != -1:
                 self.game.npcs.get_sprite(npcIndex).interaction()
                 pygame.time.wait(250)
+        interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE, TILESIZE)
+        teleportIndex = interactRect.collidelist(list(teleport.rect for teleport in self.game.teleport))
+        if teleportIndex != -1:
+            self.kill()
+            self.game.createTilemap()
+            pygame.time.wait(500)
 
 
     def movement(self):
@@ -251,7 +257,22 @@ class NPC(pygame.sprite.Sprite):
             self.game.state = 'explore'
             
         
-        
+class Teleport(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = BLOCK_LAYER
+        self.groups = self.game.all_sprites, self.game.teleport
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.width = TILESIZE
+        self.height = TILESIZE
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.image = pygame.Surface([self.width, self.height])
+        self.image.fill(BLUE)
+        self.rect.x = self.x
+        self.rect.y = self.y
 
 class TextBox(pygame.sprite.Sprite):
     def __init__(self, game):
