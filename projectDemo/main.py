@@ -34,11 +34,13 @@ class Game():
             for col in range(len(tilemap[row])):
                 if (tilemap[row])[col] == "B":
                     Block(self, col, row)
-                if (tilemap[row])[col] == "P":
+                elif (tilemap[row])[col] == "P":
                     Player(self, col, row, self.clock)
-                if (tilemap[row])[col] == "F":
+                elif (tilemap[row])[col] == "F":
                     Flower(self, col, row)
-                if (tilemap[row])[col] == 'N':
+                elif (tilemap[row])[col] == 'O':
+                    Ore(self, col, row)
+                elif (tilemap[row])[col] == 'N':
                     NPC(self, col, row)
                 #print(f"{col}", end="")
             #print()
@@ -48,6 +50,7 @@ class Game():
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.blocks = pygame.sprite.LayeredUpdates()
         self.flowers = pygame.sprite.LayeredUpdates()
+        self.ores = pygame.sprite.LayeredUpdates()
         self.npcs = pygame.sprite.LayeredUpdates()
         self.enemies = pygame.sprite.LayeredUpdates()
         self.attacks = pygame.sprite.LayeredUpdates()

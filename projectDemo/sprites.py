@@ -34,9 +34,6 @@ class Player(pygame.sprite.Sprite):
 
         self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width, self.height))
 
-
-        #self.image = pygame.Surface([self.width, self.height])
-        #self.image.fill(GREEN)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
@@ -79,6 +76,9 @@ class Player(pygame.sprite.Sprite):
             flowerIndex = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
             if flowerIndex != -1:
                 self.game.flowers.get_sprite(flowerIndex).kill()
+            oreIndex = interactRect.collidelist(list(ore.rect for ore in self.game.ores))
+            if oreIndex != -1:
+                self.game.ores.get_sprite(oreIndex).kill()
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
             if npcIndex != -1:
                 self.game.npcs.get_sprite(npcIndex).interaction()
@@ -193,6 +193,28 @@ class Flower(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
+class Ore(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = BLOCK_LAYER
+        self.groups = self.game.all_sprites, self.game.ores
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        self.x = x*TILESIZE
+        self.y = y*TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+        
+        #self.imageList = []
+        #self.image = pygame.transform.scale(pygame.image.load(self.imageList[random.randint(0, 1)]), (self.width, self.height))
+        self.image = pygame.Surface([self.width, self.height])
+        self.image.fill(GREEN)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
 
 class NPC(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
