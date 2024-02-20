@@ -22,12 +22,13 @@ class Player(pygame.sprite.Sprite):
         self.imgindex = 0
         self.facing = 'down'
         #Shows the file paths for each image, depending on which direction the player is facing
-        self.rightImgList = ['Sprites/protag/protagLattern(1).png', 'Sprites/protag/protagLatternAlt(2).png', 'Sprites/protag/protagblobRight3.png', 'Sprites/protag/protagLatternAlt(2).png']
-        self.leftImgList = ['Sprites/protag/protagBlobLeft.png', 'Sprites/protag/protagBlobLeftAlt.png', 'Sprites/protag/protagBlobLeft3.png', 'Sprites/protag/protagBlobLeftAlt.png']
-        self.upImgList = ['Sprites/protag/protagBlobUpAlt.png', 'Sprites/protag/protagBlobUpLeftAlt.png', 'Sprites/protag/protagBlobUpAlt.png', 'Sprites/protag/protagBlobUpRight.png']
+        self.rightImgList = ['Sprites/protag/protag/protagLattern(1).png', 'Sprites/protag/protag/protagLatternAlt(2).png', 'Sprites/protag/protag/protagblobRight3.png', 'Sprites/protag/protag/protagLatternAlt(2).png']
+        self.leftImgList = ['Sprites/protag/protag/protagBlobLeft.png', 'Sprites/protag/protag/protagBlobLeftAlt.png', 'Sprites/protag/protag/protagBlobLeft3.png', 'Sprites/protag/protag/protagBlobLeftAlt.png']
+        self.upImgList = ['Sprites/protag/protag/protagBlobUpAlt.png', 'Sprites/protag/protag/protagBlobUpLeftAlt.png', 'Sprites/protag/protag/protagBlobUpAlt.png', 'Sprites/protag/protag/protagBlobUpRight.png']
         #READ ME: FIX 'Sprites/protagBlobDown.png' being compressed too much by player size and looking weird as a result
         #Potential fixes: scale the image down in pygame before loading, or edit the sprite images to make them all the same resolution for more consistency (Using photoshop or smth)
-        self.downImgList = ['Sprites/protag/protagBlobDownNew.png', 'Sprites/protag/protagBlobDownLeftAlt.png', 'Sprites/protag/protagBlobDownNew.png', 'Sprites/protag/protagBlobDownRightAltNew.png',]
+        self.downImgList = ['Sprites/protagBlobDownNew.png', 'Sprites/protagBlobDownLeftAlt.png', 'Sprites/protagBlobDownNew.png', 'Sprites/protagBlobDownRightAltNew.png',]
+        
         self.clock = clock
         self.timepassed = 0
 
