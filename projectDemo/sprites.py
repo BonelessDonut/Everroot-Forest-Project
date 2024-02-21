@@ -314,7 +314,8 @@ class TextBox(pygame.sprite.Sprite):
         self.avatarBox = pygame.Rect(self.width*0.693, self.height*0.1, self.width*0.219, self.height*0.65)
         self.image = pygame.transform.scale(pygame.image.load('Sprites/SVTextboxTemplate.png'), (self.width, self.height))
         self.imagelist = os.listdir('Sprites/npcs/chipichipichapachapa')
-        self.imgindex = 0
+        self.imgindex = 3
+
         image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}'), (self.avatarBox.width, self.avatarBox.height))
         self.image.blit(image, self.avatarBox)
         #To see where the text and avatar area rectangles cover, uncomment below lines
@@ -337,11 +338,10 @@ class TextBox(pygame.sprite.Sprite):
                 break
         
     def update(self):
-        #self.imgindex = (self.imgindex + 1)%392 if ((self.timepassed)//(0.01)%392 == self.imgindex) else self.imgindex
+        self.imgindex = (self.imgindex+1)%392 
         self.timepassed += self.clock.get_time()/1000
-        #area = self.image.blit(pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[0]}'), (self.avatarBox.width, self.avatarBox.height)), self.avatarBox, self.avatarBox)
-        #print(area)
-        
+        image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}'), (self.avatarBox.width, self.avatarBox.height))
+        self.image.blit(image, self.avatarBox)
 
 
         
