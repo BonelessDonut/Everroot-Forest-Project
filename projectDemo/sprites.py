@@ -34,6 +34,7 @@ class Player(pygame.sprite.Sprite):
         self.timepassed = 0
 
         self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width, self.height))
+        
 
         #self.rect = self.image.get_rect().
         self.rect = pygame.Rect(self.x, self.y, 30, 30)
@@ -314,10 +315,10 @@ class TextBox(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(pygame.image.load('Sprites/SVTextboxTemplate.png'), (self.width, self.height))
         self.imagelist = os.listdir('Sprites/npcs/chipichipichapachapa')
         self.imgindex = 0
-        self.image.blit(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}'), self.avatarBox, self.avatarBox)
+        image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}'), (self.avatarBox.width, self.avatarBox.height))
+        self.image.blit(image, self.avatarBox)
         #To see where the text and avatar area rectangles cover, uncomment below lines
         #pygame.draw.rect(self.image, RED, self.area)
-        #pygame.draw.rect(self.image, RED, self.imageBox)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
@@ -338,8 +339,8 @@ class TextBox(pygame.sprite.Sprite):
     def update(self):
         #self.imgindex = (self.imgindex + 1)%392 if ((self.timepassed)//(0.01)%392 == self.imgindex) else self.imgindex
         self.timepassed += self.clock.get_time()/1000
-        area = self.image.blit(pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[0]}'), (self.avatarBox.width, self.avatarBox.height)), self.avatarBox, self.avatarBox)
-        print(area)
+        #area = self.image.blit(pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[0]}'), (self.avatarBox.width, self.avatarBox.height)), self.avatarBox, self.avatarBox)
+        #print(area)
         
 
 

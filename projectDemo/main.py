@@ -1,5 +1,4 @@
 import pygame, sys
-#from settings import *
 import settings
 from sprites import *
 from pygame.locals import(
