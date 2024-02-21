@@ -19,20 +19,29 @@ from pygame.locals import(
 class Game():
     def __init__(self):
         pygame.init()
+        pygame.font.init()
         self.screen = pygame.display.set_mode((WIDTH,HEIGHT))
         self.clock = pygame.time.Clock()
+
+        self.state = 'explore'
         
         #self.font = pygame.font.Font('Arial', 32)
         self.running = True
 
     def createTilemap(self):
         for row in range(len(tilemap)):
-            #print(f"{row} ", end="")
+            #print(f"{row} ", end="")d
             for col in range(len(tilemap[row])):
                 if (tilemap[row])[col] == "B":
                     Block(self, col, row)
-                if (tilemap[row])[col] == "P":
+                elif (tilemap[row])[col] == "P":
                     Player(self, col, row, self.clock)
+                elif (tilemap[row])[col] == "F":
+                    Flower(self, col, row)
+                elif (tilemap[row])[col] == 'O':
+                    Ore(self, col, row)
+                elif (tilemap[row])[col] == 'N':
+                    NPC(self, col, row)
                 #print(f"{col}", end="")
             #print()
     def new(self):
@@ -40,6 +49,9 @@ class Game():
         self.playing = True
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.blocks = pygame.sprite.LayeredUpdates()
+        self.flowers = pygame.sprite.LayeredUpdates()
+        self.ores = pygame.sprite.LayeredUpdates()
+        self.npcs = pygame.sprite.LayeredUpdates()
         self.enemies = pygame.sprite.LayeredUpdates()
         self.attacks = pygame.sprite.LayeredUpdates()
         self.createTilemap()
@@ -51,6 +63,7 @@ class Game():
             if event.type == pygame.QUIT:
                 self.playing == False
                 self.running == False
+                pygame.font.quit()
                 pygame.quit()
                 sys.exit()
     def update(self):
