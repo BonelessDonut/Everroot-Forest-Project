@@ -33,7 +33,7 @@ class Player(pygame.sprite.Sprite):
         self.clock = clock
         self.timepassed = 0
 
-        self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]).convert(), (self.width, self.height))
         
 
         #self.rect = self.image.get_rect().
@@ -54,13 +54,13 @@ class Player(pygame.sprite.Sprite):
         self.timepassed += self.clock.get_time()/1000
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
         if self.facing == 'right':
-            self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+            self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]).convert(), (self.width * 1.02, self.height * 1.02))
         elif self.facing == 'left':
-            self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+            self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]).convert(), (self.width * 1.02, self.height * 1.02))
         elif self.facing == 'up':
-            self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+            self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]).convert(), (self.width * 1.02, self.height * 1.02))
         else: # self.facing == 'down':
-            self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+            self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]).convert(), (self.width * 1.02, self.height * 1.02))
         self.xChange = 0
         self.yChange = 0
 
@@ -217,7 +217,7 @@ class Flower(pygame.sprite.Sprite):
         self.height = TILESIZE
         
         self.imageList = ['Sprites/items/hyacinth.png', 'Sprites/items/sunflower.png']
-        self.image = pygame.transform.scale(pygame.image.load(self.imageList[random.randint(0, 1)]), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load(self.imageList[random.randint(0, 1)]).convert(), (self.width, self.height))
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -260,7 +260,7 @@ class NPC(pygame.sprite.Sprite):
         self.yChange = 0
 
         self.imagelist = ['Sprites/npcs/sampleNPC/hkprotagdown.jpg', 'Sprites/npcs/sampleNPC/hkprotagleft.jpg', 'Sprites/npcs/sampleNPC/hkprotagright.jpg', 'Sprites/npcs/sampleNPC/hkprotagdown.jpg']
-        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert(), (self.width, self.height))
 
         self.TextBox = None
 
@@ -312,11 +312,11 @@ class TextBox(pygame.sprite.Sprite):
 
         self.area = pygame.Rect(0, 0, self.width*0.6, self.height*0.95)
         self.avatarBox = pygame.Rect(self.width*0.693, self.height*0.1, self.width*0.219, self.height*0.65)
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/SVTextboxTemplate.png'), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/SVTextboxTemplate.png').convert(), (self.width, self.height))
         self.imagelist = os.listdir('Sprites/npcs/chipichipichapachapa')
         self.imgindex = 3
 
-        image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}'), (self.avatarBox.width, self.avatarBox.height))
+        image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert(), (self.avatarBox.width, self.avatarBox.height))
         self.image.blit(image, self.avatarBox)
         #To see where the text and avatar area rectangles cover, uncomment below lines
         #pygame.draw.rect(self.image, RED, self.area)
@@ -340,7 +340,7 @@ class TextBox(pygame.sprite.Sprite):
     def update(self):
         self.imgindex = (self.imgindex+1)%392 
         self.timepassed += self.clock.get_time()/1000
-        image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}'), (self.avatarBox.width, self.avatarBox.height))
+        image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert(), (self.avatarBox.width, self.avatarBox.height))
         self.image.blit(image, self.avatarBox)
 
 
