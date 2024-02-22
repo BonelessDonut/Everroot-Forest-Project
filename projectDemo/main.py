@@ -29,7 +29,6 @@ class Game():
         #self.font = pygame.font.Font('Arial', 32)
         self.running = True
 
-<<<<<<< HEAD
     def createTilemap(self, prevPosition):
         if self.map == 0:
             for row in range(len(settings.currentTilemap)):
@@ -40,7 +39,7 @@ class Game():
                     elif (settings.currentTilemap[row])[col] == "P":
                         Player(self, col, row, self.clock)
                     elif (settings.currentTilemap[row])[col] == "F":
-                        Flower(self, col, row)
+                        Flower(self, col, row, self.clock)
                     elif (settings.currentTilemap[row])[col] == 'O':
                         Ore(self, col, row)
                     elif (settings.currentTilemap[row])[col] == 'N':
@@ -64,7 +63,7 @@ class Game():
                     if (settings.nextTilemap[row])[col] == "B":
                         Block(self, col, row)
                     elif (settings.nextTilemap[row])[col] == "F":
-                        Flower(self, col, row)
+                        Flower(self, col, row, self.clock)
                     elif (settings.nextTilemap[row])[col] == 'O':
                         Ore(self, col, row)
                     elif (settings.nextTilemap[row])[col] == 'N':
@@ -79,24 +78,6 @@ class Game():
             settings.currentTilemap = settings.nextTilemap
             settings.nextTilemap = temp
 
-=======
-    def createTilemap(self):
-        for row in range(len(tilemap)):
-            #print(f"{row} ", end="")d
-            for col in range(len(tilemap[row])):
-                if (tilemap[row])[col] == "B":
-                    Block(self, col, row)
-                elif (tilemap[row])[col] == "P":
-                    Player(self, col, row, self.clock)
-                elif (tilemap[row])[col] == "F":
-                    Flower(self, col, row, self.clock)
-                elif (tilemap[row])[col] == 'O':
-                    Ore(self, col, row)
-                elif (tilemap[row])[col] == 'N':
-                    NPC(self, col, row)
-                #print(f"{col}", end="")
-            #print()
->>>>>>> flowertest2
     def new(self):
 
         self.playing = True

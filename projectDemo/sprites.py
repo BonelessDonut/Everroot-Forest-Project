@@ -33,13 +33,15 @@ class Player(pygame.sprite.Sprite):
         self.clock = clock
         self.timepassed = 0
 
-        self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]).convert(), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]).convert_alpha(), (self.width, self.height))
         
 
         #self.rect = self.image.get_rect().
-        self.rect = pygame.Rect(self.x, self.y, 30, 30)
         #self.rect.x = self.x
         #self.rect.y = self.y
+        #Below line is to decrease the rectangle collision slightly
+        #Was having trouble fitting in 1 tile gaps
+        self.rect = pygame.Rect(self.x, self.y, 30, 30)
 
     def update(self):
         #pass
@@ -54,13 +56,13 @@ class Player(pygame.sprite.Sprite):
         self.timepassed += self.clock.get_time()/1000
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
         if self.facing == 'right':
-            self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]).convert(), (self.width * 1.02, self.height * 1.02))
+            self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]).convert_alpha(), (self.width * 1.02, self.height * 1.02))
         elif self.facing == 'left':
-            self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]).convert(), (self.width * 1.02, self.height * 1.02))
+            self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]).convert_alpha(), (self.width * 1.02, self.height * 1.02))
         elif self.facing == 'up':
-            self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]).convert(), (self.width * 1.02, self.height * 1.02))
+            self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]).convert_alpha(), (self.width * 1.02, self.height * 1.02))
         else: # self.facing == 'down':
-            self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]).convert(), (self.width * 1.02, self.height * 1.02))
+            self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]).convert_alpha(), (self.width * 1.02, self.height * 1.02))
         self.xChange = 0
         self.yChange = 0
 
@@ -79,10 +81,8 @@ class Player(pygame.sprite.Sprite):
                 interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE, TILESIZE*2)
             flowerIndex = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
             if flowerIndex != -1:
-                #READ ME, FINISH THE FLOWER CLASS KILL INTERACTION AND DO SOMETHING WITH THE NEW KILL ANIMATION CLASS
                 self.game.state = 'flowerC'
                 self.game.flowers.get_sprite(flowerIndex).state = 'cut'
-                print('interacted')
                 self.game.flowers.get_sprite(flowerIndex).anim()
             oreIndex = interactRect.collidelist(list(ore.rect for ore in self.game.ores))
             if oreIndex != -1:
@@ -135,8 +135,6 @@ class Player(pygame.sprite.Sprite):
 
 
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-            # Two lines below change camera to move around player character, moving all other sprites
-            # comment them out to create a static camera
             #for sprite in self.game.all_sprites:
                 #sprite.rect.x -= PLAYER_SPEED
             self.xChange += PLAYER_SPEED
@@ -144,8 +142,6 @@ class Player(pygame.sprite.Sprite):
             self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
             
         if keys[pygame.K_w] or keys[pygame.K_UP]:
-            # Two lines below change camera to move around player character, moving all other sprites
-            # comment them out to create a static camera
             #for sprite in self.game.all_sprites:
                 #sprite.rect.y += PLAYER_SPEED
             self.yChange -= PLAYER_SPEED
@@ -154,8 +150,6 @@ class Player(pygame.sprite.Sprite):
             
 
         if keys[pygame.K_s] or keys[pygame.K_DOWN]:
-            #Two lines below change camera to move around player character, moving all other sprites
-            # comment them out to create a static camera
             #for sprite in self.game.all_sprites:
                 #sprite.rect.y -= PLAYER_SPEED
             self.yChange += PLAYER_SPEED
@@ -224,7 +218,6 @@ class Flower(pygame.sprite.Sprite):
         self.timepassed = 0
         self.imgindex = 0
 
-        #a self state helps ensure that only the interacted flower goes through anim()
         self.state = 'alive'
 
         hyacinImgL = ['Sprites/items/hyacinth.png', 'Sprites/items/hyacinth2.png', 'Sprites/items/hyacinth3.png', 'Sprites/items/hyacinth4.png', 'Sprites/items/hyacinth5.png']
@@ -244,35 +237,15 @@ class Flower(pygame.sprite.Sprite):
         self.timepassed += self.clock.get_time() / 1000
         if self.game.state == 'flowerC':
             if self.state == 'cut':
-                print('updated')
-                #READ ME, THIS UPDATES ALL THE FLOWERS AT ONCE AFTER INTERACTING WITH ONLY ONE FLOWER. - UNINTENDED OUTCOME, NEEDS FIXING
                 self.anim()
                 self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][1][self.imgindex % 5]), (self.width, self.height))
 
-    def anim(self): #READ ME, FINISH THIS FUNCTION
-        #realized it was setting the state to flowerC every single loop from the Player.interact() method, so it never went to the else to kill
-        #moved it in front to make sure it switched states when the imgindex got to 4
+    def anim(self): 
         if self.imgindex > 4:
             self.game.state = 'explore'
-            print('state switched')
         if self.game.state == 'flowerC':
-            print('should i switch to kill?')
             self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.3) % 5 == self.imgindex) else self.imgindex
-            print(self.imgindex)
-            print(self.game.state)
-            #print(self.timepassed)
-            '''if self.imgindex > 4:
-                self.game.state = 'explore'
-                print('state switched')'''
-            #put this into update cuz thought it fit better there
-            #else:
-                #self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][1][self.imgindex % 5]), (self.width, self.height))
-            #MAYBE TRY MAKING THE IMGINDEX INCREASE UNTIL IT GETS PASSED 5, THEN HAVE A CONDITIONAL CHECKING IF IT IS GREATER THAN 5
-            #IF SO, CHANGE THE STATE BACK TO 'EXPLORE' AND KILL THE SPRITE
-
         else:
-            print('should kill')
-            #READ ME, SPRITE DOES NOT PROPERLY KILL, THE LAST IMAGE STILL REMAINS AFTER THE SPRITE HAS BEEN KILLED
             if self.state == 'cut':
                 self.kill()
 
@@ -313,7 +286,7 @@ class NPC(pygame.sprite.Sprite):
         self.yChange = 0
 
         self.imagelist = ['Sprites/npcs/sampleNPC/hkprotagdown.jpg', 'Sprites/npcs/sampleNPC/hkprotagleft.jpg', 'Sprites/npcs/sampleNPC/hkprotagright.jpg', 'Sprites/npcs/sampleNPC/hkprotagdown.jpg']
-        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert(), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (self.width, self.height))
 
         self.TextBox = None
 
@@ -365,11 +338,11 @@ class TextBox(pygame.sprite.Sprite):
 
         self.area = pygame.Rect(0, 0, self.width*0.6, self.height*0.95)
         self.avatarBox = pygame.Rect(self.width*0.693, self.height*0.1, self.width*0.219, self.height*0.65)
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/SVTextboxTemplate.png').convert(), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/SVTextboxTemplate.png').convert_alpha(), (self.width, self.height))
         self.imagelist = os.listdir('Sprites/npcs/chipichipichapachapa')
         self.imgindex = 3
 
-        image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert(), (self.avatarBox.width, self.avatarBox.height))
+        image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
         self.image.blit(image, self.avatarBox)
         #To see where the text and avatar area rectangles cover, uncomment below lines
         #pygame.draw.rect(self.image, RED, self.area)
@@ -393,7 +366,7 @@ class TextBox(pygame.sprite.Sprite):
     def update(self):
         self.imgindex = (self.imgindex+1)%392 
         self.timepassed += self.clock.get_time()/1000
-        image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert(), (self.avatarBox.width, self.avatarBox.height))
+        image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
         self.image.blit(image, self.avatarBox)
 
 
