@@ -44,7 +44,6 @@ class Player(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.x, self.y, 30, 30)
 
     def update(self):
-        #pass
         self.movement()
         self.interact()
 
@@ -54,7 +53,7 @@ class Player(pygame.sprite.Sprite):
         self.collideBlocks('y')
 
         self.timepassed += self.clock.get_time()/1000
-        #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
+        #Below line: Loads image using right image list, transforms it to scale with width and height, converts it, and sets it to the image
         if self.facing == 'right':
             self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]).convert_alpha(), (self.width * 1.02, self.height * 1.02))
         elif self.facing == 'left':
@@ -66,6 +65,7 @@ class Player(pygame.sprite.Sprite):
         self.xChange = 0
         self.yChange = 0
 
+    #Method for different Player interactions
     def interact(self):
         keys = pygame.key.get_pressed()
         mouses = pygame.mouse.get_pressed()
@@ -79,21 +79,31 @@ class Player(pygame.sprite.Sprite):
                 interactRect = pygame.Rect(self.rect.left, self.rect.top-self.height, TILESIZE, TILESIZE*2)
             else:
                 interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE, TILESIZE*2)
+
+            #Gets the index of the flower that the player interacted with
             flowerIndex = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
             if flowerIndex != -1:
                 self.game.state = 'flowerC'
                 self.game.flowers.get_sprite(flowerIndex).state = 'cut'
                 self.game.flowers.get_sprite(flowerIndex).anim()
+
+            #Gets the index of the ore that the player interacted with
             oreIndex = interactRect.collidelist(list(ore.rect for ore in self.game.ores))
             if oreIndex != -1:
                 self.game.ores.get_sprite(oreIndex).kill()
+
+            #Gets the index of the npc that the player interacted with
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
             if npcIndex != -1:
                 self.game.npcs.get_sprite(npcIndex).interaction()
                 pygame.time.wait(250)
+
+        #Allows mouse click functionality for interactions
         elif mouses[0]:
             mouseRect = pygame.Rect(0, 0, 40, 40)
             mouseRect.center = pygame.mouse.get_pos()
+
+            #Checks if the player is within a square's range of side length 60 pixels of the mouse
             if abs(mouseRect.x-self.rect.x) <= 60 and abs(mouseRect.y-self.rect.y) <= 60:
                 interactIndex = mouseRect.collidelist(list(ore.rect for ore in self.game.ores))
                 if interactIndex != -1:
@@ -106,7 +116,7 @@ class Player(pygame.sprite.Sprite):
                     self.game.npcs.get_sprite(interactIndex).interaction()
                     pygame.time.wait(250)
 
-            
+        #Checks for teleport interactions
         interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE, TILESIZE)
         teleportIndex = interactRect.collidelist(list(teleport.rect for teleport in self.game.teleport))
         if teleportIndex != -1:
@@ -299,7 +309,7 @@ class NPC(pygame.sprite.Sprite):
     def interaction(self):
         if self.game.state == 'explore':
             self.TextBox = TextBox(self.game)
-            self.TextBox.newText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", 20)
+            self.TextBox.newText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", 20, 'Dubidubidu')
             self.game.state = 'dialogue'
         else:
             self.TextBox.kill()
@@ -350,7 +360,7 @@ class TextBox(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
     
-    def newText(self, text, fontSize):
+    def newText(self, text, fontSize, name):
         maxLength = int((float(-2.2835*10**(-7))*self.width**2+0.000411706*self.width+0.767647)*self.width/fontSize)+1
         boxFont = pygame.font.SysFont('Courier', fontSize)
         countRows = 0
@@ -362,6 +372,7 @@ class TextBox(pygame.sprite.Sprite):
                 text = text[cutoffIndex:]
             except:
                 break
+        self.image.blit(pygame.font.SysFont('Courier', 25).render(name, False, (0, 0, 0)), (self.avatarBox.x+self.avatarBox.width/2-len(name)*TILESIZE/5.5, self.height*0.79))
         
     def update(self):
         self.imgindex = (self.imgindex+1)%392 
