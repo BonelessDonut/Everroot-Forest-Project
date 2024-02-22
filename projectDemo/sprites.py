@@ -77,6 +77,8 @@ class Player(pygame.sprite.Sprite):
             if flowerIndex != -1:
                 #READ ME, FINISH THE FLOWER CLASS KILL INTERACTION AND DO SOMETHING WITH THE NEW KILL ANIMATION CLASS
                 self.game.state = 'flowerC'
+                self.game.flowers.get_sprite(flowerIndex).state = 'cut'
+                print('interacted')
                 self.game.flowers.get_sprite(flowerIndex).anim()
             oreIndex = interactRect.collidelist(list(ore.rect for ore in self.game.ores))
             if oreIndex != -1:
@@ -193,6 +195,8 @@ class Flower(pygame.sprite.Sprite):
         self.timepassed = 0
         self.imgindex = 0
 
+        self.state = 'alive'
+
         hyacinImgL = ['Sprites/items/hyacinth.png', 'Sprites/items/hyacinth2.png', 'Sprites/items/hyacinth3.png', 'Sprites/items/hyacinth4.png', 'Sprites/items/hyacinth5.png']
         sunFloImgL = ['Sprites/items/sunflowernew.png', 'Sprites/items/sunflower2.png', 'Sprites/items/sunflower3.png', 'Sprites/items/sunflower4.png', 'Sprites/items/sunflower5.png']
         silentFImgL = ['Sprites/items/silentFlower.png', 'Sprites/items/silentFlower2.png', 'Sprites/items/silentFlower3.png', 'Sprites/items/silentFlower4.png', 'Sprites/items/silentFlower5.png']
@@ -209,25 +213,35 @@ class Flower(pygame.sprite.Sprite):
     def update(self):
         self.timepassed += self.clock.get_time() / 1000
         if self.game.state == 'flowerC':
-            #READ ME, THIS UPDATES ALL THE FLOWERS AT ONCE AFTER INTERACTING WITH ONLY ONE FLOWER. - UNINTENDED OUTCOME, NEEDS FIXING
-            self.anim()
+            if self.state == 'cut':
+                print('updated')
+                #READ ME, THIS UPDATES ALL THE FLOWERS AT ONCE AFTER INTERACTING WITH ONLY ONE FLOWER. - UNINTENDED OUTCOME, NEEDS FIXING
+                self.anim()
+                self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][1][self.imgindex % 5]), (self.width, self.height))
 
     def anim(self): #READ ME, FINISH THIS FUNCTION
-
-        if self.game.state == 'flowerC':
-            self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.30) % 5 == self.imgindex) else self.imgindex
-            #print(self.imgindex)
-            #print(self.timepassed)
-            if self.imgindex > 4:
+        if self.imgindex > 4:
                 self.game.state = 'explore'
-            else:
-                self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][1][self.imgindex % 5]), (self.width, self.height))
+                print('state switched')
+        if self.game.state == 'flowerC':
+            print('should i switch to kill?')
+            self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.3) % 5 == self.imgindex) else self.imgindex
+            print(self.imgindex)
+            print(self.game.state)
+            #print(self.timepassed)
+            '''if self.imgindex > 4:
+                self.game.state = 'explore'
+                print('state switched')'''
+            #else:
+                #self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][1][self.imgindex % 5]), (self.width, self.height))
             #MAYBE TRY MAKING THE IMGINDEX INCREASE UNTIL IT GETS PASSED 5, THEN HAVE A CONDITIONAL CHECKING IF IT IS GREATER THAN 5
             #IF SO, CHANGE THE STATE BACK TO 'EXPLORE' AND KILL THE SPRITE
 
         else:
+            print('should kill')
             #READ ME, SPRITE DOES NOT PROPERLY KILL, THE LAST IMAGE STILL REMAINS AFTER THE SPRITE HAS BEEN KILLED
-            self.game.flowers.get_sprite().kill()
+            if self.state == 'cut':
+                self.kill()
 
 class Ore(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
