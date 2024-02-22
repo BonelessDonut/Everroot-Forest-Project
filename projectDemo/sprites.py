@@ -195,6 +195,7 @@ class Flower(pygame.sprite.Sprite):
         self.timepassed = 0
         self.imgindex = 0
 
+        #a self state helps ensure that only the interacted flower goes through anim()
         self.state = 'alive'
 
         hyacinImgL = ['Sprites/items/hyacinth.png', 'Sprites/items/hyacinth2.png', 'Sprites/items/hyacinth3.png', 'Sprites/items/hyacinth4.png', 'Sprites/items/hyacinth5.png']
@@ -220,9 +221,11 @@ class Flower(pygame.sprite.Sprite):
                 self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][1][self.imgindex % 5]), (self.width, self.height))
 
     def anim(self): #READ ME, FINISH THIS FUNCTION
+        #realized it was setting the state to flowerC every single loop from the Player.interact() method, so it never went to the else to kill
+        #moved it in front to make sure it switched states when the imgindex got to 4
         if self.imgindex > 4:
-                self.game.state = 'explore'
-                print('state switched')
+            self.game.state = 'explore'
+            print('state switched')
         if self.game.state == 'flowerC':
             print('should i switch to kill?')
             self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.3) % 5 == self.imgindex) else self.imgindex
@@ -232,6 +235,7 @@ class Flower(pygame.sprite.Sprite):
             '''if self.imgindex > 4:
                 self.game.state = 'explore'
                 print('state switched')'''
+            #put this into update cuz thought it fit better there
             #else:
                 #self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][1][self.imgindex % 5]), (self.width, self.height))
             #MAYBE TRY MAKING THE IMGINDEX INCREASE UNTIL IT GETS PASSED 5, THEN HAVE A CONDITIONAL CHECKING IF IT IS GREATER THAN 5
