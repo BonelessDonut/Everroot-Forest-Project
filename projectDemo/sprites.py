@@ -228,7 +228,7 @@ class Flower(pygame.sprite.Sprite):
             print('state switched')
         if self.game.state == 'flowerC':
             print('should i switch to kill?')
-            self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.3) % 5 == self.imgindex) else self.imgindex
+            self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.20) % 5 == self.imgindex) else self.imgindex
             print(self.imgindex)
             print(self.game.state)
             #print(self.timepassed)
