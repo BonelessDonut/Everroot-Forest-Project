@@ -85,23 +85,14 @@ class Game():
                         NPC(self, col, row)
                     elif (settings.currentTilemap[mapNumber][row])[col] == 'T':
                         Teleport(self, col, row)
-                        if int(mapNumber) == 0:
-                            if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
-                                Player(self, col-1, row, self.clock)
-                            elif prevPosition[0] == 31 and col == 0 and prevPosition[1] == row:
-                                Player(self, col+1, row, self.clock)
-                            elif prevPosition[1] == 0 and row == 17 and prevPosition[0] == col:
-                                Player(self, col, row-1, self.clock)
-                            elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
-                                Player(self, col, row+1, self.clock)
-                        if int(mapNumber) == 1 and row == prevPosition[1]:
-                            Player(self, col+1, row, self.clock)
-                        elif int(mapNumber) == 2 and col == prevPosition[0]:
-                            Player(self, col, row-1, self.clock)
-                        elif int(mapNumber) == 3 and col == prevPosition[0]:
-                            Player(self, col, row+1, self.clock)
-                        elif int(mapNumber) == 4 and row == prevPosition[1]:
+                        if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
                             Player(self, col-1, row, self.clock)
+                        elif prevPosition[0] == 31 and col == 0 and prevPosition[1] == row:
+                            Player(self, col+1, row, self.clock)
+                        elif prevPosition[1] == 0 and row == 17 and prevPosition[0] == col:
+                            Player(self, col, row-1, self.clock)
+                        elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
+                            Player(self, col, row+1, self.clock)
             temp = settings.currentTilemap
             #settings.currentTilemap = settings.nextTilemap
             #settings.nextTilemap = temp
