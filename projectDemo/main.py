@@ -93,9 +93,6 @@ class Game():
                             Player(self, col, row-1, self.clock)
                         elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
                             Player(self, col, row+1, self.clock)
-            temp = settings.currentTilemap
-            #settings.currentTilemap = settings.nextTilemap
-            #settings.nextTilemap = temp
 
     def new(self):
 
