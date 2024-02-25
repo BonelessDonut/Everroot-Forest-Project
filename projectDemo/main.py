@@ -24,6 +24,11 @@ class Game():
         self.clock = pygame.time.Clock()
 
         self.state = 'explore'
+        #Game states:
+        #Explore - Player can move around
+        #Dialogue - Player is currently in dialogue, player can't move
+        #flowerC - flower animation is playing, player can't move
+
         self.map = (-1, -1)
         
         #self.font = pygame.font.Font('Arial', 32)

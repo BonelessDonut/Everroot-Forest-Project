@@ -125,6 +125,7 @@ class Player(pygame.sprite.Sprite):
             self.game.createTilemap((tpSprite.x//TILESIZE, tpSprite.y//TILESIZE))
             pygame.time.wait(100)
 
+
     
 
 
@@ -292,11 +293,24 @@ class NPC(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
 
+        self.meetings = 0
+
         self.xChange = 0
         self.yChange = 0
 
         self.imagelist = ['Sprites/npcs/sampleNPC/hkprotagdown.jpg', 'Sprites/npcs/sampleNPC/hkprotagleft.jpg', 'Sprites/npcs/sampleNPC/hkprotagright.jpg', 'Sprites/npcs/sampleNPC/hkprotagdown.jpg']
         self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (self.width, self.height))
+
+        self.dialogueStage = '01:First Meet'
+        self.dialogueStageIndex = 1
+        #Always leave a space at the end of the quote!
+        self.dialogueList = {'01:First Meet':[{'Meetings': 1},
+                                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                                                "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
+                                                "Boom Boom Boom Boom "],
+                             '02:Second Meet': [{'Meetings':2},
+                                                "Hi again..."]
+                            }
 
         self.TextBox = None
 
@@ -306,13 +320,41 @@ class NPC(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+    def updateDialogue(self):
+        conditions = self.dialogueList[self.dialogueStage][0]
+        nextDialogue = True
+        for check in conditions:
+            if check == 'Meetings' and self.meetings < conditions[check]:
+                nextDialogue = False
+                break
+        if nextDialogue:
+            keys = list(self.dialogueList.keys())
+            try:
+                self.dialogueStage = keys[keys.index(self.dialogueStage)+1]
+            except IndexError:
+                print('no more dialogue')
+        self.dialogueStageIndex = 1
+
+
     def interaction(self):
         if self.game.state == 'explore':
+            self.meetings += 1
             self.TextBox = TextBox(self.game)
-            self.TextBox.newText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", 20, 'Dubidubidu')
+            self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 20, 'Dubidubidu')
+            self.dialogueStageIndex += 1
             self.game.state = 'dialogue'
+        elif self.dialogueStageIndex < len(self.dialogueList[self.dialogueStage]):
+            #The below was an attempt to draw over the previous text, but that became more of a hassle then simply remaking the TextBox
+            #clear = pygame.Surface((self.TextBox.area.width, self.TextBox.area.height), pygame.SRCALPHA)
+            #clear.fill(RED)
+            #self.TextBox.image.blit(clear, (15, 10))
+            self.TextBox.kill()
+            self.TextBox = TextBox(self.game)
+            self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 20, 'Dubidubidu')
+            self.dialogueStageIndex += 1
         else:
             self.TextBox.kill()
+            self.updateDialogue()
             self.game.state = 'explore'
             
         
@@ -365,7 +407,10 @@ class TextBox(pygame.sprite.Sprite):
         boxFont = pygame.font.SysFont('Courier', fontSize)
         countRows = 0
         while(len(text) > 0):
-            cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9]', text[maxLength-1::-1]).end()+1
+            try:
+                cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9]', text[maxLength-1::-1]).end()+1
+            except AttributeError:
+                cutoffIndex = maxLength
             self.image.blit(boxFont.render(text[0:cutoffIndex].strip(), False, (0, 0, 0)), (15, 10+countRows*fontSize), self.area)
             countRows += 1
             try:
@@ -373,6 +418,8 @@ class TextBox(pygame.sprite.Sprite):
             except:
                 break
         self.image.blit(pygame.font.SysFont('Courier', 25).render(name, False, (0, 0, 0)), (self.avatarBox.x+self.avatarBox.width/2-len(name)*TILESIZE/5.5, self.height*0.79))
+
+    
         
     def update(self):
         self.imgindex = (self.imgindex+1)%392 
