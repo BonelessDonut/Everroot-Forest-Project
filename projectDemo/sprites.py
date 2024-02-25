@@ -230,7 +230,7 @@ class Flower(pygame.sprite.Sprite):
                 self.kill()
 
 class Ore(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, clock):
         self.game = game
         self._layer = BLOCK_LAYER
         self.groups = self.game.all_sprites, self.game.ores
@@ -240,6 +240,12 @@ class Ore(pygame.sprite.Sprite):
         self.y = y*TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
+
+        self.clock = clock
+        self.timepassed = 0
+        self.imgindex = 0
+
+        self.state = 'alive'
         
         #self.imageList = []
         #self.image = pygame.transform.scale(pygame.image.load(self.imageList[random.randint(0, 1)]), (self.width, self.height))
@@ -249,6 +255,11 @@ class Ore(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
+    def update(self):
+        self.timepassed += self.clock.get_time() / 1000
+        pass
+
 
 
 class NPC(pygame.sprite.Sprite):
