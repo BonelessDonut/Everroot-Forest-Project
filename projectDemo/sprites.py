@@ -17,6 +17,9 @@ class Player(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
 
+        self.mouseRect = pygame.Rect(0, 0, 40, 40)
+        self.mouseRect.center = pygame.mouse.get_pos()
+
         self.xChange = 0
         self.yChange = 0
 
@@ -65,6 +68,25 @@ class Player(pygame.sprite.Sprite):
         self.xChange = 0
         self.yChange = 0
 
+        if self.game.state == 'dialogue':
+            self.mouseRect.center = pygame.mouse.get_pos()
+            interactRect = pygame.Rect(self.rect.left-TILESIZE*0.1, self.rect.top-TILESIZE*0.1, TILESIZE*1.2, TILESIZE*1.2)
+            npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
+            npc = self.game.npcs.get_sprite(npcIndex)
+            collisionList = []
+            for rect in npc.TextBox.choiceRectList:
+                collisionList.append(pygame.Rect(rect.left, rect.top, rect.width, rect.height))
+            for rect in range(len(collisionList)):
+                collisionList[rect].x = npc.TextBox.x + 13
+                collisionList[rect].y = npc.TextBox.y + 25 + 30*rect
+            if len(collisionList) > 0:
+                highlighted = self.mouseRect.collidelist(collisionList) 
+                if highlighted == -1:
+                    return
+                else:
+                    npc.TextBox.selectedRect = highlighted
+
+
     #Method for different Player interactions
     def interact(self):
         keys = pygame.key.get_pressed()
@@ -72,13 +94,13 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE]:
             interactRect = None
             if self.facing == 'right':
-                interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE*2, TILESIZE)
+                interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE*1.1, TILESIZE)
             elif self.facing == 'left':
-                interactRect = pygame.Rect(self.rect.left-self.width, self.rect.top, TILESIZE*2, TILESIZE)
+                interactRect = pygame.Rect(self.rect.left-TILESIZE*0.1, self.rect.top, TILESIZE*1.1, TILESIZE)
             elif self.facing == 'up':
-                interactRect = pygame.Rect(self.rect.left, self.rect.top-self.height, TILESIZE, TILESIZE*2)
+                interactRect = pygame.Rect(self.rect.left, self.rect.top-TILESIZE*0.1, TILESIZE, TILESIZE*1.1)
             else:
-                interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE, TILESIZE*2)
+                interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE, TILESIZE*1.1)
 
             #Gets the index of the flower that the player interacted with
             flowerIndex = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
@@ -97,24 +119,60 @@ class Player(pygame.sprite.Sprite):
             if npcIndex != -1:
                 self.game.npcs.get_sprite(npcIndex).interaction()
                 pygame.time.wait(250)
+        elif self.game.state == 'dialogue' and (keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_UP] or keys[pygame.K_DOWN]):
+            interactRect = None
+            if self.facing == 'right':
+                interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE*1.1, TILESIZE)
+            elif self.facing == 'left':
+                interactRect = pygame.Rect(self.rect.left-TILESIZE*0.1, self.rect.top, TILESIZE*1.1, TILESIZE)
+            elif self.facing == 'up':
+                interactRect = pygame.Rect(self.rect.left, self.rect.top-TILESIZE*0.1, TILESIZE, TILESIZE*1.1)
+            else:
+                interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE, TILESIZE*1.1)
+            
+            #Gets the index of the npc that the player interacted with
+            npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
+            if npcIndex != -1:
+                npc = self.game.npcs.get_sprite(npcIndex)
+                if keys[pygame.K_w] or keys[pygame.K_UP]:
+                    npc.TextBox.selectedRect = npc.TextBox.selectedRect - 1 if npc.TextBox.selectedRect > 0 else npc.TextBox.selectedRect
+                    pygame.time.wait(150)
+                else:
+                    npc.TextBox.selectedRect = npc.TextBox.selectedRect + 1 if npc.TextBox.selectedRect < len(npc.TextBox.choiceRectList)-1 else npc.TextBox.selectedRect
+                    pygame.time.wait(150)
+
+
 
         #Allows mouse click functionality for interactions
         elif mouses[0]:
             mouseRect = pygame.Rect(0, 0, 40, 40)
             mouseRect.center = pygame.mouse.get_pos()
 
-            #Checks if the player is within a square's range of side length 60 pixels of the mouse
-            if abs(mouseRect.x-self.rect.x) <= 60 and abs(mouseRect.y-self.rect.y) <= 60:
-                interactIndex = mouseRect.collidelist(list(ore.rect for ore in self.game.ores))
-                if interactIndex != -1:
-                    self.game.ores.get_sprite(interactIndex).kill()
-                interactIndex = mouseRect.collidelist(list(flower.rect for flower in self.game.flowers))
-                if interactIndex != -1:
-                    self.game.flowers.get_sprite(interactIndex).kill()
-                interactIndex = mouseRect.collidelist(list(npc.rect for npc in self.game.npcs))
-                if interactIndex != -1:
-                    self.game.npcs.get_sprite(interactIndex).interaction()
-                    pygame.time.wait(250)
+            if self.game.state == 'dialogue':
+                interactRect = pygame.Rect(self.rect.left-TILESIZE*0.1, self.rect.top-TILESIZE*0.1, TILESIZE*1.2, TILESIZE*1.2)
+                npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
+                npc = self.game.npcs.get_sprite(npcIndex)
+                rectCollisionList = npc.TextBox.choiceRectList[:]
+                for rect in range(len(rectCollisionList)):
+                    rectCollisionList[rect].x = npc.TextBox.x + 13
+                    rectCollisionList[rect].y = npc.TextBox.y + 25 + 30*rect
+                if len(rectCollisionList) > 0:
+                    npc.selectedRect = mouseRect.collidelist(rectCollisionList)
+                    npc.interaction()
+
+            else:
+                #Checks if the player is within a square's range of side length 60 pixels of the mouse
+                if abs(mouseRect.x-self.rect.x) <= 60 and abs(mouseRect.y-self.rect.y) <= 60:
+                    interactIndex = mouseRect.collidelist(list(ore.rect for ore in self.game.ores))
+                    if interactIndex != -1:
+                        self.game.ores.get_sprite(interactIndex).kill()
+                    interactIndex = mouseRect.collidelist(list(flower.rect for flower in self.game.flowers))
+                    if interactIndex != -1:
+                        self.game.flowers.get_sprite(interactIndex).kill()
+                    interactIndex = mouseRect.collidelist(list(npc.rect for npc in self.game.npcs))
+                    if interactIndex != -1:
+                        self.game.npcs.get_sprite(interactIndex).interaction()
+                        pygame.time.wait(250)
 
         #Checks for teleport interactions
         interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE, TILESIZE)
@@ -294,6 +352,7 @@ class NPC(pygame.sprite.Sprite):
         self.height = TILESIZE
 
         self.meetings = 0
+        self.name = 'Dubidubidu'
 
         self.xChange = 0
         self.yChange = 0
@@ -307,7 +366,8 @@ class NPC(pygame.sprite.Sprite):
         self.dialogueList = {'01:First Meet':[{'Meetings': 1},
                                                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
-                                                "Boom Boom Boom Boom "],
+                                                "Boom Boom Boom Boom ",
+                                                "%Choices; Cats are cute?; Yes; Of Course; Meow"],
                              '02:Second Meet': [{'Meetings':2},
                                                 "Hi again..."]
                             }
@@ -340,7 +400,7 @@ class NPC(pygame.sprite.Sprite):
         if self.game.state == 'explore':
             self.meetings += 1
             self.TextBox = TextBox(self.game)
-            self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 20, 'Dubidubidu')
+            self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 20, 'Courier', self.name)
             self.dialogueStageIndex += 1
             self.game.state = 'dialogue'
         elif self.dialogueStageIndex < len(self.dialogueList[self.dialogueStage]):
@@ -348,14 +408,36 @@ class NPC(pygame.sprite.Sprite):
             #clear = pygame.Surface((self.TextBox.area.width, self.TextBox.area.height), pygame.SRCALPHA)
             #clear.fill(RED)
             #self.TextBox.image.blit(clear, (15, 10))
-            self.TextBox.kill()
-            self.TextBox = TextBox(self.game)
-            self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 20, 'Dubidubidu')
-            self.dialogueStageIndex += 1
+            nextDialogue = self.dialogueList[self.dialogueStage][self.dialogueStageIndex]
+            #READ ME, FINISH MAKING THE NPC DIALOGUE CHOICE INTERACTION WORK
+            if len(self.TextBox.choiceRectList) > 0:
+                self.choiceResponse(False)
+                self.dialogueStageIndex += 1
+                if self.dialogueStageIndex == len(self.dialogueList[self.dialogueStage]):
+                    self.TextBox.kill()
+                    self.updateDialogue()
+                    self.game.state = 'explore'
+
+            elif nextDialogue.find('%Choices') != -1:
+                self.TextBox.kill()
+                self.TextBox = TextBox(self.game)
+                choicesList = nextDialogue.split(';')
+                self.TextBox.newText(choicesList[1:], 20, 'Courier', self.name)
+                if self.dialogueStageIndex+1 != len(self.dialogueList[self.dialogueStage]):
+                    self.dialogueStageIndex += 1
+            else:
+                self.TextBox.kill()
+                self.TextBox = TextBox(self.game)
+                self.TextBox.newText(nextDialogue, 20, 'Courier', self.name)
+                self.dialogueStageIndex += 1
         else:
             self.TextBox.kill()
             self.updateDialogue()
             self.game.state = 'explore'
+
+    #READ ME, FINISH WHEN CHOICES ARE DEFINED
+    def choiceResponse(self, isFlavor):
+        pass
             
         
 class Teleport(pygame.sprite.Sprite):
@@ -394,6 +476,9 @@ class TextBox(pygame.sprite.Sprite):
         self.imagelist = os.listdir('Sprites/npcs/chipichipichapachapa')
         self.imgindex = 3
 
+        self.selectedRect = 0
+        self.choiceRectList = []
+
         image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
         self.image.blit(image, self.avatarBox)
         #To see where the text and avatar area rectangles cover, uncomment below lines
@@ -402,22 +487,34 @@ class TextBox(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
     
-    def newText(self, text, fontSize, name):
+    def newText(self, text, fontSize, font, name):
         maxLength = int((float(-2.2835*10**(-7))*self.width**2+0.000411706*self.width+0.767647)*self.width/fontSize)+1
-        boxFont = pygame.font.SysFont('Courier', fontSize)
+        boxFont = pygame.font.SysFont(font, fontSize)
         countRows = 0
         while(len(text) > 0):
-            try:
-                cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9]', text[maxLength-1::-1]).end()+1
-            except AttributeError:
-                cutoffIndex = maxLength
-            self.image.blit(boxFont.render(text[0:cutoffIndex].strip(), False, (0, 0, 0)), (15, 10+countRows*fontSize), self.area)
-            countRows += 1
-            try:
-                text = text[cutoffIndex:]
-            except:
-                break
-        self.image.blit(pygame.font.SysFont('Courier', 25).render(name, False, (0, 0, 0)), (self.avatarBox.x+self.avatarBox.width/2-len(name)*TILESIZE/5.5, self.height*0.79))
+            if type(text) == str:
+                try:
+                    cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9]', text[maxLength-1::-1]).end()+1
+                except AttributeError:
+                    cutoffIndex = maxLength
+                self.image.blit(boxFont.render(text[0:cutoffIndex].strip(), False, (0, 0, 0)), (15, 10+countRows*fontSize), self.area)
+                countRows += 1
+                try:
+                    text = text[cutoffIndex:]
+                except:
+                    break
+            else:
+                if countRows == 0:
+                    self.image.blit(pygame.font.SysFont(font, int(fontSize*1.5)).render(text[0].strip(), False, (0, 0, 0)), (15, 10+countRows*fontSize*1.5), self.area)
+                    #self.choiceRectList.append(pygame.Rect(13, 10+countRows*fontSize*1.5, self.width*0.58, fontSize*1.5))
+                else:
+                    self.image.blit(boxFont.render(text[0].strip(), False, (0, 0, 0)), (15, 15+countRows*fontSize*1.5), self.area)
+                    self.choiceRectList.append(pygame.Rect(13, 10+countRows*fontSize*1.5, self.width*0.58, fontSize*1.5))
+                for rect in self.choiceRectList:
+                    pygame.draw.rect(self.image, GRAY, rect, 2, 1)
+                countRows += 1
+                text = text[1:]
+        self.image.blit(pygame.font.SysFont(font, 25).render(name, False, (0, 0, 0)), (self.avatarBox.x+self.avatarBox.width/2-len(name)*TILESIZE/5.5, self.height*0.79))
 
     
         
@@ -426,6 +523,12 @@ class TextBox(pygame.sprite.Sprite):
         self.timepassed += self.clock.get_time()/1000
         image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
         self.image.blit(image, self.avatarBox)
+        if len(self.choiceRectList) > 0:
+            for rect in range(len(self.choiceRectList)):
+                if rect == self.selectedRect:
+                    pygame.draw.rect(self.image, BLACK, self.choiceRectList[rect], 2, 1)
+                else:
+                    pygame.draw.rect(self.image, GRAY, self.choiceRectList[rect], 2, 1)
 
 
         

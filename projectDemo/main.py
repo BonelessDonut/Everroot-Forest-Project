@@ -21,12 +21,12 @@ class Game():
         pygame.init()
         pygame.font.init()
         self.screen = pygame.display.set_mode((WIDTH,HEIGHT))
-        self.clock = pygame.time.Clock()
+        self.clock = pygame.time.Clock() 
 
         self.state = 'explore'
         #Game states:
-        #Explore - Player can move around
-        #Dialogue - Player is currently in dialogue, player can't move
+        #explore - Player can move around
+        #dialogue - Player is currently in dialogue, player can't move
         #flowerC - flower animation is playing, player can't move
 
         self.map = (-1, -1)
@@ -78,7 +78,7 @@ class Game():
                 self.map[0] -= 1
             
             for row in range(len(settings.currentTilemap[mapNumber])):
-                #print(f"{row} ", end="")d
+                #print(f"{row} ", end="")
                 for col in range(len(settings.currentTilemap[mapNumber][row])):
                     if (settings.currentTilemap[mapNumber][row])[col] == "B":
                         Block(self, col, row)
