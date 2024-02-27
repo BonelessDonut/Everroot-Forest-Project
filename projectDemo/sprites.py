@@ -75,7 +75,9 @@ class Player(pygame.sprite.Sprite):
                 interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE, TILESIZE*2)
             flowerIndex = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
             if flowerIndex != -1:
-                self.game.flowers.get_sprite(flowerIndex).kill()
+                self.game.state = 'flowerC'
+                self.game.flowers.get_sprite(flowerIndex).state = 'cut'
+                self.game.flowers.get_sprite(flowerIndex).anim()
             oreIndex = interactRect.collidelist(list(ore.rect for ore in self.game.ores))
             if oreIndex != -1:
                 self.game.ores.get_sprite(oreIndex).kill()
@@ -176,7 +178,7 @@ class Block(pygame.sprite.Sprite):
         self.rect.y = self.y
 
 class Flower(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, clock):
         self.game = game
         self._layer = BLOCK_LAYER
         self.groups = self.game.all_sprites, self.game.flowers
@@ -186,16 +188,49 @@ class Flower(pygame.sprite.Sprite):
         self.y = y*TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        
-        self.imageList = ['Sprites/items/hyacinth.png', 'Sprites/items/sunflower.png']
-        self.image = pygame.transform.scale(pygame.image.load(self.imageList[random.randint(0, 1)]), (self.width, self.height))
+
+        self.clock = clock
+        self.timepassed = 0
+        self.imgindex = 0
+
+        #a self state helps ensure that only the interacted flower goes through anim()
+        self.state = 'alive'
+
+        hyacinImgL = ['Sprites/items/hyacinth.png', 'Sprites/items/hyacinth2.png', 'Sprites/items/hyacinth3.png', 'Sprites/items/hyacinth4.png', 'Sprites/items/hyacinth5.png']
+        sunFloImgL = ['Sprites/items/sunflowernew.png', 'Sprites/items/sunflower2.png', 'Sprites/items/sunflower3.png', 'Sprites/items/sunflower4.png', 'Sprites/items/sunflower5.png']
+        silentFImgL = ['Sprites/items/silentFlower.png', 'Sprites/items/silentFlower2.png', 'Sprites/items/silentFlower3.png', 'Sprites/items/silentFlower4.png', 'Sprites/items/silentFlower5.png']
+
+        self.imageList = [['Sprites/items/hyacinth.png', hyacinImgL], ['Sprites/items/sunflowernew.png', sunFloImgL], ['Sprites/items/silentFlower.png', silentFImgL]]
+        self.flowerSpriteNum = random.randint(0, len(self.imageList)-1)
+        self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][0]), (self.width, self.height))
+
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
 
+    def update(self):
+        self.timepassed += self.clock.get_time() / 1000
+        if self.game.state == 'flowerC':
+            if self.state == 'cut':
+                #READ ME, THIS UPDATES ALL THE FLOWERS AT ONCE AFTER INTERACTING WITH ONLY ONE FLOWER. - UNINTENDED OUTCOME, NEEDS FIXING
+                self.anim()
+                self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][1][self.imgindex % 5]), (self.width, self.height))
+
+    def anim(self): 
+        #realized it was setting the state to flowerC every single loop from the Player.interact() method, so it never went to the else to kill
+        #moved it in front to make sure it switched states when the imgindex got to 4
+        if self.imgindex > 4:
+            self.game.state = 'explore'
+        if self.game.state == 'flowerC':
+            self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.3) % 5 == self.imgindex) else self.imgindex
+
+        else:
+            if self.state == 'cut':
+                self.kill()
+
 class Ore(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, clock):
         self.game = game
         self._layer = BLOCK_LAYER
         self.groups = self.game.all_sprites, self.game.ores
@@ -205,6 +240,12 @@ class Ore(pygame.sprite.Sprite):
         self.y = y*TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
+
+        self.clock = clock
+        self.timepassed = 0
+        self.imgindex = 0
+
+        self.state = 'alive'
         
         #self.imageList = []
         #self.image = pygame.transform.scale(pygame.image.load(self.imageList[random.randint(0, 1)]), (self.width, self.height))
@@ -214,6 +255,11 @@ class Ore(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
+    def update(self):
+        self.timepassed += self.clock.get_time() / 1000
+        pass
+
 
 
 class NPC(pygame.sprite.Sprite):

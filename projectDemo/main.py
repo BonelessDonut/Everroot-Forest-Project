@@ -37,9 +37,9 @@ class Game():
                 elif (tilemap[row])[col] == "P":
                     Player(self, col, row, self.clock)
                 elif (tilemap[row])[col] == "F":
-                    Flower(self, col, row)
+                    Flower(self, col, row, self.clock)
                 elif (tilemap[row])[col] == 'O':
-                    Ore(self, col, row)
+                    Ore(self, col, row, self.clock)
                 elif (tilemap[row])[col] == 'N':
                     NPC(self, col, row)
                 #print(f"{col}", end="")
