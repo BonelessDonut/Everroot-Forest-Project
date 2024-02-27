@@ -1,0 +1,44 @@
+'''https://www.reddit.com/r/pygame/comments/petby5/inventory_system/
+- need list to hold items
+- need ui for the on screen inventory/hot bar
+- need to be able to load/unload items(materials) into the hot bar.. 
+- in the hotbar, the items are all pictured but the automatic equipment in each world (main, over, and mineworld) is highlighted based on where in the world the sprite is. 
+- 
+'''
+
+
+from globals import *
+from world.sprite import *
+
+class Item:
+    def __init__(self, name: str, quantity: int = 1) -> None:
+        self.name = name
+        self.quantity = quantity
+    def use(self, *args, **kwargs):
+        pass
+
+class BlockItem(Item): #placeable item (block)
+    def __init__(self, name: str, quantity: int = 1) -> None:
+        super().__init__(name, quantity)
+    def use(self, player, position: tuple): #placing the block
+        items[self.name].use_type()
+
+class ItemData:
+    def __init__(self, name: str, quantity: int = 1, groups: list[str] = ['sprites', 'block_group'], use_type: Entity = Entity, item_type: Item = Item) -> None:
+        self.name = name
+        self.quantity = quantity
+        self.groups = groups
+        self.use_type = use_type
+        self.item_type = item_type
+
+items: dict[str, ItemData] = (
+    'grass':ItemData('grass'), 
+    'dirt':ItemData('dirt'), 
+    'stone':ItemData('stone'), 
+)
+
+
+
+
+
+
