@@ -28,7 +28,13 @@ class Player(pygame.sprite.Sprite):
         #READ ME: FIX 'Sprites/protagBlobDown.png' being compressed too much by player size and looking weird as a result
         #Potential fixes: scale the image down in pygame before loading, or edit the sprite images to make them all the same resolution for more consistency (Using photoshop or smth)
         self.downImgList = ['Sprites/protag/protagBlobDownNew.png', 'Sprites/protag/protagBlobDownLeftAlt.png', 'Sprites/protag/protagBlobDownNew.png', 'Sprites/protag/protagBlobDownRightAltNew.png',]
-        
+
+        self.cutImgList = ['Sprites/protag/protagCut.png', 'Sprites/protag/protagCutRed.png', 'Sprites/protag/protagCutBlue.png', 'Sprites/protag/protagCutPlat.png']
+        self.cutIndex = 0
+
+        self.mineImgList = ['Sprites/protag/protagMine.png', 'Sprites/protag/protagMineRed.png', 'Sprites/protag/protagMineBlue.png', 'Sprites/protag/protagMinePlat.png']
+        self.mineIndex = 0
+
         self.clock = clock
         self.timepassed = 0
 
@@ -50,14 +56,15 @@ class Player(pygame.sprite.Sprite):
 
         self.timepassed += self.clock.get_time()/1000
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
-        if self.facing == 'right':
-            self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
-        elif self.facing == 'left':
-            self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
-        elif self.facing == 'up':
-            self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
-        else: # self.facing == 'down':
-            self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+        if self.game.state == 'explore':
+            if self.facing == 'right':
+                self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+            elif self.facing == 'left':
+                self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+            elif self.facing == 'up':
+                self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+            else: # self.facing == 'down':
+                self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
         self.xChange = 0
         self.yChange = 0
 
@@ -76,6 +83,9 @@ class Player(pygame.sprite.Sprite):
             flowerIndex = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
             if flowerIndex != -1:
                 self.game.state = 'flowerC'
+
+                self.image = pygame.transform.scale(pygame.image.load(self.cutImgList[self.cutIndex]), (self.width * 1.02, self.height * 1.02))
+
                 self.game.flowers.get_sprite(flowerIndex).state = 'cut'
                 self.game.flowers.get_sprite(flowerIndex).anim()
             oreIndex = interactRect.collidelist(list(ore.rect for ore in self.game.ores))
