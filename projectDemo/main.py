@@ -47,7 +47,7 @@ class Game():
                     elif (settings.currentTilemap[0][row])[col] == "F":
                         Flower(self, col, row, self.clock)
                     elif (settings.currentTilemap[0][row])[col] == 'O':
-                        Ore(self, col, row)
+                        Ore(self, col, row, self.clock)
                     elif (settings.currentTilemap[0][row])[col] == 'N':
                         NPC(self, col, row)
                     elif (settings.currentTilemap[0][row])[col] == 'T':
@@ -85,7 +85,7 @@ class Game():
                     elif (settings.currentTilemap[mapNumber][row])[col] == "F":
                         Flower(self, col, row, self.clock)
                     elif (settings.currentTilemap[mapNumber][row])[col] == 'O':
-                        Ore(self, col, row)
+                        Ore(self, col, row, self.clock)
                     elif (settings.currentTilemap[mapNumber][row])[col] == 'N':
                         NPC(self, col, row)
                     elif (settings.currentTilemap[mapNumber][row])[col] == 'T':

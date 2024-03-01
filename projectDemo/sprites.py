@@ -32,7 +32,14 @@ class Player(pygame.sprite.Sprite):
         #READ ME: FIX 'Sprites/protagBlobDown.png' being compressed too much by player size and looking weird as a result
         #Potential fixes: scale the image down in pygame before loading, or edit the sprite images to make them all the same resolution for more consistency (Using photoshop or smth)
         self.downImgList = ['Sprites/protag/protagBlobDownNew.png', 'Sprites/protag/protagBlobDownLeftAlt.png', 'Sprites/protag/protagBlobDownNew.png', 'Sprites/protag/protagBlobDownRightAltNew.png',]
-        
+
+        #READ ME, ADD SPRITES FOR CUTTING WHILE FACING OTHER DIRECTIONS THAN RIGHT
+        self.cutImgList = ['Sprites/protag/protagCut.png', 'Sprites/protag/protagCutRed.png', 'Sprites/protag/protagCutBlue.png', 'Sprites/protag/protagCutPlat.png']
+        self.cutIndex = 0
+        #READ ME, ADD SPRITES FOR MINING WHILE FACING OTHER DIRECTIONS THAN RIGHT
+        self.mineImgList = ['Sprites/protag/protagMine.png', 'Sprites/protag/protagMineRed.png', 'Sprites/protag/protagMineBlue.png', 'Sprites/protag/protagMinePlat.png']
+        self.mineIndex = 0
+
         self.clock = clock
         self.timepassed = 0
 
@@ -56,15 +63,16 @@ class Player(pygame.sprite.Sprite):
         self.collideBlocks('y')
 
         self.timepassed += self.clock.get_time()/1000
-        #Below line: Loads image using right image list, transforms it to scale with width and height, converts it, and sets it to the image
-        if self.facing == 'right':
-            self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]).convert_alpha(), (self.width * 1.02, self.height * 1.02))
-        elif self.facing == 'left':
-            self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]).convert_alpha(), (self.width * 1.02, self.height * 1.02))
-        elif self.facing == 'up':
-            self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]).convert_alpha(), (self.width * 1.02, self.height * 1.02))
-        else: # self.facing == 'down':
-            self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]).convert_alpha(), (self.width * 1.02, self.height * 1.02))
+        #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
+        if self.game.state == 'explore':
+            if self.facing == 'right':
+                self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+            elif self.facing == 'left':
+                self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+            elif self.facing == 'up':
+                self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+            else: # self.facing == 'down':
+                self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
         self.xChange = 0
         self.yChange = 0
 
@@ -107,6 +115,8 @@ class Player(pygame.sprite.Sprite):
             if flowerIndex != -1:
                 self.game.state = 'flowerC'
                 self.game.flowers.get_sprite(flowerIndex).state = 'cutting'
+                #READ ME, USE "self.facing" DIRECTIONS TO DETERMINE WHICH DIRECTION CUTTING SPRITE TO USE
+                self.image = pygame.transform.scale(pygame.image.load(self.cutImgList[self.cutIndex]), (self.width * 1.02, self.height * 1.02))
                 self.game.flowers.get_sprite(flowerIndex).anim()
 
             #Gets the index of the ore that the player interacted with
@@ -295,6 +305,8 @@ class Flower(pygame.sprite.Sprite):
         silentFImgL = ['Sprites/items/silentFlower.png', 'Sprites/items/silentFlower2.png', 'Sprites/items/silentFlower3.png', 'Sprites/items/silentFlower4.png', 'Sprites/items/silentFlower5.png']
 
         self.imageList = [['Sprites/items/hyacinth.png', hyacinImgL], ['Sprites/items/sunflowernew.png', sunFloImgL], ['Sprites/items/silentFlower.png', silentFImgL]]
+        #Randomly selects the flower to spawn as one of the flower options:
+        #either a hyacinth, sunflower, or silent princess flower
         self.flowerSpriteNum = random.randint(0, len(self.imageList)-1)
         self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][0]), (self.width, self.height))
 
@@ -307,20 +319,24 @@ class Flower(pygame.sprite.Sprite):
         self.timepassed += self.clock.get_time() / 1000
         if self.game.state == 'flowerC':
             if self.state == 'cutting':
+                #READ ME, THIS UPDATES ALL THE FLOWERS AT ONCE AFTER INTERACTING WITH ONLY ONE FLOWER. - UNINTENDED OUTCOME, NEEDS FIXING
                 self.anim()
                 self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][1][self.imgindex % 5]), (self.width, self.height))
 
     def anim(self): 
+        #realized it was setting the state to flowerC every single loop from the Player.interact() method, so it never went to the else to kill
+        #moved it in front to make sure it switched states when the imgindex got to 4
         if self.imgindex > 4:
             self.game.state = 'explore'
         if self.game.state == 'flowerC':
             self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.3) % 5 == self.imgindex) else self.imgindex
+
         else:
             if self.state == 'cutting':
                 self.kill()
 
 class Ore(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, clock):
         self.game = game
         self._layer = BLOCK_LAYER
         self.groups = self.game.all_sprites, self.game.ores
@@ -330,15 +346,39 @@ class Ore(pygame.sprite.Sprite):
         self.y = y*TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        
-        #self.imageList = []
-        #self.image = pygame.transform.scale(pygame.image.load(self.imageList[random.randint(0, 1)]), (self.width, self.height))
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(GREEN)
+
+        self.clock = clock
+        self.timepassed = 0
+        self.imgindex = 0
+
+        self.state = 'alive'
+
+        rubyImageL = ['Sprites/items/oreRuby.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
+        emeraldImageL = ['Sprites/items/oreEmerald.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
+        copperImageL = ['Sprites/items/oreCopper.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
+        amethImageL = ['Sprites/items/oreAmethyst.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
+        ironImageL = ['Sprites/items/oreIron.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
+
+
+
+        self.imageList = [rubyImageL[self.imgindex], emeraldImageL[self.imgindex], copperImageL[self.imgindex], amethImageL[self.imgindex], ironImageL[self.imgindex]]
+        self.oreSpriteNum = random.randint(0, len(self.imageList) - 1)
+
+        self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.oreSpriteNum]), (self.width, self.height))
+        #self.image = pygame.Surface([self.width, self.height])
+        #self.image.fill(GREEN)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
+    def update(self):
+        self.timepassed += self.clock.get_time() / 1000
+        pass
+
+    def killAnim(self):
+        pass
+
 
 
 class NPC(pygame.sprite.Sprite):
