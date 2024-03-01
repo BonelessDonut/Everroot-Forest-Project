@@ -106,7 +106,7 @@ class Player(pygame.sprite.Sprite):
             flowerIndex = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
             if flowerIndex != -1:
                 self.game.state = 'flowerC'
-                self.game.flowers.get_sprite(flowerIndex).state = 'cut'
+                self.game.flowers.get_sprite(flowerIndex).state = 'cutting'
                 self.game.flowers.get_sprite(flowerIndex).anim()
 
             #Gets the index of the ore that the player interacted with
@@ -159,6 +159,7 @@ class Player(pygame.sprite.Sprite):
                 if len(rectCollisionList) > 0:
                     npc.selectedRect = mouseRect.collidelist(rectCollisionList)
                     npc.interaction()
+                    pygame.time.wait(200)
 
             else:
                 #Checks if the player is within a square's range of side length 60 pixels of the mouse
@@ -305,7 +306,7 @@ class Flower(pygame.sprite.Sprite):
     def update(self):
         self.timepassed += self.clock.get_time() / 1000
         if self.game.state == 'flowerC':
-            if self.state == 'cut':
+            if self.state == 'cutting':
                 self.anim()
                 self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][1][self.imgindex % 5]), (self.width, self.height))
 
@@ -315,7 +316,7 @@ class Flower(pygame.sprite.Sprite):
         if self.game.state == 'flowerC':
             self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.3) % 5 == self.imgindex) else self.imgindex
         else:
-            if self.state == 'cut':
+            if self.state == 'cutting':
                 self.kill()
 
 class Ore(pygame.sprite.Sprite):
@@ -362,15 +363,20 @@ class NPC(pygame.sprite.Sprite):
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
-        #Always leave a space at the end of the quote!
+        #Always leave a space/punctuation at the end of the quote!
         self.dialogueList = {'01:First Meet':[{'Meetings': 1},
                                                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
                                                 "Boom Boom Boom Boom ",
-                                                "%Choices; Cats are cute?; Yes; Of Course; Meow"],
+                                                "%Choices; Cats are cute?; Yes; Of Course; Meow",
+                                                "%Choices; Do you want to submit 100 flowers?; Yes; No, not yet"],
                              '02:Second Meet': [{'Meetings':2},
                                                 "Hi again..."]
                             }
+        
+        #What needs to be done:
+        #For Choices strings, make it a list instead, depending on choice do selectedRect for next dialogue and then next dialogue after the choices string
+        #Probably do in choiceResponse method.
 
         self.TextBox = None
 
@@ -392,7 +398,7 @@ class NPC(pygame.sprite.Sprite):
             try:
                 self.dialogueStage = keys[keys.index(self.dialogueStage)+1]
             except IndexError:
-                print('no more dialogue')
+                pass
         self.dialogueStageIndex = 1
 
 
@@ -404,12 +410,7 @@ class NPC(pygame.sprite.Sprite):
             self.dialogueStageIndex += 1
             self.game.state = 'dialogue'
         elif self.dialogueStageIndex < len(self.dialogueList[self.dialogueStage]):
-            #The below was an attempt to draw over the previous text, but that became more of a hassle then simply remaking the TextBox
-            #clear = pygame.Surface((self.TextBox.area.width, self.TextBox.area.height), pygame.SRCALPHA)
-            #clear.fill(RED)
-            #self.TextBox.image.blit(clear, (15, 10))
             nextDialogue = self.dialogueList[self.dialogueStage][self.dialogueStageIndex]
-            #READ ME, FINISH MAKING THE NPC DIALOGUE CHOICE INTERACTION WORK
             if len(self.TextBox.choiceRectList) > 0:
                 self.choiceResponse(False)
                 self.dialogueStageIndex += 1
@@ -417,14 +418,13 @@ class NPC(pygame.sprite.Sprite):
                     self.TextBox.kill()
                     self.updateDialogue()
                     self.game.state = 'explore'
-
+                else:
+                    self.interaction()
             elif nextDialogue.find('%Choices') != -1:
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game)
                 choicesList = nextDialogue.split(';')
                 self.TextBox.newText(choicesList[1:], 20, 'Courier', self.name)
-                if self.dialogueStageIndex+1 != len(self.dialogueList[self.dialogueStage]):
-                    self.dialogueStageIndex += 1
             else:
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game)
@@ -437,6 +437,7 @@ class NPC(pygame.sprite.Sprite):
 
     #READ ME, FINISH WHEN CHOICES ARE DEFINED
     def choiceResponse(self, isFlavor):
+        self.TextBox.choiceRectList = []
         pass
             
         

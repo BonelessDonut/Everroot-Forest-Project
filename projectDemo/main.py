@@ -112,7 +112,6 @@ class Game():
         self.attacks = pygame.sprite.LayeredUpdates()
         self.createTilemap(None)
         #self.player = Player(self, 1, 2)
-
     def events(self):
         #game loop events
         for event in pygame.event.get():
