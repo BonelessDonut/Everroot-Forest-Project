@@ -212,6 +212,8 @@ class Flower(pygame.sprite.Sprite):
         silentFImgL = ['Sprites/items/silentFlower.png', 'Sprites/items/silentFlower2.png', 'Sprites/items/silentFlower3.png', 'Sprites/items/silentFlower4.png', 'Sprites/items/silentFlower5.png']
 
         self.imageList = [['Sprites/items/hyacinth.png', hyacinImgL], ['Sprites/items/sunflowernew.png', sunFloImgL], ['Sprites/items/silentFlower.png', silentFImgL]]
+        #Randomly selects the flower to spawn as one of the flower options:
+        #either a hyacinth, sunflower, or silent princess flower
         self.flowerSpriteNum = random.randint(0, len(self.imageList)-1)
         self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][0]), (self.width, self.height))
 
@@ -257,7 +259,13 @@ class Ore(pygame.sprite.Sprite):
         self.imgindex = 0
 
         self.state = 'alive'
-        
+
+        rubyImageL = []
+        emeraldImageL = []
+        copperImageL = []
+        amethImageL = []
+        ironImageL = []
+
         #self.imageList = []
         #self.image = pygame.transform.scale(pygame.image.load(self.imageList[random.randint(0, 1)]), (self.width, self.height))
         self.image = pygame.Surface([self.width, self.height])
@@ -269,6 +277,9 @@ class Ore(pygame.sprite.Sprite):
 
     def update(self):
         self.timepassed += self.clock.get_time() / 1000
+        pass
+
+    def killAnim(self):
         pass
 
 
