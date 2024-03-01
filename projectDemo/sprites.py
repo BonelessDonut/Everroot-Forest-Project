@@ -371,7 +371,7 @@ class NPC(pygame.sprite.Sprite):
                                                 "%Choices; Cats are cute?; Yes; Of Course; Meow",
                                                 "%Choices; Do you want to submit 100 flowers?; Yes; No, not yet"],
                              '02:Second Meet': [{'Meetings':2},
-                                                "Hi again..."]
+                                                "Hi again... "]
                             }
         
         #What needs to be done:
@@ -403,14 +403,18 @@ class NPC(pygame.sprite.Sprite):
 
 
     def interaction(self):
+        #Going into dialogue from explore
         if self.game.state == 'explore':
             self.meetings += 1
             self.TextBox = TextBox(self.game)
             self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 20, 'Courier', self.name)
             self.dialogueStageIndex += 1
             self.game.state = 'dialogue'
+
+        #While not finished with dialogue section
         elif self.dialogueStageIndex < len(self.dialogueList[self.dialogueStage]):
             nextDialogue = self.dialogueList[self.dialogueStage][self.dialogueStageIndex]
+            #If there are choices displayed on the screen
             if len(self.TextBox.choiceRectList) > 0:
                 self.choiceResponse(False)
                 self.dialogueStageIndex += 1
@@ -420,16 +424,19 @@ class NPC(pygame.sprite.Sprite):
                     self.game.state = 'explore'
                 else:
                     self.interaction()
+            #If the next dialogue to display is a choice list
             elif nextDialogue.find('%Choices') != -1:
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game)
                 choicesList = nextDialogue.split(';')
                 self.TextBox.newText(choicesList[1:], 20, 'Courier', self.name)
+            #Displaying normal dialogue
             else:
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game)
                 self.TextBox.newText(nextDialogue, 20, 'Courier', self.name)
                 self.dialogueStageIndex += 1
+        #When finished with dialogue
         else:
             self.TextBox.kill()
             self.updateDialogue()
@@ -493,6 +500,7 @@ class TextBox(pygame.sprite.Sprite):
         boxFont = pygame.font.SysFont(font, fontSize)
         countRows = 0
         while(len(text) > 0):
+            #If normal dialogue
             if type(text) == str:
                 try:
                     cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9]', text[maxLength-1::-1]).end()+1
@@ -504,9 +512,10 @@ class TextBox(pygame.sprite.Sprite):
                     text = text[cutoffIndex:]
                 except:
                     break
+            #If a choice dialogue
             else:
                 if countRows == 0:
-                    self.image.blit(pygame.font.SysFont(font, int(fontSize*1.5)).render(text[0].strip(), False, (0, 0, 0)), (15, 10+countRows*fontSize*1.5), self.area)
+                    self.image.blit(pygame.font.SysFont(font, int(fontSize*1.2)).render(text[0].strip(), False, (0, 0, 0)), (15, 10+countRows*fontSize*1.2), self.area)
                     #self.choiceRectList.append(pygame.Rect(13, 10+countRows*fontSize*1.5, self.width*0.58, fontSize*1.5))
                 else:
                     self.image.blit(boxFont.render(text[0].strip(), False, (0, 0, 0)), (15, 15+countRows*fontSize*1.5), self.area)
