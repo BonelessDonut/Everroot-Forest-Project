@@ -260,16 +260,20 @@ class Ore(pygame.sprite.Sprite):
 
         self.state = 'alive'
 
-        rubyImageL = []
-        emeraldImageL = []
-        copperImageL = []
-        amethImageL = []
-        ironImageL = []
+        rubyImageL = ['Sprites/items/oreRuby.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
+        emeraldImageL = ['Sprites/items/oreEmerald.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
+        copperImageL = ['Sprites/items/oreCopper.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
+        amethImageL = ['Sprites/items/oreAmethyst.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
+        ironImageL = ['Sprites/items/oreIron.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
 
-        #self.imageList = []
-        #self.image = pygame.transform.scale(pygame.image.load(self.imageList[random.randint(0, 1)]), (self.width, self.height))
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(GREEN)
+
+
+        self.imageList = [rubyImageL[self.imgindex], emeraldImageL[self.imgindex], copperImageL[self.imgindex], amethImageL[self.imgindex], ironImageL[self.imgindex]]
+        self.oreSpriteNum = random.randint(0, len(self.imageList) - 1)
+
+        self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.oreSpriteNum]), (self.width, self.height))
+        #self.image = pygame.Surface([self.width, self.height])
+        #self.image.fill(GREEN)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
