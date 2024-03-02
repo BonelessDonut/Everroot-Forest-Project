@@ -116,13 +116,16 @@ class Player(pygame.sprite.Sprite):
                 self.game.state = 'flowerC'
                 self.game.flowers.get_sprite(flowerIndex).state = 'cutting'
                 #READ ME, USE "self.facing" DIRECTIONS TO DETERMINE WHICH DIRECTION CUTTING SPRITE TO USE
-                self.image = pygame.transform.scale(pygame.image.load(self.cutImgList[self.cutIndex]), (self.width * 1.02, self.height * 1.02))
+                self.image = pygame.transform.scale(pygame.image.load(self.cutImgList[self.cutIndex]), (self.width * 1.04, self.height * 1.04))
                 self.game.flowers.get_sprite(flowerIndex).anim()
 
             #Gets the index of the ore that the player interacted with
             oreIndex = interactRect.collidelist(list(ore.rect for ore in self.game.ores))
             if oreIndex != -1:
-                self.game.ores.get_sprite(oreIndex).kill()
+                self.game.state = 'oreMine'
+                self.game.ores.get_sprite(oreIndex).state = 'mining'
+                self.image = pygame.transform.scale(pygame.image.load(self.mineImgList[self.mineIndex]), (self.width * 1.04, self.height * 1.04))
+                self.game.ores.get_sprite(oreIndex).killAnim()
 
             #Gets the index of the npc that the player interacted with
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
@@ -285,7 +288,7 @@ class Block(pygame.sprite.Sprite):
 class Flower(pygame.sprite.Sprite):
     def __init__(self, game, x, y, clock):
         self.game = game
-        self._layer = BLOCK_LAYER
+        self._layer = ITEM_LAYER
         self.groups = self.game.all_sprites, self.game.flowers
         pygame.sprite.Sprite.__init__(self, self.groups)
 
@@ -296,7 +299,7 @@ class Flower(pygame.sprite.Sprite):
 
         self.clock = clock
         self.timepassed = 0
-        self.imgindex = 0
+        self.imgindex = 1
 
         self.state = 'alive'
 
@@ -338,7 +341,7 @@ class Flower(pygame.sprite.Sprite):
 class Ore(pygame.sprite.Sprite):
     def __init__(self, game, x, y, clock):
         self.game = game
-        self._layer = BLOCK_LAYER
+        self._layer = ITEM_LAYER
         self.groups = self.game.all_sprites, self.game.ores
         pygame.sprite.Sprite.__init__(self, self.groups)
 
@@ -353,18 +356,18 @@ class Ore(pygame.sprite.Sprite):
 
         self.state = 'alive'
 
-        rubyImageL = ['Sprites/items/oreRuby.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
-        emeraldImageL = ['Sprites/items/oreEmerald.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
-        copperImageL = ['Sprites/items/oreCopper.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
-        amethImageL = ['Sprites/items/oreAmethyst.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
-        ironImageL = ['Sprites/items/oreIron.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png']
+        rubyImageL = ['Sprites/items/oreRuby.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png', 'Sprites/items/oreRuby3.png']
+        emeraldImageL = ['Sprites/items/oreEmerald.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png', 'Sprites/items/oreRuby3.png']
+        copperImageL = ['Sprites/items/oreCopper.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png', 'Sprites/items/oreRuby3.png']
+        amethImageL = ['Sprites/items/oreAmethyst.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png', 'Sprites/items/oreRuby3.png']
+        ironImageL = ['Sprites/items/oreIron.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png', 'Sprites/items/oreRuby3.png']
 
 
 
-        self.imageList = [rubyImageL[self.imgindex], emeraldImageL[self.imgindex], copperImageL[self.imgindex], amethImageL[self.imgindex], ironImageL[self.imgindex]]
+        self.imageList = [['Sprites/items/oreRuby.png', rubyImageL], ['Sprites/items/oreEmerald.png', emeraldImageL], ['Sprites/items/oreCopper.png', copperImageL], ['Sprites/items/oreAmethyst.png', amethImageL], ['Sprites/items/oreIron.png', ironImageL]]
         self.oreSpriteNum = random.randint(0, len(self.imageList) - 1)
 
-        self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.oreSpriteNum]), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.oreSpriteNum][0]), (self.width, self.height))
         #self.image = pygame.Surface([self.width, self.height])
         #self.image.fill(GREEN)
 
@@ -374,9 +377,24 @@ class Ore(pygame.sprite.Sprite):
 
     def update(self):
         self.timepassed += self.clock.get_time() / 1000
+        if self.game.state == 'oreMine':
+            if self.state == 'mining':
+                #READ ME, THIS UPDATES ALL THE FLOWERS AT ONCE AFTER INTERACTING WITH ONLY ONE FLOWER. - UNINTENDED OUTCOME, NEEDS FIXING
+                self.killAnim()
+                self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.oreSpriteNum][1][self.imgindex % 4]), (self.width, self.height))
+                print(self.imgindex)
+
+
         pass
 
     def killAnim(self):
+        if self.imgindex > 2:
+            self.game.state = 'explore'
+        if self.game.state == 'oreMine':
+            self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.31) % 4 == self.imgindex) else self.imgindex
+        else:
+            if self.state == 'mining':
+                self.kill()
         pass
 
 
