@@ -329,6 +329,10 @@ class Flower(pygame.sprite.Sprite):
 
         self.state = 'alive'
 
+        #READ ME, EDIT ALL OF THE FLOWER SPRITES TO NOT INCLUDE THE CUTTING SHEARS
+        #THIS WILL LIKELY IMPROVE ANIMATION FLUIDITY WHEN FLOWERS ARE INTERACTED WITH
+        #WILL ALSO REMOVE DUPLICATE SHEARS WITH THE PLAYER CUTTING ANIMATION
+
         hyacinImgL = ['Sprites/items/hyacinth.png', 'Sprites/items/hyacinth2.png', 'Sprites/items/hyacinth3.png', 'Sprites/items/hyacinth4.png', 'Sprites/items/hyacinth5.png']
         sunFloImgL = ['Sprites/items/sunflowernew.png', 'Sprites/items/sunflower2.png', 'Sprites/items/sunflower3.png', 'Sprites/items/sunflower4.png', 'Sprites/items/sunflower5.png']
         silentFImgL = ['Sprites/items/silentFlower.png', 'Sprites/items/silentFlower2.png', 'Sprites/items/silentFlower3.png', 'Sprites/items/silentFlower4.png', 'Sprites/items/silentFlower5.png']
