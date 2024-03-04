@@ -221,7 +221,7 @@ class Player(pygame.sprite.Sprite):
             tpSprite = self.game.teleport.get_sprite(teleportIndex)
             self.kill()
             self.game.createTilemap((tpSprite.x//TILESIZE, tpSprite.y//TILESIZE))
-            pygame.time.wait(100)
+            pygame.time.wait(60)
 
 
     
@@ -304,12 +304,34 @@ class Block(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
 
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(RED)
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/tiles/brick1.png'), (self.width, self.height))
+        #self.image.fill(RED)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
+'''class Ground(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+
+        self.game = game
+        self._layer = GROUND_LAYER
+        self.groups = self.game.all_sprites, self.game.ground
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        self.x = x*TILESIZE
+        self.y = y*TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/tiles/ground2.png'), (self.width, self.height))
+        #self.image.fill(RED)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y'''
+
+
 
 class Flower(pygame.sprite.Sprite):
     def __init__(self, game, x, y, clock):
@@ -333,9 +355,9 @@ class Flower(pygame.sprite.Sprite):
         #THIS WILL LIKELY IMPROVE ANIMATION FLUIDITY WHEN FLOWERS ARE INTERACTED WITH
         #WILL ALSO REMOVE DUPLICATE SHEARS WITH THE PLAYER CUTTING ANIMATION
 
-        hyacinImgL = ['Sprites/items/hyacinth.png', 'Sprites/items/hyacinth2.png', 'Sprites/items/hyacinth3.png', 'Sprites/items/hyacinth4.png', 'Sprites/items/hyacinth5.png']
-        sunFloImgL = ['Sprites/items/sunflowernew.png', 'Sprites/items/sunflower2.png', 'Sprites/items/sunflower3.png', 'Sprites/items/sunflower4.png', 'Sprites/items/sunflower5.png']
-        silentFImgL = ['Sprites/items/silentFlower.png', 'Sprites/items/silentFlower2.png', 'Sprites/items/silentFlower3.png', 'Sprites/items/silentFlower4.png', 'Sprites/items/silentFlower5.png']
+        hyacinImgL = ['Sprites/items/hyacinth.png', 'Sprites/items/hyacinth3New.png', 'Sprites/items/hyacinth5.png']
+        sunFloImgL = ['Sprites/items/sunflowernew.png', 'Sprites/items/sunflower3New.png', 'Sprites/items/sunflower5.png']
+        silentFImgL = ['Sprites/items/silentFlower.png', 'Sprites/items/silentFlower3New.png', 'Sprites/items/silentFlower5.png']
 
         self.imageList = [['Sprites/items/hyacinth.png', hyacinImgL], ['Sprites/items/sunflowernew.png', sunFloImgL], ['Sprites/items/silentFlower.png', silentFImgL]]
         #Randomly selects the flower to spawn as one of the flower options:
@@ -354,15 +376,15 @@ class Flower(pygame.sprite.Sprite):
             if self.state == 'cutting':
                 #READ ME, THIS UPDATES ALL THE FLOWERS AT ONCE AFTER INTERACTING WITH ONLY ONE FLOWER. - UNINTENDED OUTCOME, NEEDS FIXING
                 self.anim()
-                self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][1][self.imgindex % 5]), (self.width, self.height))
+                self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][1][self.imgindex % 3]), (self.width, self.height))
 
     def anim(self): 
         #realized it was setting the state to flowerC every single loop from the Player.interact() method, so it never went to the else to kill
         #moved it in front to make sure it switched states when the imgindex got to 4
-        if self.imgindex > 4:
+        if self.imgindex > 2:
             self.game.state = 'explore'
         if self.game.state == 'flowerC':
-            self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.3) % 5 == self.imgindex) else self.imgindex
+            self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.31) % 3 == self.imgindex) else self.imgindex
 
         else:
             if self.state == 'cutting':
