@@ -208,7 +208,11 @@ class Player(pygame.sprite.Sprite):
                         self.game.ores.get_sprite(interactIndex).kill()
                     interactIndex = mouseRect.collidelist(list(flower.rect for flower in self.game.flowers))
                     if interactIndex != -1:
-                        self.game.flowers.get_sprite(interactIndex).kill()
+                        self.game.state = 'flowerC'
+                        self.game.flowers.get_sprite(interactIndex).state = 'cutting'
+                        #READ ME, USE "self.facing" DIRECTIONS TO DETERMINE WHICH DIRECTION CUTTING SPRITE TO USE
+                        self.image = pygame.transform.scale(pygame.image.load(self.cutImgList[self.cutIndex]), (self.width * 1.02, self.height * 1.02))
+                        self.game.flowers.get_sprite(interactIndex).anim()
                     interactIndex = mouseRect.collidelist(list(npc.rect for npc in self.game.npcs))
                     if interactIndex != -1:
                         self.game.npcs.get_sprite(interactIndex).interaction()
