@@ -481,8 +481,7 @@ class NPC(pygame.sprite.Sprite):
                                                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
                                                 "Boom Boom Boom Boom ",
-                                                "%Choices; Cats are cute?; Yes; Of Course; Meow",
-                                                "%Choices; Do you want to submit 100 flowers?; Yes; No, not yet"],
+                                                "%Choices; Cats are cute?; Yes; Of Course; Meow"],
                              '02:Second Meet': [{'Meetings':2},
                                                 "Hi again... "]
                             }
@@ -592,7 +591,8 @@ class TextBox(pygame.sprite.Sprite):
         self.timepassed = 0
 
         self.area = pygame.Rect(0, 0, self.width*0.6, self.height*0.95)
-        self.avatarBox = pygame.Rect(self.width*0.693, self.height*0.1, self.width*0.219, self.height*0.65)
+        #self.avatarBox = pygame.Rect(self.width*0.693, self.height*0.1, self.width*0.219, self.height*0.65)
+        self.avatarBox = pygame.Rect(self.width*0.72, self.height*0.24, self.width*0.2775, self.height*0.73)
         self.image = pygame.transform.scale(pygame.image.load('Sprites/SVTextboxTemplate.png').convert_alpha(), (self.width, self.height))
         self.imagelist = os.listdir('Sprites/npcs/chipichipichapachapa')
         self.imgindex = 3
@@ -608,7 +608,11 @@ class TextBox(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
     
+    #Function to actually display the text on the screen
+    #Parameters: text is either a string displaying one textbox worth of dialogue or a list with the first element as the question and the rest as choices
+    #fontSize is the font size, font is the font, and name is the NPC name
     def newText(self, text, fontSize, font, name):
+        #Formula for the maximum number of characters that can fit on the screen assuming it's monospaced font
         maxLength = int((float(-2.2835*10**(-7))*self.width**2+0.000411706*self.width+0.767647)*self.width/fontSize)+1
         boxFont = pygame.font.SysFont(font, fontSize)
         countRows = 0
