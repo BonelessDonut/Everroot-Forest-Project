@@ -1,0 +1,16 @@
+Charlenne Tan notes on Procedural Generation
+
+general information on procedural generation that may be useful for our game:
+- one room can generate into automatically generated different kinds of rooms without the coder coding an entire map
+- procedural content can "adapt" to different screen sizes and resolutions
+- allows the player to replay an entire game as if it were new with differently generated maps
+- new tasks to discuss/think about
+ - generating rooms of different sizes and shapes
+ - making the map loop on itself so that the player has better innate navigation and doesn't get lost
+ - giving rooms differing or specific content
+looked up procedural generation done in 3d from a new coder's POV and looked for inspiration here on what to look up for the rooms
+- spawning things only at specific locations (ie reeds only at a formed beach that's by a lake)
+- spawning chance creating different odds for certain things spawning at certain locations (ie mushrooms at the base of a tree)
+- having new content generated not spawn within each other (ie vegetation in a rock)
+- having a main path that the user can follow instead of wandering aimlessly
+- 

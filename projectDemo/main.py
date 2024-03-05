@@ -59,6 +59,7 @@ class Game():
         else:
             self.all_sprites.empty()
             self.blocks.empty()
+            self.ground.empty()
             self.flowers.empty()
             self.ores.empty()
             self.npcs.empty()
@@ -104,6 +105,7 @@ class Game():
         self.playing = True
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.blocks = pygame.sprite.LayeredUpdates()
+        self.ground = pygame.sprite.LayeredUpdates()
         self.flowers = pygame.sprite.LayeredUpdates()
         self.ores = pygame.sprite.LayeredUpdates()
         self.npcs = pygame.sprite.LayeredUpdates()
