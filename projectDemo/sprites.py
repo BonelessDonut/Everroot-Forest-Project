@@ -478,7 +478,7 @@ class NPC(pygame.sprite.Sprite):
         self.dialogueStageIndex = 1
         #Always leave a space/punctuation at the end of the quote!
         self.dialogueList = {'01:First Meet':[{'Meetings': 1},
-                                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
                                                 "Boom Boom Boom Boom ",
                                                 "%Choices; Cats are cute?; Yes; Of Course; Meow"],
@@ -590,10 +590,9 @@ class TextBox(pygame.sprite.Sprite):
         self.clock = game.clock
         self.timepassed = 0
 
-        self.area = pygame.Rect(0, 0, self.width*0.6, self.height*0.95)
-        #self.avatarBox = pygame.Rect(self.width*0.693, self.height*0.1, self.width*0.219, self.height*0.65)
+        self.area = pygame.Rect(0, 3, self.width*0.70, self.height*0.6)
         self.avatarBox = pygame.Rect(self.width*0.72, self.height*0.24, self.width*0.2775, self.height*0.73)
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/SVTextboxTemplate.png').convert_alpha(), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/textbox1.png').convert_alpha(), (self.width, self.height*1.20))
         self.imagelist = os.listdir('Sprites/npcs/chipichipichapachapa')
         self.imgindex = 3
 
@@ -614,6 +613,9 @@ class TextBox(pygame.sprite.Sprite):
     def newText(self, text, fontSize, font, name):
         #Formula for the maximum number of characters that can fit on the screen assuming it's monospaced font
         maxLength = int((float(-2.2835*10**(-7))*self.width**2+0.000411706*self.width+0.767647)*self.width/fontSize)+1
+        self.font = font
+        self.fontSize = fontSize
+        self.name = name
         boxFont = pygame.font.SysFont(font, fontSize)
         countRows = 0
         while(len(text) > 0):
@@ -623,25 +625,30 @@ class TextBox(pygame.sprite.Sprite):
                     cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9]', text[maxLength-1::-1]).end()+1
                 except AttributeError:
                     cutoffIndex = maxLength
-                self.image.blit(boxFont.render(text[0:cutoffIndex].strip(), False, (0, 0, 0)), (15, 10+countRows*fontSize), self.area)
+                print("cutoffIndex is ", cutoffIndex)
+                print("maxlength is ",  maxLength)
+                print("self.area is ", self.area)
+                print(15, 10+countRows*fontSize)
+                self.image.blit(boxFont.render(text[0:cutoffIndex].strip(), False, (255, 255, 255)), (15, 40+countRows*fontSize), self.area)
                 countRows += 1
                 try:
                     text = text[cutoffIndex:]
+                    print(len(text))
                 except:
                     break
             #If a choice dialogue
             else:
                 if countRows == 0:
-                    self.image.blit(pygame.font.SysFont(font, int(fontSize*1.2)).render(text[0].strip(), False, (0, 0, 0)), (15, 10+countRows*fontSize*1.2), self.area)
+                    self.image.blit(pygame.font.SysFont(font, int(fontSize*1.2)).render(text[0].strip(), False, (255, 255, 255)), (15, 10+countRows*fontSize*1.2), self.area)
                     #self.choiceRectList.append(pygame.Rect(13, 10+countRows*fontSize*1.5, self.width*0.58, fontSize*1.5))
                 else:
-                    self.image.blit(boxFont.render(text[0].strip(), False, (0, 0, 0)), (15, 15+countRows*fontSize*1.5), self.area)
+                    self.image.blit(boxFont.render(text[0].strip(), False, (255, 255, 255)), (15, 15+countRows*fontSize*1.5), self.area)
                     self.choiceRectList.append(pygame.Rect(13, 10+countRows*fontSize*1.5, self.width*0.58, fontSize*1.5))
                 for rect in self.choiceRectList:
                     pygame.draw.rect(self.image, GRAY, rect, 2, 1)
                 countRows += 1
                 text = text[1:]
-        self.image.blit(pygame.font.SysFont(font, 25).render(name, False, (0, 0, 0)), (self.avatarBox.x+self.avatarBox.width/2-len(name)*TILESIZE/5.5, self.height*0.79))
+
 
     
         
@@ -650,6 +657,7 @@ class TextBox(pygame.sprite.Sprite):
         self.timepassed += self.clock.get_time()/1000
         image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
         self.image.blit(image, self.avatarBox)
+        self.image.blit(pygame.font.SysFont(self.font, 25).render(self.name, False, (255, 255, 255)),(self.avatarBox.x + self.avatarBox.width / 2 - len(self.name) * TILESIZE / 5.5, self.height * 0.79))
         if len(self.choiceRectList) > 0:
             for rect in range(len(self.choiceRectList)):
                 if rect == self.selectedRect:
