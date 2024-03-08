@@ -29,16 +29,16 @@ class Game():
         #dialogue - Player is currently in dialogue, player can't move
         #flowerC - flower animation is playing, player can't move
 
-        self.map = (-1, -1)
+        self.map = [-1, -1]
         
         #self.font = pygame.font.Font('Arial', 32)
         self.running = True
 
     def createTilemap(self, prevPosition):
         #Only for initial map creation
-        if self.map == (-1, -1):
+        if self.map == [-1, -1]:
             for row in range(len(settings.currentTilemap[0])):
-                #print(f"{row} ", end="")d
+                #print(f"{row} ", end="")
                 for col in range(len(settings.currentTilemap[0][row])):
                     if (settings.currentTilemap[0][row])[col] == "B":
                         Block(self, col, row)

@@ -478,7 +478,7 @@ class NPC(pygame.sprite.Sprite):
         self.dialogueStageIndex = 1
         #Always leave a space/punctuation at the end of the quote!
         self.dialogueList = {'01:First Meet':[{'Meetings': 1},
-                                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
+                                                "Would you rather cum in the sink or sink in the cum? That is indeed the question for which we must all ponder and arrive at our own answers.",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
                                                 "Boom Boom Boom Boom ",
                                                 "%Choices; Cats are cute?; Yes; Of Course; Meow"],
@@ -519,7 +519,7 @@ class NPC(pygame.sprite.Sprite):
         if self.game.state == 'explore':
             self.meetings += 1
             self.TextBox = TextBox(self.game)
-            self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 20, 'Courier', self.name)
+            self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 20, 'Garamond', self.name)
             self.dialogueStageIndex += 1
             self.game.state = 'dialogue'
 
@@ -541,12 +541,12 @@ class NPC(pygame.sprite.Sprite):
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game)
                 choicesList = nextDialogue.split(';')
-                self.TextBox.newText(choicesList[1:], 20, 'Courier', self.name)
+                self.TextBox.newText(choicesList[1:], 20, 'Garamond', self.name)
             #Displaying normal dialogue
             else:
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game)
-                self.TextBox.newText(nextDialogue, 20, 'Courier', self.name)
+                self.TextBox.newText(nextDialogue, 20, 'Garamond', self.name)
                 self.dialogueStageIndex += 1
         #When finished with dialogue
         else:
@@ -606,7 +606,24 @@ class TextBox(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
-    
+
+
+    def textBreaker(self, text):
+        # variable to keep track of text currently getting displayed
+        # inspiration for this function: https://stackoverflow.com/questions/31381169/pygame-scrolling-dialogue-text
+        # https://sentry.io/answers/python-yield-keyword/
+        tprint = ''
+        for letter in text:
+            tprint += letter
+            # this function yields and returns the updated text string for every character except if there is a space
+            # in that case, the space is appended onto the string and the function yields after the following character
+            if letter != ' ':
+                # yield keyword pauses the current iteration of a sequence, in this case the for loop, and returns the
+                # current value of the variable tprint. This iteration is picked up at the next letter when the function is called again.
+                # it essentially returns the text given as a string that increases in length by one character each time.
+                yield tprint
+
+
     #Function to actually display the text on the screen
     #Parameters: text is either a string displaying one textbox worth of dialogue or a list with the first element as the question and the rest as choices
     #fontSize is the font size, font is the font, and name is the NPC name
@@ -618,6 +635,7 @@ class TextBox(pygame.sprite.Sprite):
         self.name = name
         boxFont = pygame.font.SysFont(font, fontSize)
         countRows = 0
+        #currentText = textBreaker(text)
         while(len(text) > 0):
             #If normal dialogue
             if type(text) == str:
@@ -625,15 +643,15 @@ class TextBox(pygame.sprite.Sprite):
                     cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9]', text[maxLength-1::-1]).end()+1
                 except AttributeError:
                     cutoffIndex = maxLength
-                print("cutoffIndex is ", cutoffIndex)
-                print("maxlength is ",  maxLength)
-                print("self.area is ", self.area)
-                print(15, 10+countRows*fontSize)
+                #print("cutoffIndex is ", cutoffIndex)
+                #print("maxlength is ",  maxLength)
+                #print("self.area is ", self.area)
+                #print(15, 10+countRows*fontSize)
                 self.image.blit(boxFont.render(text[0:cutoffIndex].strip(), False, (255, 255, 255)), (15, 40+countRows*fontSize), self.area)
                 countRows += 1
                 try:
                     text = text[cutoffIndex:]
-                    print(len(text))
+                    #print(len(text))
                 except:
                     break
             #If a choice dialogue
@@ -657,7 +675,7 @@ class TextBox(pygame.sprite.Sprite):
         self.timepassed += self.clock.get_time()/1000
         image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
         self.image.blit(image, self.avatarBox)
-        self.image.blit(pygame.font.SysFont(self.font, 25).render(self.name, False, (255, 255, 255)),(self.avatarBox.x + self.avatarBox.width / 2 - len(self.name) * TILESIZE / 5.5, self.height * 0.79))
+        self.image.blit(pygame.font.SysFont('Courier', 25).render(self.name, False, (255, 255, 255)),(self.avatarBox.x + self.avatarBox.width / 2 - len(self.name) * TILESIZE / 5.5, self.height * 0.79))
         if len(self.choiceRectList) > 0:
             for rect in range(len(self.choiceRectList)):
                 if rect == self.selectedRect:
