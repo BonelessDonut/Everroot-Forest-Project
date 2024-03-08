@@ -615,6 +615,7 @@ class TextBox(pygame.sprite.Sprite):
         tprint = ''
         for letter in text:
             tprint += letter
+            #print(tprint)
             # this function yields and returns the updated text string for every character except if there is a space
             # in that case, the space is appended onto the string and the function yields after the following character
             if letter != ' ':
@@ -633,9 +634,11 @@ class TextBox(pygame.sprite.Sprite):
         self.font = font
         self.fontSize = fontSize
         self.name = name
-        boxFont = pygame.font.SysFont(font, fontSize)
-        countRows = 0
-        #currentText = textBreaker(text)
+        self.boxFont = pygame.font.SysFont(font, fontSize)
+        self.countRows = 0
+        self.currentText = self.textBreaker('')
+        self.rowDone = False
+
         while(len(text) > 0):
             #If normal dialogue
             if type(text) == str:
@@ -647,8 +650,13 @@ class TextBox(pygame.sprite.Sprite):
                 #print("maxlength is ",  maxLength)
                 #print("self.area is ", self.area)
                 #print(15, 10+countRows*fontSize)
-                self.image.blit(boxFont.render(text[0:cutoffIndex].strip(), False, (255, 255, 255)), (15, 40+countRows*fontSize), self.area)
-                countRows += 1
+                #while next(currentText) != text[0:cutoffIndex]:
+                try:
+                    self.currentText = self.textBreaker(text[0:cutoffIndex])
+                except StopIteration:
+                    self.countRows += 1
+
+
                 try:
                     text = text[cutoffIndex:]
                     #print(len(text))
@@ -656,15 +664,15 @@ class TextBox(pygame.sprite.Sprite):
                     break
             #If a choice dialogue
             else:
-                if countRows == 0:
-                    self.image.blit(pygame.font.SysFont(font, int(fontSize*1.2)).render(text[0].strip(), False, (255, 255, 255)), (15, 10+countRows*fontSize*1.2), self.area)
+                if self.countRows == 0:
+                    self.image.blit(pygame.font.SysFont(font, int(fontSize*1.2)).render(text[0].strip(), False, (255, 255, 255)), (15, 10+self.countRows*self.fontSize*1.2), self.area)
                     #self.choiceRectList.append(pygame.Rect(13, 10+countRows*fontSize*1.5, self.width*0.58, fontSize*1.5))
                 else:
-                    self.image.blit(boxFont.render(text[0].strip(), False, (255, 255, 255)), (15, 15+countRows*fontSize*1.5), self.area)
-                    self.choiceRectList.append(pygame.Rect(13, 10+countRows*fontSize*1.5, self.width*0.58, fontSize*1.5))
+                    self.image.blit(self.boxFont.render(text[0].strip(), False, (255, 255, 255)), (15, 15+self.countRows*fontSize*1.5), self.area)
+                    self.choiceRectList.append(pygame.Rect(13, 10+self.countRows*fontSize*1.5, self.width*0.58, fontSize*1.5))
                 for rect in self.choiceRectList:
                     pygame.draw.rect(self.image, GRAY, rect, 2, 1)
-                countRows += 1
+                self.countRows += 1
                 text = text[1:]
 
 
@@ -675,6 +683,11 @@ class TextBox(pygame.sprite.Sprite):
         self.timepassed += self.clock.get_time()/1000
         image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
         self.image.blit(image, self.avatarBox)
+        try:
+            self.image.blit(self.boxFont.render(next(self.currentText).strip(), False, (255, 255, 255)),(15, 40 + self.countRows * self.fontSize), self.area)
+        except StopIteration:
+            self.rowDone = True
+            self.countRows += 1
         self.image.blit(pygame.font.SysFont('Courier', 25).render(self.name, False, (255, 255, 255)),(self.avatarBox.x + self.avatarBox.width / 2 - len(self.name) * TILESIZE / 5.5, self.height * 0.79))
         if len(self.choiceRectList) > 0:
             for rect in range(len(self.choiceRectList)):
