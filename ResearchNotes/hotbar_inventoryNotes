@@ -229,3 +229,25 @@ while running:
                         player_inventory.items[pos[0]][pos[1]] = None
 
 
+
+'''video #3 https://www.youtube.com/watch?v=3pY97haPiQE
+-- not pygame
+
+'''
+
+'''video 4 and 5
+
+
+'''
+
+def add_item(self, item):
+    first_available_slot = len(self.slots) #first empty slot
+    target_slot = len(self.slot) # first slot of same name
+    for index, slot in enumerate(self.slots): #gives index position of what we're looking for
+        if slot.name == "default" and index < first_available_slot: #gives first available slot
+            first_available_slot = index
+        if slot.name == item.name: 
+            target_slot = index
+    if target_slot < len(self.slots): 
+        self.slots[target_slot].quantity += 1 
+                                 
