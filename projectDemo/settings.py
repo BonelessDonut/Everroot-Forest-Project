@@ -17,14 +17,14 @@ PLAYER_SPEED = 5
 BLOCK_LAYER = 4
 GROUND_LAYER = 1
 
-mapList = [[0, 3, 0],
-           [5, 1, 2],
-           [0, 4, 0]]
+mapList = [[-1, 2, -1],
+           [4, 0, 1],
+           [-1, 3, -1]]
 
 #tiles to represent the world, each 'B' represents a block, the 'P' is the player's position
 #There are 32 horizontal tiles (width of 1280 / 40) and 18 vertical tiles (height of 720 / 40))
 currentTilemap = [[
-    'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBB1',
+    'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBB',
     'B..............................B',
     'B..........BBBB................B',
     'B.........BBF.BB......O........B',
@@ -43,7 +43,7 @@ currentTilemap = [[
     'B..............................B',
     'BBBBBBBBBBBBBBBBBBBBBTTBBBBBBBBB'
 ], [#right
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB2',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
     'B..............................B',
     'B..............................B',
     'B.........BBF.BB......O........B',
@@ -62,7 +62,7 @@ currentTilemap = [[
     'B..............................B',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ], [#up
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB3',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
     'B..............................B',
     'B..............................B',
     'B.........BBF.BB......O........B',
@@ -81,7 +81,7 @@ currentTilemap = [[
     'B..............................B',
     'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBB'
 ], [#down
-    'BBBBBBBBBBBBBBBBBBBBBTTBBBBBBBBB4',
+    'BBBBBBBBBBBBBBBBBBBBBTTBBBBBBBBB',
     'B..............................B',
     'B..............................B',
     'B.....................O........B',
@@ -100,7 +100,7 @@ currentTilemap = [[
     'B.............O................B',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ], [#left
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB5',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
     'B..............................B',
     'B..............................B',
     'B.........BBF.BB......O........B',

@@ -66,16 +66,16 @@ class Game():
             self.teleport.empty()
 
             if prevPosition[0] == 31:
-                mapNumber = mapList[self.map[0]][self.map[1]+1] - 1
+                mapNumber = mapList[self.map[0]][self.map[1]+1] 
                 self.map[1] += 1
             elif prevPosition[0] == 0:
-                mapNumber = mapList[self.map[0]][self.map[1]-1] - 1
+                mapNumber = mapList[self.map[0]][self.map[1]-1] 
                 self.map[1] -= 1
             elif prevPosition[1] == 17:
-                mapNumber = mapList[self.map[0]+1][self.map[1]] - 1
+                mapNumber = mapList[self.map[0]+1][self.map[1]] 
                 self.map[0] += 1
             elif prevPosition[1] == 0:
-                mapNumber = mapList[self.map[0]-1][self.map[1]] - 1
+                mapNumber = mapList[self.map[0]-1][self.map[1]] 
                 self.map[0] -= 1
             
             for row in range(len(settings.currentTilemap[mapNumber])):
