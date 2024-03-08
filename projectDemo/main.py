@@ -54,7 +54,7 @@ class Game():
                         Teleport(self, col, row)
                     #print(f"{col}", end="")
                 #print()
-            self.map = [1, 1]
+            self.map = [2, 2]
         #For moving between rooms
         else:
             self.all_sprites.empty()
@@ -99,6 +99,29 @@ class Game():
                             Player(self, col, row-1, self.clock)
                         elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
                             Player(self, col, row+1, self.clock)
+
+        print("mapList:", mapList)
+        print("currentTilemap:", currentTilemap)
+    
+    def addRoom(self, prevPosition):
+        emptyRoom = []
+        for row in range(18):
+            emptyRow = ''
+            for col in range(32):
+                if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
+                    emptyRow += 'T'
+                elif prevPosition[0] == 31 and col == 0 and prevPosition[1] == row:
+                    emptyRow += 'T'
+                elif prevPosition[1] == 0 and row == 17 and prevPosition[0] == col:
+                    emptyRow += 'T'
+                elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
+                    emptyRow += 'T'
+                elif row == 0 or row == 17 or col == 0 or col == 31:
+                    emptyRow += 'B'
+                else:
+                    emptyRow += '.'
+            emptyRoom.append(emptyRow)
+        currentTilemap.append(emptyRoom)
 
     def new(self):
 
