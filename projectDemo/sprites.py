@@ -519,7 +519,7 @@ class NPC(pygame.sprite.Sprite):
         if self.game.state == 'explore':
             self.meetings += 1
             self.TextBox = TextBox(self.game)
-            self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 20, 'Garamond', self.name)
+            self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 24, 'Garamond', self.name)
             self.dialogueStageIndex += 1
             self.game.state = 'dialogue'
 
@@ -541,12 +541,12 @@ class NPC(pygame.sprite.Sprite):
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game)
                 choicesList = nextDialogue.split(';')
-                self.TextBox.newText(choicesList[1:], 20, 'Garamond', self.name)
+                self.TextBox.newText(choicesList[1:], 24, 'Garamond', self.name)
             #Displaying normal dialogue
             else:
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game)
-                self.TextBox.newText(nextDialogue, 20, 'Garamond', self.name)
+                self.TextBox.newText(nextDialogue, 24, 'Garamond', self.name)
                 self.dialogueStageIndex += 1
         #When finished with dialogue
         else:
@@ -618,6 +618,7 @@ class TextBox(pygame.sprite.Sprite):
             #print(tprint)
             # this function yields and returns the updated text string for every character except if there is a space
             # in that case, the space is appended onto the string and the function yields after the following character
+
             if letter != ' ':
                 # yield keyword pauses the current iteration of a sequence, in this case the for loop, and returns the
                 # current value of the variable tprint. This iteration is picked up at the next letter when the function is called again.
@@ -641,6 +642,7 @@ class TextBox(pygame.sprite.Sprite):
 
         while(len(text) > 0):
             #If normal dialogue
+
             if type(text) == str:
                 try:
                     cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9]', text[maxLength-1::-1]).end()+1
@@ -652,9 +654,18 @@ class TextBox(pygame.sprite.Sprite):
                 #print(15, 10+countRows*fontSize)
                 #while next(currentText) != text[0:cutoffIndex]:
                 try:
-                    self.currentText = self.textBreaker(text[0:cutoffIndex])
+                    while not self.rowDone:
+
+                        self.currentText = self.textBreaker(text[0:cutoffIndex])
+                        self.image.blit(self.boxFont.render(next(self.currentText).strip(), False, (255, 255, 255)),(15, 40 + self.countRows * self.fontSize), self.area)
+                        print(next(self.currentText))
+                        if(next(self.currentText) == text[0:cutoffIndex]):
+                            self.rowDone = True
+                        else:
+                            self.rowDone = True
                 except StopIteration:
                     self.countRows += 1
+                    print("stopped")
 
 
                 try:
@@ -662,6 +673,9 @@ class TextBox(pygame.sprite.Sprite):
                     #print(len(text))
                 except:
                     break
+
+
+
             #If a choice dialogue
             else:
                 if self.countRows == 0:
@@ -684,10 +698,10 @@ class TextBox(pygame.sprite.Sprite):
         image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
         self.image.blit(image, self.avatarBox)
         try:
+            print(next(self.currentText))
             self.image.blit(self.boxFont.render(next(self.currentText).strip(), False, (255, 255, 255)),(15, 40 + self.countRows * self.fontSize), self.area)
         except StopIteration:
             self.rowDone = True
-            self.countRows += 1
         self.image.blit(pygame.font.SysFont('Courier', 25).render(self.name, False, (255, 255, 255)),(self.avatarBox.x + self.avatarBox.width / 2 - len(self.name) * TILESIZE / 5.5, self.height * 0.79))
         if len(self.choiceRectList) > 0:
             for rect in range(len(self.choiceRectList)):
