@@ -202,7 +202,7 @@ class Player(pygame.sprite.Sprite):
 
             else:
                 #Checks if the player is within a square's range of side length 60 pixels of the mouse
-                if abs(mouseRect.x-self.rect.x) <= 60 and abs(mouseRect.y-self.rect.y) <= 60:
+                if ((mouseRect.x-self.rect.x)**2+(mouseRect.y-self.rect.y)**2)**(1/2) <= 60:
                     interactIndex = mouseRect.collidelist(list(ore.rect for ore in self.game.ores))
                     if interactIndex != -1:
                         self.game.state = 'oreMine'
@@ -500,7 +500,7 @@ class NPC(pygame.sprite.Sprite):
         #Always leave a space/punctuation at the end of the quote!
         #Would you rather cum in the sink or sink in the cum? That is indeed the question for which we must all ponder and arrive at our own answers.
         self.dialogueList = {'01:First Meet':[{'Meetings': 1},
-                                                "Testing dialogue",
+                                                "Testing dialogue ",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
                                                 "Boom Boom Boom Boom ",
                                                 "%Choices; Cats are cute?; Yes; Of Course; Meow"],
