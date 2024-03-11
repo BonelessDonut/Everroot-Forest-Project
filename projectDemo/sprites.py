@@ -140,7 +140,16 @@ class Player(pygame.sprite.Sprite):
             if oreIndex != -1:
                 self.game.state = 'oreMine'
                 self.game.ores.get_sprite(oreIndex).state = 'mining'
-                self.game.ores.get_sprite(oreIndex).kill()
+                self.game.ores.get_sprite(oreIndex).killAnim()
+                if self.facing == 'right':
+                    self.image = pygame.transform.scale(pygame.image.load(self.mineRightImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                elif self.facing == 'left':
+                    self.image = pygame.transform.scale(pygame.image.load(self.mineLeftImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                elif self.facing == 'up':
+                    self.image = pygame.transform.scale(pygame.image.load(self.mineUpImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                else:
+                    self.image = pygame.transform.scale(pygame.image.load(self.mineDownImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+            
             
 
 
