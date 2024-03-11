@@ -131,7 +131,6 @@ class Player(pygame.sprite.Sprite):
                 elif self.facing == 'up':
                     self.image = pygame.transform.scale(pygame.image.load(self.cutUpImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
                 else:
-                    print(self.facing)
                     self.image = pygame.transform.scale(pygame.image.load(self.cutDownImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
 
 
@@ -141,15 +140,8 @@ class Player(pygame.sprite.Sprite):
             if oreIndex != -1:
                 self.game.state = 'oreMine'
                 self.game.ores.get_sprite(oreIndex).state = 'mining'
-                self.game.ores.get_sprite(oreIndex).killAnim()
-                if self.facing == 'right':
-                    self.image = pygame.transform.scale(pygame.image.load(self.mineRightImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
-                elif self.facing == 'left':
-                    self.image = pygame.transform.scale(pygame.image.load(self.mineLeftImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
-                elif self.facing == 'up':
-                    self.image = pygame.transform.scale(pygame.image.load(self.mineUpImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
-                else:
-                    self.image = pygame.transform.scale(pygame.image.load(self.mineDownImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))\
+                self.game.ores.get_sprite(oreIndex).kill()
+            
 
 
 
@@ -192,6 +184,7 @@ class Player(pygame.sprite.Sprite):
                 npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
                 npc = self.game.npcs.get_sprite(npcIndex)
                 rectCollisionList = npc.TextBox.choiceRectList[:]
+
                 for rect in range(len(rectCollisionList)):
                     rectCollisionList[rect].x = npc.TextBox.x + 13
                     rectCollisionList[rect].y = npc.TextBox.y + 25 + 30*rect
@@ -203,6 +196,7 @@ class Player(pygame.sprite.Sprite):
             else:
                 #Checks if the player is within a square's range of side length 60 pixels of the mouse
                 if ((mouseRect.x-self.rect.x)**2+(mouseRect.y-self.rect.y)**2)**(1/2) <= 60:
+
                     interactIndex = mouseRect.collidelist(list(ore.rect for ore in self.game.ores))
                     if interactIndex != -1:
                         self.game.state = 'oreMine'
