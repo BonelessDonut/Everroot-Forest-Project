@@ -205,14 +205,35 @@ class Player(pygame.sprite.Sprite):
                 if abs(mouseRect.x-self.rect.x) <= 60 and abs(mouseRect.y-self.rect.y) <= 60:
                     interactIndex = mouseRect.collidelist(list(ore.rect for ore in self.game.ores))
                     if interactIndex != -1:
-                        self.game.ores.get_sprite(interactIndex).kill()
+                        self.game.state = 'oreMine'
+                        self.game.ores.get_sprite(interactIndex).state = 'mining'
+                        self.game.ores.get_sprite(interactIndex).killAnim()
+                        if self.facing == 'right':
+                            self.image = pygame.transform.scale(pygame.image.load(self.mineRightImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                        elif self.facing == 'left':
+                            self.image = pygame.transform.scale(pygame.image.load(self.mineLeftImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                        elif self.facing == 'up':
+                            self.image = pygame.transform.scale(pygame.image.load(self.mineUpImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                        else:
+                            self.image = pygame.transform.scale(pygame.image.load(self.mineDownImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))\
+
+                    
                     interactIndex = mouseRect.collidelist(list(flower.rect for flower in self.game.flowers))
                     if interactIndex != -1:
                         self.game.state = 'flowerC'
                         self.game.flowers.get_sprite(interactIndex).state = 'cutting'
-                        #READ ME, USE "self.facing" DIRECTIONS TO DETERMINE WHICH DIRECTION CUTTING SPRITE TO USE
-                        self.image = pygame.transform.scale(pygame.image.load(self.cutImgList[self.cutIndex]), (self.width * 1.02, self.height * 1.02))
                         self.game.flowers.get_sprite(interactIndex).anim()
+                        #READ ME, USE "self.facing" DIRECTIONS TO DETERMINE WHICH DIRECTION CUTTING SPRITE TO USE
+                        if self.facing == 'right':
+                            self.image = pygame.transform.scale(pygame.image.load(self.cutRightImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
+                        elif self.facing == 'left':
+                            self.image = pygame.transform.scale(pygame.image.load(self.cutLeftImgList[self.cutUpgrade]),   (self.width * 1.06, self.height * 1.06))
+                        elif self.facing == 'up':
+                            self.image = pygame.transform.scale(pygame.image.load(self.cutUpImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
+                        else:
+                            self.image = pygame.transform.scale(pygame.image.load(self.cutDownImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
+
+
                     interactIndex = mouseRect.collidelist(list(npc.rect for npc in self.game.npcs))
                     if interactIndex != -1:
                         self.game.npcs.get_sprite(interactIndex).interaction()
@@ -477,8 +498,9 @@ class NPC(pygame.sprite.Sprite):
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
         #Always leave a space/punctuation at the end of the quote!
+        #Would you rather cum in the sink or sink in the cum? That is indeed the question for which we must all ponder and arrive at our own answers.
         self.dialogueList = {'01:First Meet':[{'Meetings': 1},
-                                                "Would you rather cum in the sink or sink in the cum? That is indeed the question for which we must all ponder and arrive at our own answers.",
+                                                "Testing dialogue",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
                                                 "Boom Boom Boom Boom ",
                                                 "%Choices; Cats are cute?; Yes; Of Course; Meow"],
