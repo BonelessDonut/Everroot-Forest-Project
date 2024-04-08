@@ -150,7 +150,21 @@ class Game():
         #Play the intro screen
         #To be created later
         pass
-
+    
+    def add_item(self, item):
+        first_available = len(self.slots) 
+        same_slot = len(self.slots) 
+        for index, slot in enumerate(self.slots): 
+            if slot.name == 'blank' and first_available == len(self.slots):
+                first_available = index
+            elif slot.name == item.name: 
+                same_slot = index
+                break
+        if same_slot < len(self.slots): 
+            self.slots[same_slot].quantity += 1 
+        elif first_available < len(self.slots):
+            self.slots[first_available].name = item.name
+            self.slots[first_available].quantity = 1
 
 
 

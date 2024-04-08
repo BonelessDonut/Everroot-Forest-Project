@@ -684,4 +684,4 @@ class TextBox(pygame.sprite.Sprite):
                     pygame.draw.rect(self.image, GRAY, self.choiceRectList[rect], 2, 1)
 
 
-        
+class Inventory(pygame.sprite.Sprite):
