@@ -319,6 +319,62 @@ class Player(pygame.sprite.Sprite):
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.y -= yDiff
 
+
+#Assuming one melee and multiple ranged weapons
+#type - weapon name: currently presumably some variation of sword and bubble gun (shotgun)
+class Weapon():
+    def __init__(self, game, type, player):
+        self.game = game
+        self.player = player
+        self.type = type
+        #timer used to count the time between attacks
+        self.timer = 0
+        self.spread = None
+        self.damage = None
+        self.pause = None
+        self.range = None
+        self.reloadTime = None
+        self.ammo = None
+        
+        if type == 'bubble':
+            #45 degrees spread of bubble bullets
+            self.spread = 45
+            self.damage = 10
+            #how long to pause between each bullet
+            self.pause = 2/self.ammo
+            self.range = 2*TILESIZE
+            #how long to reload ammo
+            self.reloadTime = 2
+            self.ammo = 50
+        #melee
+        else:
+            #75 degrees spread of melee swing
+            self.spread = 75
+            self.damage = 25
+            self.pause = 0.4
+    
+    def attack(self):
+        if self.timer == 0:
+            if type == 'bubble':
+                angle = random.uniform(-1*self.spread, self.spread)
+                if self.player.facing == 'up':
+                    angle += 90
+                elif self.player.facing == 'left':
+                    angle += 180
+                elif self.player.facing == 'down':
+                    angle += 270
+                Bullet(self.game, self.x, self.y, angle)
+
+        else:
+            return False
+    
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, angle):
+        self.game = game
+        self.clock = game.clock
+        
+
+
 class Block(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
 
