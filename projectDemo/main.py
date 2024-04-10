@@ -112,6 +112,7 @@ class Game():
         self.teleport = pygame.sprite.LayeredUpdates()
         self.enemies = pygame.sprite.LayeredUpdates()
         self.attacks = pygame.sprite.LayeredUpdates()
+        self.bullets = pygame.sprite.LayeredUpdates()
         self.createTilemap(None)
         #self.player = Player(self, 1, 2)
     def events(self):

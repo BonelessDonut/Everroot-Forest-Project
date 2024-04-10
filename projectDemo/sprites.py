@@ -16,6 +16,7 @@ class Player(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
+        self.weapon = Weapon(self.game, 'bubble', self)
 
         self.mouseRect = pygame.Rect(0, 0, 40, 40)
         self.mouseRect.center = pygame.mouse.get_pos()
@@ -106,6 +107,7 @@ class Player(pygame.sprite.Sprite):
     def interact(self):
         keys = pygame.key.get_pressed()
         mouses = pygame.mouse.get_pressed()
+        interacted = False
         if keys[pygame.K_SPACE]:
             interactRect = None
             if self.facing == 'right':
@@ -120,6 +122,7 @@ class Player(pygame.sprite.Sprite):
             #Gets the index of the flower that the player interacted with
             flowerIndex = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
             if flowerIndex != -1:
+                interacted = True
                 self.game.state = 'flowerC'
                 self.game.flowers.get_sprite(flowerIndex).state = 'cutting'
                 self.game.flowers.get_sprite(flowerIndex).anim()
@@ -138,6 +141,7 @@ class Player(pygame.sprite.Sprite):
             #Gets the index of the ore that the player interacted with
             oreIndex = interactRect.collidelist(list(ore.rect for ore in self.game.ores))
             if oreIndex != -1:
+                interacted = True
                 self.game.state = 'oreMine'
                 self.game.ores.get_sprite(oreIndex).state = 'mining'
                 self.game.ores.get_sprite(oreIndex).killAnim()
@@ -150,15 +154,15 @@ class Player(pygame.sprite.Sprite):
                 else:
                     self.image = pygame.transform.scale(pygame.image.load(self.mineDownImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
             
-            
-
-
-
             #Gets the index of the npc that the player interacted with
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
             if npcIndex != -1:
+                interacted = True
                 self.game.npcs.get_sprite(npcIndex).interaction()
                 pygame.time.wait(250)
+
+            if not interacted:
+                self.weapon.attack()
         elif self.game.state == 'dialogue' and (keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_UP] or keys[pygame.K_DOWN]):
             interactRect = None
             if self.facing == 'right':
@@ -173,6 +177,7 @@ class Player(pygame.sprite.Sprite):
             #Gets the index of the npc that the player interacted with
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
             if npcIndex != -1:
+                interacted = True
                 npc = self.game.npcs.get_sprite(npcIndex)
                 if keys[pygame.K_w] or keys[pygame.K_UP]:
                     npc.TextBox.selectedRect = npc.TextBox.selectedRect - 1 if npc.TextBox.selectedRect > 0 else npc.TextBox.selectedRect
@@ -180,7 +185,6 @@ class Player(pygame.sprite.Sprite):
                 else:
                     npc.TextBox.selectedRect = npc.TextBox.selectedRect + 1 if npc.TextBox.selectedRect < len(npc.TextBox.choiceRectList)-1 else npc.TextBox.selectedRect
                     pygame.time.wait(150)
-
 
 
         #Allows mouse click functionality for interactions
@@ -340,12 +344,12 @@ class Weapon():
             #45 degrees spread of bubble bullets
             self.spread = 45
             self.damage = 10
+            self.ammo = 12
             #how long to pause between each bullet
-            self.pause = 2/self.ammo
+            self.pause = 1
             self.range = 2*TILESIZE
             #how long to reload ammo
             self.reloadTime = 2
-            self.ammo = 50
         #melee
         else:
             #75 degrees spread of melee swing
@@ -355,7 +359,7 @@ class Weapon():
     
     def attack(self):
         if self.timer == 0:
-            if type == 'bubble':
+            if self.type == 'bubble':
                 angle = random.uniform(-1*self.spread, self.spread)
                 if self.player.facing == 'up':
                     angle += 90
@@ -363,7 +367,8 @@ class Weapon():
                     angle += 180
                 elif self.player.facing == 'down':
                     angle += 270
-                Bullet(self.game, self.x, self.y, angle)
+                angle = angle - 360 if angle >= 360 else angle
+                Bullet(self.game, self.player.x, self.player.y, angle)
 
         else:
             return False
@@ -372,7 +377,26 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, game, x, y, angle):
         self.game = game
         self.clock = game.clock
-        
+        self.groups = self.game.all_sprites, self.game.bullets
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.timepassed = 0
+        self.x = x*TILESIZE
+        self.y = y*TILESIZE
+        self.width = TILESIZE//4
+        self.height = TILESIZE//4
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/items/bubble.png'), (self.width, self.height))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.speed = 6
+
+        self.xIncrement = self.speed*math.cos(angle)
+        self.yIncrement = self.speed*math.sin(angle)
+
+    def update(self):
+        self.timepassed += self.clock.get_time() / 1000
+        self.x += self.xIncrement
+        self.y += self.yIncrement
 
 
 class Block(pygame.sprite.Sprite):
