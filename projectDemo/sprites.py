@@ -377,6 +377,7 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, game, x, y, angle):
         self.game = game
         self.clock = game.clock
+        self._layer = BLOCK_LAYER
         self.groups = self.game.all_sprites, self.game.bullets
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.timepassed = 0
