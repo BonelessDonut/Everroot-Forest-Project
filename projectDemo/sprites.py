@@ -69,6 +69,8 @@ class Player(pygame.sprite.Sprite):
         self.collideBlocks('x')
         self.rect.y += self.yChange
         self.collideBlocks('y')
+        self.x = self.rect.x
+        self.y = self.rect.y
 
         self.timepassed += self.clock.get_time()/1000
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
@@ -163,6 +165,8 @@ class Player(pygame.sprite.Sprite):
 
             if not interacted:
                 self.weapon.attack()
+
+
         elif self.game.state == 'dialogue' and (keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_UP] or keys[pygame.K_DOWN]):
             interactRect = None
             if self.facing == 'right':
@@ -326,52 +330,94 @@ class Player(pygame.sprite.Sprite):
 
 #Assuming one melee and multiple ranged weapons
 #type - weapon name: currently presumably some variation of sword and bubble gun (shotgun)
-class Weapon():
+class Weapon(pygame.sprite.Sprite):
     def __init__(self, game, type, player):
         self.game = game
+        self.clock = game.clock
         self.player = player
+        self.groups = self.game.all_sprites, self.game.weapons
+        pygame.sprite.Sprite.__init__(self, self.groups)
         self.type = type
         #timer used to count the time between attacks
         self.timer = 0
+        self.timepassed = 0
         self.spread = None
         self.damage = None
         self.pause = None
         self.range = None
         self.reloadTime = None
         self.ammo = None
-        
+        self.x = self.player.x
+        self.y = self.player.y
+        self.width = TILESIZE//2
+        self.height = TILESIZE//2
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/items/bubblegun.png'), (self.width, self.height))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+        #bubble is a burst of 3 bullets with 15 bullet ammo
         if type == 'bubble':
-            #45 degrees spread of bubble bullets
-            self.spread = 45
+            #7 degrees spread of bubble bullets
+            self.spread = 5
             self.damage = 10
-            self.ammo = 12
+            self.ammo = 90
             #how long to pause between each bullet
-            self.pause = 1
+            self.pause = 0.2
             self.range = 2*TILESIZE
             #how long to reload ammo
             self.reloadTime = 2
+            #how long each between each bullet during a burst (3 bullets should be separated by self.burstTime)
+            self.burstTime = self.pause/10
         #melee
         else:
             #75 degrees spread of melee swing
             self.spread = 75
             self.damage = 25
             self.pause = 0.4
+
+    def reload(self):
+        pass
     
     def attack(self):
         if self.timer == 0:
-            if self.type == 'bubble':
-                angle = random.uniform(-1*self.spread, self.spread)
-                if self.player.facing == 'up':
-                    angle += 90
-                elif self.player.facing == 'left':
-                    angle += 180
-                elif self.player.facing == 'down':
-                    angle += 270
-                angle = angle - 360 if angle >= 360 else angle
-                Bullet(self.game, self.player.x, self.player.y, angle)
+            #Can only shoot if having enough ammo
+            #Since it's a burst weapon, you're only allowed to shoot after each burst is done shooting
+            #After the first shot of each burst here, the other 2 bubbles are shot in the update method
+            if self.type == 'bubble' and self.ammo > 0 and self.ammo % 3 == 0:
+                Bullet(self.game, self.player.x, self.player.y, self.calculateAngle())
+                self.ammo -= 1
+                self.timer = self.pause
+        
+    def update(self):
+        self.timepassed = self.clock.get_time() / 1000
+        
+        #To space out the bubble shots by burstTime
+        if self.ammo % 3 == 2 and -1*self.burstTime < self.timer - self.pause < 0 or self.ammo % 3 == 1 and -2*self.burstTime < self.timer - self.pause < -1*self.burstTime:
+            Bullet(self.game, self.player.x, self.player.y, self.calculateAngle())
+            self.ammo -= 1
 
-        else:
-            return False
+        #editing the timer between shots
+        self.timer -= self.timepassed
+        if self.timer < 0:
+            self.timer = 0
+
+        #moves the Weapon sprite with the player
+        self.x = self.player.x
+        self.y = self.player.y
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+    def calculateAngle(self):
+        angle = random.uniform(-1*self.spread, self.spread)
+        if self.player.facing == 'up':
+            angle += 90
+        elif self.player.facing == 'left':
+            angle += 180
+        elif self.player.facing == 'down':
+            angle += 270
+        angle = angle - 360 if angle >= 360 else angle
+        return angle*math.pi/180
     
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, game, x, y, angle):
@@ -380,11 +426,10 @@ class Bullet(pygame.sprite.Sprite):
         self._layer = BLOCK_LAYER
         self.groups = self.game.all_sprites, self.game.bullets
         pygame.sprite.Sprite.__init__(self, self.groups)
-        self.timepassed = 0
-        self.x = x*TILESIZE
-        self.y = y*TILESIZE
-        self.width = TILESIZE//4
-        self.height = TILESIZE//4
+        self.x = x
+        self.y = y
+        self.width = TILESIZE
+        self.height = TILESIZE
         self.image = pygame.transform.scale(pygame.image.load('Sprites/items/bubble.png'), (self.width, self.height))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -392,12 +437,15 @@ class Bullet(pygame.sprite.Sprite):
         self.speed = 6
 
         self.xIncrement = self.speed*math.cos(angle)
-        self.yIncrement = self.speed*math.sin(angle)
+        self.yIncrement = -1*self.speed*math.sin(angle)
+
 
     def update(self):
-        self.timepassed += self.clock.get_time() / 1000
         self.x += self.xIncrement
         self.y += self.yIncrement
+        self.rect.x = self.x
+        self.rect.y = self.y
+        #print(self.x, self.y)
 
 
 class Block(pygame.sprite.Sprite):
