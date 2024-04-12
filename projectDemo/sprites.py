@@ -369,6 +369,9 @@ class Weapon():
                     angle += 270
                 angle = angle - 360 if angle >= 360 else angle
                 Bullet(self.game, self.player.x, self.player.y, angle)
+            else:
+                # This section is for handling attacking with melee weapons
+                pass
 
         else:
             return False
@@ -399,6 +402,15 @@ class Bullet(pygame.sprite.Sprite):
         self.x += self.xIncrement
         self.y += self.yIncrement
 
+class MeleeSprite(pygame.sprite.Sprite):
+    # This class is intended to handle the sprite for a melee weapon when attacking using those
+    # As well as the hitbox associated with that attack
+
+    # For a swinging weapon, the weapon sprite should move across the arc and the hitbox should follow accordingly
+
+    # For a stabbing / poking weapon, the weapon sprite and hitbox could just come out and be static for the duration of the attack
+    # With the hitbox fading away a bit sooner than the visual sprite
+    pass
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
