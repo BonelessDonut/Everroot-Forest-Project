@@ -37,6 +37,7 @@ class Game():
     def createTilemap(self, prevPosition):
         #Only for initial map creation
         if self.map == [-1, -1]:
+            Inventory(self)
             for row in range(len(settings.currentTilemap[0])):
                 #print(f"{row} ", end="")
                 for col in range(len(settings.currentTilemap[0][row])):
@@ -64,6 +65,7 @@ class Game():
             self.ores.empty()
             self.npcs.empty()
             self.teleport.empty()
+            
 
             if prevPosition[0] == 31:
                 mapNumber = mapList[self.map[0]][self.map[1]+1] 
@@ -151,20 +153,7 @@ class Game():
         #To be created later
         pass
     
-    def add_item(self, item):
-        first_available = len(self.slots) 
-        same_slot = len(self.slots) 
-        for index, slot in enumerate(self.slots): 
-            if slot.name == 'blank' and first_available == len(self.slots):
-                first_available = index
-            elif slot.name == item.name: 
-                same_slot = index
-                break
-        if same_slot < len(self.slots): 
-            self.slots[same_slot].quantity += 1 
-        elif first_available < len(self.slots):
-            self.slots[first_available].name = item.name
-            self.slots[first_available].quantity = 1
+        
 
 
 

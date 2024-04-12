@@ -685,3 +685,36 @@ class TextBox(pygame.sprite.Sprite):
 
 
 class Inventory(pygame.sprite.Sprite):
+    def __init__(self, game):
+
+        self.game = game
+        self._layer = TEXT_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        self.x = 1*TILESIZE
+        self.y = 17*TILESIZE
+        self.width = 13*TILESIZE
+        self.height = 1*TILESIZE
+
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/hotbar.png'), (self.width, self.height))
+        #self.image.fill(RED)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+    def add_item(self, item):
+        first_available = len(self.slots) 
+        same_slot = len(self.slots) 
+        for index, slot in enumerate(self.slots): 
+            if slot.name == 'blank' and first_available == len(self.slots):
+                first_available = index
+            elif slot.name == item.name: 
+                same_slot = index
+                break
+        if same_slot < len(self.slots): 
+            self.slots[same_slot].quantity += 1 
+        elif first_available < len(self.slots):
+            self.slots[first_available].name = item.name
+            self.slots[first_available].quantity = 1
