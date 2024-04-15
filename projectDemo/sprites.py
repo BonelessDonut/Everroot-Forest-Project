@@ -364,7 +364,7 @@ class Weapon(pygame.sprite.Sprite):
             self.ammo = 90
             #how long to pause between each bullet
             self.pause = 0.2
-            self.range = 2*TILESIZE
+            self.range = 5*TILESIZE
             #how long to reload ammo
             self.reloadTime = 2
             #how long each between each bullet during a burst (3 bullets should be separated by self.burstTime)
@@ -385,7 +385,7 @@ class Weapon(pygame.sprite.Sprite):
             #Since it's a burst weapon, you're only allowed to shoot after each burst is done shooting
             #After the first shot of each burst here, the other 2 bubbles are shot in the update method
             if self.type == 'bubble' and self.ammo > 0 and self.ammo % 3 == 0:
-                Bullet(self.game, self.player.x, self.player.y, self.calculateAngle())
+                Bullet(self.game, self.player.x, self.player.y, self.calculateAngle(), self.range)
                 self.ammo -= 1
                 self.timer = self.pause
         
@@ -394,7 +394,7 @@ class Weapon(pygame.sprite.Sprite):
         
         #To space out the bubble shots by burstTime
         if self.ammo % 3 == 2 and -1*self.burstTime < self.timer - self.pause < 0 or self.ammo % 3 == 1 and -2*self.burstTime < self.timer - self.pause < -1*self.burstTime:
-            Bullet(self.game, self.player.x, self.player.y, self.calculateAngle())
+            Bullet(self.game, self.player.x, self.player.y, self.calculateAngle(), self.range)
             self.ammo -= 1
 
         #editing the timer between shots
@@ -420,7 +420,7 @@ class Weapon(pygame.sprite.Sprite):
         return angle*math.pi/180
     
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, angle):
+    def __init__(self, game, x, y, angle, range):
         self.game = game
         self.clock = game.clock
         self.timepassed = 0
@@ -436,12 +436,16 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
         self.speed = 6
+        self.range = range
 
         self.xIncrement = self.speed*math.cos(angle)
         self.yIncrement = -1*self.speed*math.sin(angle)
 
 
     def update(self):
+        self.range -= math.sqrt(self.xIncrement**2 + self.yIncrement**2)
+        if self.range <= 0:
+            self.kill()
         self.x += self.xIncrement
         self.y += self.yIncrement
         self.rect.x = self.x
@@ -454,7 +458,6 @@ class Bullet(pygame.sprite.Sprite):
         if self.timepassed > 50:  
             self.kill()
         
-        #print(self.x, self.y)
 
 
 class Block(pygame.sprite.Sprite):
