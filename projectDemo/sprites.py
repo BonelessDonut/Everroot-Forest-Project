@@ -423,6 +423,7 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, game, x, y, angle):
         self.game = game
         self.clock = game.clock
+        self.timepassed = 0
         self._layer = BLOCK_LAYER
         self.groups = self.game.all_sprites, self.game.bullets
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -445,6 +446,14 @@ class Bullet(pygame.sprite.Sprite):
         self.y += self.yIncrement
         self.rect.x = self.x
         self.rect.y = self.y
+
+        hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False)
+        if hits:
+            self.timepassed += self.clock.get_time()
+
+        if self.timepassed > 50:  
+            self.kill()
+        
         #print(self.x, self.y)
 
 
