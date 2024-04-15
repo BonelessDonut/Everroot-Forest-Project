@@ -1,5 +1,6 @@
 import random, math
 from sprites import *
+import pygame
 
 
 # Assuming one melee and multiple ranged weapons
