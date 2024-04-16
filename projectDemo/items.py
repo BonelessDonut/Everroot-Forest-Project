@@ -61,23 +61,6 @@ class Weapon(pygame.sprite.Sprite):
     #Author: Max Chiu 4/10/2024
     def attack(self):
         if self.timer == 0:
-<<<<<<< HEAD
-            print("Through the first if")
-            if self.type == 'bubble':
-                print("Through the second if")
-                angle = random.uniform(-1 * self.spread, self.spread)
-                if self.player.facing == 'up':
-                    angle += 90
-                elif self.player.facing == 'left':
-                    angle += 180
-                elif self.player.facing == 'down':
-                    angle += 270
-                angle = angle - 360 if angle >= 360 else angle
-                Bullet(self.game, self.player.x, self.player.y, angle)
-            else:
-                # This section is for handling attacking with melee weapons
-                MeleeAttack(self.game, self, self.player)
-=======
             #Can only shoot if having enough ammo
             #Since it's a burst weapon, you're only allowed to shoot after each burst is done shooting
             #After the first shot of each burst here, the other 2 bubbles are shot in the update method
@@ -86,7 +69,7 @@ class Weapon(pygame.sprite.Sprite):
                 self.ammo -= 1
                 self.timer = self.pause
             elif self.type == 'swordfish':
-                MeleeSprite(self.game, self, self.player)
+                MeleeAttack(self.game, self, self.player)
         
     #Author: Max Chiu 4/12/2024
     def update(self):
@@ -96,7 +79,6 @@ class Weapon(pygame.sprite.Sprite):
         if self.ammo % 3 == 2 and -1*self.burstTime < self.timer - self.pause < 0 or self.ammo % 3 == 1 and -2*self.burstTime < self.timer - self.pause < -1*self.burstTime:
             Bullet(self.game, self.player.x, self.player.y, self.calculateAngle(), self.range)
             self.ammo -= 1
->>>>>>> 58a7f088ea8dd844e69ccc344b35edffd2e56964
 
         #editing the timer between shots
         self.timer -= self.timepassed
@@ -154,21 +136,18 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
-<<<<<<< HEAD
+        hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False)
+        if hits:
+            self.timepassed += self.clock.get_time()
+
+        if self.timepassed > 50:
+            self.kill()
+
 class MeleeAttack(pygame.sprite.Sprite):
     # This code was written by Eddie Suber (the MeleeAttack class), written with the help and inspiration of:
     # https://www.youtube.com/watch?v=mFPfNHbsWYw
     # https://www.dropbox.com/s/tdjzeuhsc6twuyu/AdventureGame(with_exe)(Ver.1).zip?dl=0&e=1&file_subpath=%2FAdventure+Game%2Fitems.py
 
-=======
-        hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False)
-        if hits:
-            self.timepassed += self.clock.get_time()
-
-        if self.timepassed > 50:  
-            self.kill()
-class MeleeSprite(pygame.sprite.Sprite):
->>>>>>> 58a7f088ea8dd844e69ccc344b35edffd2e56964
     # This class is intended to handle the sprite for a melee weapon when attacking using those
     # As well as the hitbox associated with that attack
 

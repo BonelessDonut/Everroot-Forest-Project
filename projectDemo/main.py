@@ -70,6 +70,11 @@ class Game():
             self.npcs.empty()
             self.teleport.empty()
 
+
+            # This is a variable to allow the weapon that was equipped in the current room to stay equipped
+            # Otherwise it would reset to the default weapon everytime the player changes rooms
+            priorWeapon = self.player.weapon.type
+
             # figures out which preloaded map to move the player to. 
             # looks at the direction the player moves in and moves to the appropriate map tile
             if prevPosition[0] == 31:
@@ -101,13 +106,14 @@ class Game():
                         # teleports the player's position on the screen when they move rooms
                         Teleport(self, col, row)
                         if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
-                            Player(self, col-1, row, self.clock)
+                            self.player = Player(self, col-1, row, self.clock)
                         elif prevPosition[0] == 31 and col == 0 and prevPosition[1] == row:
-                            Player(self, col+1, row, self.clock)
+                            self.player = Player(self, col+1, row, self.clock)
                         elif prevPosition[1] == 0 and row == 17 and prevPosition[0] == col:
-                            Player(self, col, row-1, self.clock)
+                            self.player = Player(self, col, row-1, self.clock)
                         elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
-                            Player(self, col, row+1, self.clock)
+                            self.player = Player(self, col, row+1, self.clock)
+                        self.player.weapon.type = priorWeapon
 
     def new(self):
 
@@ -139,13 +145,10 @@ class Game():
             if event.type == pygame.KEYUP and (event.key == pygame.K_e and not self.player.itemUsed) and (self.player.weapon.type == 'swordfish' and self.state == 'explore'):
                 self.player.itemUsed = True
                 MeleeAttack(self, self.player.weapon, self.player)
+            # Q is used to switch weapons for the player
             if event.type == pygame.KEYUP and event.key == pygame.K_q:
-                # Q is used to switch weapons for the player
-                if self.state == 'explore':
-                    # Player can use Q to switch weapons
-                    self.player.weaponNum += 1
-                    self.player.weaponNum %= len(self.player.weaponList)
-                    self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
+                self.player.switchWeapons()
+
     def update(self):
         #game loop updates
         self.all_sprites.update()

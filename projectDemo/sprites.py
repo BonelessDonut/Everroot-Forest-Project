@@ -25,11 +25,7 @@ class Player(pygame.sprite.Sprite):
         self.weaponNum = 0
         self.weapon = items.Weapon(self.game, self.weaponList[self.weaponNum], self)
         self.weaponAnimationCount = 0
-<<<<<<< HEAD
         self.weaponAnimationSpeed = 18
-=======
-        self.weaponAnimationSpeed = 40
->>>>>>> 58a7f088ea8dd844e69ccc344b35edffd2e56964
 
         self.mouseRect = pygame.Rect(0, 0, 40, 40)
         self.mouseRect.center = pygame.mouse.get_pos()
@@ -190,7 +186,6 @@ class Player(pygame.sprite.Sprite):
                 pygame.time.wait(250)
 
             if not interacted:
-                self.itemUsed = True
                 self.weapon.attack()
 
 
@@ -354,6 +349,14 @@ class Player(pygame.sprite.Sprite):
                     self.rect.y = hits[0].rect.bottom
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.y -= yDiff
+    def switchWeapons(self):
+        # Method written by Eddie Suber
+        if self.game.state == 'explore':
+            # Player can use Q to switch weapons
+            self.weaponNum += 1
+            self.weaponNum %= len(self.weaponList)
+            self.weapon.type = self.weaponList[self.weaponNum]
+        pass
 
 
 class Block(pygame.sprite.Sprite):
