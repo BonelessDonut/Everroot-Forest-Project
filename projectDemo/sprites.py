@@ -7,8 +7,9 @@ import re
 import os
 
 
-swordfish_imgs = ['Sprites/items/swordfish.png', 'Sprites/items/swordfish2.png', 'Sprites/items/swordfish3.png']
+
 class Player(pygame.sprite.Sprite):
+    itemUsed = False
 
     def __init__(self, game, x, y, clock):
         self.game = game
@@ -19,7 +20,12 @@ class Player(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.weapon = Weapon(self.game, 'bubble', self)
+        # The weapons available to the player are stored in a list
+        self.weaponList = ['bubble', 'swordfish']
+        self.weaponNum = 0
+        self.weapon = Weapon(self.game, self.weaponList[self.weaponNum], self)
+        self.weaponAnimationCount = 0
+        self.weaponAnimationSpeed = 40
 
         self.mouseRect = pygame.Rect(0, 0, 40, 40)
         self.mouseRect.center = pygame.mouse.get_pos()
@@ -53,7 +59,6 @@ class Player(pygame.sprite.Sprite):
 
         self.clock = clock
         self.timepassed = 0
-        self.itemUsed = False
 
         self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]).convert_alpha(), (self.width, self.height))
         
@@ -68,11 +73,14 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.movement()
         self.interact()
+        self.weapon = Weapon(self.game, self.weaponList[self.weaponNum], self)
 
         self.rect.x += self.xChange
         self.collideBlocks('x')
         self.rect.y += self.yChange
         self.collideBlocks('y')
+        # Uncomment the line below to check what weapon is currently in use from the console
+        # print(f"Current weapon is {self.weaponList[self.weaponNum]}")
 
         self.timepassed += self.clock.get_time()/1000
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
@@ -112,6 +120,28 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         mouses = pygame.mouse.get_pressed()
         interacted = False
+
+        if self.itemUsed:
+            if self.weaponAnimationCount == 0:
+                if self.facing == 'right':
+                    self.image = self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+                elif self.facing == 'left':
+                    self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]),(self.width * 1.02, self.height * 1.02))
+                elif self.facing == 'up':
+                    self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]),(self.width * 1.02, self.height * 1.02))
+                else:  # self.facing == 'down':
+                    self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]),(self.width * 1.02, self.height * 1.02))
+
+            self.weaponAnimationCount += 1
+            if self.weaponAnimationCount > self.weaponAnimationSpeed:
+                self.weaponAnimationCount = 0
+                self.itemUsed = False
+
+        if self.game.state == 'explore':
+            # Player can use Q to switch weapons
+            if pygame.KEYUP and keys[pygame.K_q]:
+                self.weaponNum += 1
+                self.weaponNum %= len(self.weaponList)
         if keys[pygame.K_SPACE]:
             interactRect = None
             if self.facing == 'right':
@@ -265,7 +295,7 @@ class Player(pygame.sprite.Sprite):
 
 
     def movement(self):
-        if self.game.state != 'explore':
+        if self.game.state != 'explore' or self.itemUsed:
             return
         #The key press segments came from viewing this tutorial
         #https://www.youtube.com/watch?v=GakNgbiAxzs&list=PLkkm3wcQHjT7gn81Wn-e78cAyhwBW3FIc&index=2
