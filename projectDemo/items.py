@@ -196,7 +196,6 @@ class MeleeAttack(pygame.sprite.Sprite):
         self.rect.y = self.player.rect.y - TILESIZE + 8
         #print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
 
-        print("In facingUp function")
         if self.animationCount < (self.player.weaponAnimationSpeed // 3):
             self.x = self.player.x + (TILESIZE // 1.4)
             self.rect.x = self.player.rect.x + (TILESIZE // 1.4)
@@ -220,7 +219,6 @@ class MeleeAttack(pygame.sprite.Sprite):
         self.rect.y = self.player.rect.y + TILESIZE - 8
         # print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
 
-        print("In facingDown function")
         if self.animationCount < (self.player.weaponAnimationSpeed // 3):
             self.x = self.player.x + (TILESIZE // 1.4) - self.width * 2
             self.rect.x = self.player.rect.x + (TILESIZE // 1.4) - self.width * 2
@@ -243,7 +241,6 @@ class MeleeAttack(pygame.sprite.Sprite):
         self.rect.y = self.player.rect.y + TILESIZE - 8
         # print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
 
-        print("In facingLeft function")
         if self.animationCount < (self.player.weaponAnimationSpeed // 3):
             self.y = self.player.y + (TILESIZE // 1.4) - self.height * 2
             self.rect.y = self.player.rect.y + (TILESIZE // 1.4) - self.height * 2
@@ -266,7 +263,6 @@ class MeleeAttack(pygame.sprite.Sprite):
         self.rect.y = self.player.rect.y + TILESIZE - 8
         # print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
 
-        print("In facingLeft function")
         if self.animationCount < (self.player.weaponAnimationSpeed // 3):
             self.y = self.player.y + (TILESIZE // 1.4)
             self.rect.y = self.player.rect.y + (TILESIZE // 1.4)
@@ -297,11 +293,9 @@ class MeleeAttack(pygame.sprite.Sprite):
 
         if self.player.itemUsed:
             self.animationCount += 1
-            print(f"Weaponanimationcount is {self.animationCount}")
             if self.animationCount >= self.player.weaponAnimationSpeed:
                 self.animationCount = 0
                 self.player.itemUsed = False
-                print("itemUsed is set to False")
                 self.kill()
 
             if self.player.facing == 'up':
