@@ -36,6 +36,7 @@ class Game():
 
     def createTilemap(self, prevPosition):
         #Only for initial map creation
+        # -1, -1 is the convention to make known that the map doesnt currently exist
         if self.map == [-1, -1]:
             for row in range(len(settings.currentTilemap[0])):
                 #print(f"{row} ", end="")
@@ -54,9 +55,11 @@ class Game():
                         Teleport(self, col, row)
                     #print(f"{col}", end="")
                 #print()
+            # 1, 1 : the map now exists from the list in settings.py
             self.map = [1, 1]
         #For moving between rooms
         else:
+            # kill all the current sprites in the current room
             self.all_sprites.empty()
             self.blocks.empty()
             self.ground.empty()
@@ -65,6 +68,8 @@ class Game():
             self.npcs.empty()
             self.teleport.empty()
 
+            # figures out which preloaded map to move the player to. 
+            # looks at the direction the player moves in and moves to the appropriate map tile
             if prevPosition[0] == 31:
                 mapNumber = mapList[self.map[0]][self.map[1]+1] 
                 self.map[1] += 1
@@ -81,6 +86,7 @@ class Game():
             for row in range(len(settings.currentTilemap[mapNumber])):
                 #print(f"{row} ", end="")
                 for col in range(len(settings.currentTilemap[mapNumber][row])):
+                    # looks at the premade room in settings.py, if a tile is on the map, print the corresponding sprite on the new map
                     if (settings.currentTilemap[mapNumber][row])[col] == "B":
                         Block(self, col, row)
                     elif (settings.currentTilemap[mapNumber][row])[col] == "F":
@@ -90,6 +96,7 @@ class Game():
                     elif (settings.currentTilemap[mapNumber][row])[col] == 'N':
                         NPC(self, col, row)
                     elif (settings.currentTilemap[mapNumber][row])[col] == 'T':
+                        # teleports the player's position on the screen when they move rooms
                         Teleport(self, col, row)
                         if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
                             Player(self, col-1, row, self.clock)
@@ -111,7 +118,7 @@ class Game():
         self.npcs = pygame.sprite.LayeredUpdates()
         self.teleport = pygame.sprite.LayeredUpdates()
         self.enemies = pygame.sprite.LayeredUpdates()
-        self.attacks = pygame.sprite.LayeredUpdates()
+        self.weapons = pygame.sprite.LayeredUpdates()
         self.bullets = pygame.sprite.LayeredUpdates()
         self.createTilemap(None)
         #self.player = Player(self, 1, 2)
