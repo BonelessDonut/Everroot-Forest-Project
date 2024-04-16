@@ -1,5 +1,6 @@
 import pygame, sys
 import settings
+from items import *
 from sprites import *
 from pygame.locals import(
     K_w,
