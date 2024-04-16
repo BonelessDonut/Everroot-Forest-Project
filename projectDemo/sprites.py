@@ -511,6 +511,37 @@ class NPC(pygame.sprite.Sprite):
     def choiceResponse(self, isFlavor):
         self.TextBox.choiceRectList = []
         pass
+
+#Authored by Max Chiu 4/16/2024
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = PLAYER_LAYER
+        self.groups = self.game.all_sprites, self.game.enemies
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = 2*TILESIZE
+        self.height = 2*TILESIZE
+
+        self.health = 100
+
+        self.name = 'Udibudibudib'
+
+        self.xChange = 0
+        self.yChange = 0
+
+        self.imagelist = ['Sprites/npcs/sampleEnemy/sampleEnemyLeft.png', 'Sprites/npcs/sampleEnemy/sampleEnemyRight.png']
+        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (self.width, self.height))
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+    def dealtDamage(self, damage):
+        self.health -= damage
+        if self.health < 0:
+            self.kill()
             
         
 class Teleport(pygame.sprite.Sprite):

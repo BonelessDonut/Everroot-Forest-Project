@@ -53,6 +53,8 @@ class Game():
                         Ore(self, col, row, self.clock)
                     elif (settings.currentTilemap[0][row])[col] == 'N':
                         NPC(self, col, row)
+                    elif (settings.currentTilemap[0][row])[col] == 'E':
+                        Enemy(self, col, row)
                     elif (settings.currentTilemap[0][row])[col] == 'T':
                         Teleport(self, col, row)
                     #print(f"{col}", end="")
@@ -102,6 +104,8 @@ class Game():
                         Ore(self, col, row, self.clock)
                     elif (settings.currentTilemap[mapNumber][row])[col] == 'N':
                         NPC(self, col, row)
+                    elif (settings.currentTilemap[0][row])[col] == 'E':
+                        Enemy(self, col, row)
                     elif (settings.currentTilemap[mapNumber][row])[col] == 'T':
                         # teleports the player's position on the screen when they move rooms
                         Teleport(self, col, row)

@@ -65,7 +65,7 @@ class Weapon(pygame.sprite.Sprite):
             #Since it's a burst weapon, you're only allowed to shoot after each burst is done shooting
             #After the first shot of each burst here, the other 2 bubbles are shot in the update method
             if self.type == 'bubble' and self.ammo > 0 and self.ammo % 3 == 0:
-                Bullet(self.game, self.player.x, self.player.y, self.calculateAngle(), self.range)
+                Bullet(self.game, self.player.x, self.player.y, self.calculateAngle(), self.range, self.damage)
                 self.ammo -= 1
                 self.timer = self.pause
             elif self.type == 'swordfish':
@@ -77,7 +77,7 @@ class Weapon(pygame.sprite.Sprite):
         
         #To space out the bubble shots by burstTime
         if self.ammo % 3 == 2 and -1*self.burstTime < self.timer - self.pause < 0 or self.ammo % 3 == 1 and -2*self.burstTime < self.timer - self.pause < -1*self.burstTime:
-            Bullet(self.game, self.player.x, self.player.y, self.calculateAngle(), self.range)
+            Bullet(self.game, self.player.x, self.player.y, self.calculateAngle(), self.range, self.damage)
             self.ammo -= 1
 
         #editing the timer between shots
@@ -105,7 +105,7 @@ class Weapon(pygame.sprite.Sprite):
     
 #Author: Max Chiu 4/10/24
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, angle, range):
+    def __init__(self, game, x, y, angle, range, damage):
         self.game = game
         self.clock = game.clock
         self.timepassed = 0
@@ -122,11 +122,12 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.y = self.y
         self.speed = 6
         self.range = range
+        self.damage = damage
 
         self.xIncrement = self.speed*math.cos(angle)
         self.yIncrement = -1*self.speed*math.sin(angle)
 
-    #Author: Max Chiu 4/15/2024
+    #Author: Max Chiu 4/15/2024, 4/16/2024
     def update(self):
         self.range -= math.sqrt(self.xIncrement**2 + self.yIncrement**2)
         if self.range <= 0:
@@ -139,9 +140,18 @@ class Bullet(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False)
         if hits:
             self.timepassed += self.clock.get_time()
-
         if self.timepassed > 50:
             self.kill()
+
+
+        enemyIndex = self.rect.collidelist(list(enemy.rect for enemy in self.game.enemies))
+        if enemyIndex != -1:
+            self.timepassed += self.clock.get_time()
+        if self.timepassed > 50:
+            self.game.enemies.get_sprite(enemyIndex).dealtDamage(self.damage)
+            self.kill()
+
+            
 
 class MeleeAttack(pygame.sprite.Sprite):
     # This code was written by Eddie Suber (the MeleeAttack class), written with the help and inspiration of:
