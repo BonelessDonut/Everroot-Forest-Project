@@ -14,3 +14,11 @@ looked up procedural generation done in 3d from a new coder's POV and looked for
 - having new content generated not spawn within each other (ie vegetation in a rock)
 - having a main path that the user can follow instead of wandering aimlessly
 - 
+
+
+for randomizing enemies, walls, flowers..
+pre-make the inside walls of differing rooms
+set rooms into a class
+randomize which rooms 
+- loop to check if there is a wall
+- - if yes, randomize again to place enemies and flowers (flowers static, enemies moving)
