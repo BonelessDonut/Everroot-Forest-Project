@@ -25,7 +25,7 @@ class Player(pygame.sprite.Sprite):
         self.weaponNum = 0
         self.weapon = items.Weapon(self.game, self.weaponList[self.weaponNum], self)
         self.weaponAnimationCount = 0
-        self.weaponAnimationSpeed = 80
+        self.weaponAnimationSpeed = 40
 
         self.mouseRect = pygame.Rect(0, 0, 40, 40)
         self.mouseRect.center = pygame.mouse.get_pos()

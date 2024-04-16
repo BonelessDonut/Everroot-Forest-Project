@@ -41,7 +41,7 @@ class Weapon(pygame.sprite.Sprite):
             self.damage = 10
             self.ammo = 60
             #how long to pause between each bullet
-            self.pause = 1
+            self.pause = 0.3
             self.range = 5*TILESIZE
             #how long to reload ammo
             self.reloadTime = 2
@@ -65,7 +65,6 @@ class Weapon(pygame.sprite.Sprite):
             if self.type == 'bubble' and self.ammo > 0 and self.ammo % 3 == 0:
                 Bullet(self.game, self.player.x, self.player.y, self.calculateAngle(), self.range)
                 self.ammo -= 1
-                print(self.ammo)
                 self.timer = self.pause
             elif self.type == 'swordfish':
                 MeleeSprite(self.game, self, self.player)
@@ -110,8 +109,8 @@ class Bullet(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x
         self.y = y
-        self.width = TILESIZE
-        self.height = TILESIZE
+        self.width = TILESIZE/1.5
+        self.height = TILESIZE/1.5
         self.image = pygame.transform.scale(pygame.image.load('Sprites/items/bubble.png'), (self.width, self.height))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
