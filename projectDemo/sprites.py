@@ -25,7 +25,7 @@ class Player(pygame.sprite.Sprite):
         self.weaponNum = 0
         self.weapon = Weapon(self.game, self.weaponList[self.weaponNum], self)
         self.weaponAnimationCount = 0
-        self.weaponAnimationSpeed = 80
+        self.weaponAnimationSpeed = 18
 
         self.mouseRect = pygame.Rect(0, 0, 40, 40)
         self.mouseRect.center = pygame.mouse.get_pos()
@@ -121,27 +121,17 @@ class Player(pygame.sprite.Sprite):
         interacted = False
 
         if self.itemUsed:
-            if self.weaponAnimationCount == 0:
-                if self.facing == 'right':
-                    self.image = self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
-                elif self.facing == 'left':
-                    self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]),(self.width * 1.02, self.height * 1.02))
-                elif self.facing == 'up':
-                    self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]),(self.width * 1.02, self.height * 1.02))
-                else:  # self.facing == 'down':
-                    self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]),(self.width * 1.02, self.height * 1.02))
+            if self.facing == 'right':
+                self.image = self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+            elif self.facing == 'left':
+                self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]),(self.width * 1.02, self.height * 1.02))
+            elif self.facing == 'up':
+                self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]),(self.width * 1.02, self.height * 1.02))
+            else:  # self.facing == 'down':
+                self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]),(self.width * 1.02, self.height * 1.02))
 
-            self.weaponAnimationCount += 1
-            if self.weaponAnimationCount > self.weaponAnimationSpeed:
-                self.weaponAnimationCount = 0
-                self.itemUsed = False
 
-        if self.game.state == 'explore':
-            # Player can use Q to switch weapons
-            if keys[pygame.K_q]:
-                self.weaponNum += 1
-                self.weaponNum %= len(self.weaponList)
-                self.weapon.type = self.weaponList[self.weaponNum]
+
         if keys[pygame.K_SPACE]:
             interactRect = None
             if self.facing == 'right':

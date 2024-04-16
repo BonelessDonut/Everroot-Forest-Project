@@ -23,6 +23,7 @@ class Game():
         self.screen = pygame.display.set_mode((WIDTH,HEIGHT))
         self.clock = pygame.time.Clock() 
 
+        self.player = None
         self.state = 'explore'
         #Game states:
         #explore - Player can move around
@@ -44,7 +45,7 @@ class Game():
                     if (settings.currentTilemap[0][row])[col] == "B":
                         Block(self, col, row)
                     elif (settings.currentTilemap[0][row])[col] == "P":
-                        Player(self, col, row, self.clock)
+                        self.player = Player(self, col, row, self.clock)
                     elif (settings.currentTilemap[0][row])[col] == "F":
                         Flower(self, col, row, self.clock)
                     elif (settings.currentTilemap[0][row])[col] == 'O':
@@ -119,6 +120,7 @@ class Game():
         self.teleport = pygame.sprite.LayeredUpdates()
         self.enemies = pygame.sprite.LayeredUpdates()
         self.weapons = pygame.sprite.LayeredUpdates()
+        self.attacks = pygame.sprite.LayeredUpdates()
         self.bullets = pygame.sprite.LayeredUpdates()
         self.createTilemap(None)
         #self.player = Player(self, 1, 2)
@@ -131,8 +133,17 @@ class Game():
                 pygame.font.quit()
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                Player.itemUsed = True
+            # Use E to attack using a melee weapon
+            if event.type == pygame.KEYUP and (event.key == pygame.K_e and not self.player.itemUsed) and (self.player.weapon.type == 'swordfish' and self.state == 'explore'):
+                self.player.itemUsed = True
+                MeleeAttack(self, self.player.weapon, self.player)
+            if event.type == pygame.KEYUP and event.key == pygame.K_q:
+                # Q is used to switch weapons for the player
+                if self.state == 'explore':
+                    # Player can use Q to switch weapons
+                    self.player.weaponNum += 1
+                    self.player.weaponNum %= len(self.player.weaponList)
+                    self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
     def update(self):
         #game loop updates
         self.all_sprites.update()
