@@ -79,8 +79,8 @@ class Player(pygame.sprite.Sprite):
         self.collideBlocks('x')
         self.rect.y += self.yChange
         self.collideBlocks('y')
-        # Uncomment the line below to check what weapon is currently in use from the console
-        # print(f"Current weapon is {self.weaponList[self.weaponNum]}")
+        self.x = self.rect.x
+        self.y = self.rect.y
 
         self.timepassed += self.clock.get_time()/1000
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
@@ -198,6 +198,8 @@ class Player(pygame.sprite.Sprite):
             if not interacted:
                 self.itemUsed = True
                 self.weapon.attack()
+
+
         elif self.game.state == 'dialogue' and (keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_UP] or keys[pygame.K_DOWN]):
             interactRect = None
             if self.facing == 'right':
@@ -358,9 +360,6 @@ class Player(pygame.sprite.Sprite):
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.y -= yDiff
 
-
-
-    
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
