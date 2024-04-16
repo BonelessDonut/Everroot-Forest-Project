@@ -361,7 +361,7 @@ class Weapon(pygame.sprite.Sprite):
             #7 degrees spread of bubble bullets
             self.spread = 5
             self.damage = 10
-            self.ammo = 90
+            self.ammo = 60
             #how long to pause between each bullet
             self.pause = 0.2
             self.range = 5*TILESIZE
