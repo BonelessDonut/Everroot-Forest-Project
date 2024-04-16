@@ -8,6 +8,7 @@ import pygame
 # type - weapon name: currently presumably some variation of sword and bubble gun (shotgun)
 swordfish_imgs = ['Sprites/items/swordfish.png', 'Sprites/items/swordfish2.png', 'Sprites/items/swordfish3.png']
 
+#Author: Max Chiu 4/10/24
 class Weapon(pygame.sprite.Sprite):
     def __init__(self, game, type, player):
         self.game = game
@@ -57,6 +58,7 @@ class Weapon(pygame.sprite.Sprite):
     def reload(self):
         pass
     
+    #Author: Max Chiu 4/10/2024
     def attack(self):
         if self.timer == 0:
 <<<<<<< HEAD
@@ -86,6 +88,7 @@ class Weapon(pygame.sprite.Sprite):
             elif self.type == 'swordfish':
                 MeleeSprite(self.game, self, self.player)
         
+    #Author: Max Chiu 4/12/2024
     def update(self):
         self.timepassed = self.clock.get_time() / 1000
         
@@ -106,6 +109,7 @@ class Weapon(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+    #Author: Max Chiu 4/12/2024
     def calculateAngle(self):
         angle = random.uniform(-1*self.spread, self.spread)
         if self.player.facing == 'up':
@@ -117,6 +121,7 @@ class Weapon(pygame.sprite.Sprite):
         angle = angle - 360 if angle >= 360 else angle
         return angle*math.pi/180
     
+#Author: Max Chiu 4/10/24
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, game, x, y, angle, range):
         self.game = game
@@ -139,7 +144,7 @@ class Bullet(pygame.sprite.Sprite):
         self.xIncrement = self.speed*math.cos(angle)
         self.yIncrement = -1*self.speed*math.sin(angle)
 
-
+    #Author: Max Chiu 4/15/2024
     def update(self):
         self.range -= math.sqrt(self.xIncrement**2 + self.yIncrement**2)
         if self.range <= 0:
