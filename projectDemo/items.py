@@ -198,26 +198,51 @@ class MeleeSprite(pygame.sprite.Sprite):
     def facingDown(self):
         self.rect.x = self.player.rect.x - TILESIZE // 4.9
         self.rect.y = self.player.rect.y + TILESIZE - 8
-        print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
+        #print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
 
         if self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3 == 1:
-            self.rect.x = self.player.rect.x + TILESIZE // 2.6
+            self.rect.x = self.player.rect.x - TILESIZE // 2.6
             self.hitbox = (self.rect.x + TILESIZE // 1.5, self.rect.y + TILESIZE // 2, TILESIZE // 2, TILESIZE // 2)
         elif self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3 == 2:
-            self.rect.x = self.player.rect.x + TILESIZE // 3.3
+            self.rect.x = self.player.rect.x + TILESIZE // 2.9
             self.hitbox = (self.rect.x - TILESIZE // 4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
         elif self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3 == 3:
-            self.rect.x = self.player.rect.x
+            self.rect.x = self.player.rect.x + TILESIZE // 1.8
             self.hitbox = (self.rect.x, self.rect.y + TILESIZE // 2, TILESIZE // 2, TILESIZE // 2)
         pass
 
     # For when attacking while facing left
     def facingLeft(self):
-        
+        self.rect.x = self.player.rect.x - TILESIZE // 2
+        self.rect.y = self.player.rect.y
+        # print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
+
+        if self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3 == 1:
+            self.rect.y = self.player.rect.y - TILESIZE // 4.9
+            self.hitbox = (self.rect.x + TILESIZE // 1.5, self.rect.y + TILESIZE // 2, TILESIZE // 2, TILESIZE // 2)
+        elif self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3 == 2:
+            self.rect.y = self.player.rect.y + TILESIZE // 2.8
+            self.hitbox = (self.rect.x - TILESIZE // 4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
+        elif self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3 == 3:
+            self.rect.y = self.player.rect.y + TILESIZE // 1.4
+            self.hitbox = (self.rect.x, self.rect.y + TILESIZE // 2, TILESIZE // 2, TILESIZE // 2)
         pass
 
     # For when attacking while facing right
     def facingRight(self):
+        self.rect.x = self.player.rect.x + TILESIZE + 8
+        self.rect.y = self.player.rect.y
+        # print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
+
+        if self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3 == 1:
+            self.rect.y = self.player.rect.y - TILESIZE // 4.9
+            self.hitbox = (self.rect.x + TILESIZE // 1.5, self.rect.y + TILESIZE // 2, TILESIZE // 2, TILESIZE // 2)
+        elif self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3 == 2:
+            self.rect.y = self.player.rect.y + TILESIZE // 2.8
+            self.hitbox = (self.rect.x - TILESIZE // 4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
+        elif self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3 == 3:
+            self.rect.y = self.player.rect.y + TILESIZE // 1.4
+            self.hitbox = (self.rect.x, self.rect.y + TILESIZE // 2, TILESIZE // 2, TILESIZE // 2)
         pass
 
     def update(self):
@@ -229,6 +254,8 @@ class MeleeSprite(pygame.sprite.Sprite):
                 self.player.itemUsed = False
             self.timepassed += self.clock.get_time() / 1000
             self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.31) % 3 == self.imgindex) else self.imgindex
+            if self.timepassed // (0.31) % 3 == self.animationCount:
+                self.animationCount += 1
 
             if self.player.facing == 'up':
                 self.facingUp()

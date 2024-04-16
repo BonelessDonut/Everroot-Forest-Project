@@ -132,7 +132,7 @@ class Game():
                 pygame.font.quit()
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 Player.itemUsed = True
     def update(self):
         #game loop updates

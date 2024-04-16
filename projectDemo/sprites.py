@@ -25,7 +25,7 @@ class Player(pygame.sprite.Sprite):
         self.weaponNum = 0
         self.weapon = items.Weapon(self.game, self.weaponList[self.weaponNum], self)
         self.weaponAnimationCount = 0
-        self.weaponAnimationSpeed = 40
+        self.weaponAnimationSpeed = 80
 
         self.mouseRect = pygame.Rect(0, 0, 40, 40)
         self.mouseRect.center = pygame.mouse.get_pos()
@@ -73,7 +73,6 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.movement()
         self.interact()
-        self.weapon = items.Weapon(self.game, self.weaponList[self.weaponNum], self)
 
         self.rect.x += self.xChange
         self.collideBlocks('x')
@@ -139,9 +138,10 @@ class Player(pygame.sprite.Sprite):
 
         if self.game.state == 'explore':
             # Player can use Q to switch weapons
-            if pygame.KEYUP and keys[pygame.K_q]:
+            if keys[pygame.K_q]:
                 self.weaponNum += 1
                 self.weaponNum %= len(self.weaponList)
+                self.weapon.type = self.weaponList[self.weaponNum]
         if keys[pygame.K_SPACE]:
             interactRect = None
             if self.facing == 'right':
@@ -297,42 +297,43 @@ class Player(pygame.sprite.Sprite):
 
 
     def movement(self):
-        if self.game.state != 'explore' or self.itemUsed:
+        if self.game.state != 'explore':
             return
         #The key press segments came from viewing this tutorial
         #https://www.youtube.com/watch?v=GakNgbiAxzs&list=PLkkm3wcQHjT7gn81Wn-e78cAyhwBW3FIc&index=2
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-            # Two lines below change camera to move around player character, moving all other sprites
-            # comment them out to create a static camera
-            #for sprite in self.game.all_sprites:
-                #sprite.rect.x += PLAYER_SPEED
-            self.xChange -= PLAYER_SPEED
-            self.facing = 'left'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
+        if not self.itemUsed:
+            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+                # Two lines below change camera to move around player character, moving all other sprites
+                # comment them out to create a static camera
+                #for sprite in self.game.all_sprites:
+                    #sprite.rect.x += PLAYER_SPEED
+                self.xChange -= PLAYER_SPEED
+                self.facing = 'left'
+                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
 
 
-        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-            #for sprite in self.game.all_sprites:
-                #sprite.rect.x -= PLAYER_SPEED
-            self.xChange += PLAYER_SPEED
-            self.facing = 'right'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
-            
-        if keys[pygame.K_w] or keys[pygame.K_UP]:
-            #for sprite in self.game.all_sprites:
-                #sprite.rect.y += PLAYER_SPEED
-            self.yChange -= PLAYER_SPEED
-            self.facing = 'up'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.18)%4 == self.imgindex) else self.imgindex
-            
+            if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+                #for sprite in self.game.all_sprites:
+                    #sprite.rect.x -= PLAYER_SPEED
+                self.xChange += PLAYER_SPEED
+                self.facing = 'right'
+                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
 
-        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
-            #for sprite in self.game.all_sprites:
-                #sprite.rect.y -= PLAYER_SPEED
-            self.yChange += PLAYER_SPEED
-            self.facing = 'down'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.25)%4 == self.imgindex) else self.imgindex
+            if keys[pygame.K_w] or keys[pygame.K_UP]:
+                #for sprite in self.game.all_sprites:
+                    #sprite.rect.y += PLAYER_SPEED
+                self.yChange -= PLAYER_SPEED
+                self.facing = 'up'
+                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.18)%4 == self.imgindex) else self.imgindex
+
+
+            if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+                #for sprite in self.game.all_sprites:
+                    #sprite.rect.y -= PLAYER_SPEED
+                self.yChange += PLAYER_SPEED
+                self.facing = 'down'
+                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.25)%4 == self.imgindex) else self.imgindex
 
     def collideBlocks(self, direction):
         if direction == 'x':
