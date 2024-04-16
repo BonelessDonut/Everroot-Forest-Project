@@ -1,6 +1,6 @@
 import pygame
 from settings import *
-from items import *
+import items 
 import math
 import random
 import re
@@ -23,9 +23,13 @@ class Player(pygame.sprite.Sprite):
         # The weapons available to the player are stored in a list
         self.weaponList = ['bubble', 'swordfish']
         self.weaponNum = 0
-        self.weapon = Weapon(self.game, self.weaponList[self.weaponNum], self)
+        self.weapon = items.Weapon(self.game, self.weaponList[self.weaponNum], self)
         self.weaponAnimationCount = 0
+<<<<<<< HEAD
         self.weaponAnimationSpeed = 18
+=======
+        self.weaponAnimationSpeed = 40
+>>>>>>> 58a7f088ea8dd844e69ccc344b35edffd2e56964
 
         self.mouseRect = pygame.Rect(0, 0, 40, 40)
         self.mouseRect.center = pygame.mouse.get_pos()

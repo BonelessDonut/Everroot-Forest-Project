@@ -1,5 +1,6 @@
 import pygame, sys
 import settings
+from items import *
 from sprites import *
 from pygame.locals import(
     K_w,
@@ -40,7 +41,7 @@ class Game():
         # -1, -1 is the convention to make known that the map doesnt currently exist
         if self.map == [-1, -1]:
             for row in range(len(settings.currentTilemap[0])):
-                #print(f"{row} ", end="")
+                #print(f"{row} ", end="")   
                 for col in range(len(settings.currentTilemap[0][row])):
                     if (settings.currentTilemap[0][row])[col] == "B":
                         Block(self, col, row)
@@ -122,6 +123,7 @@ class Game():
         self.weapons = pygame.sprite.LayeredUpdates()
         self.attacks = pygame.sprite.LayeredUpdates()
         self.bullets = pygame.sprite.LayeredUpdates()
+        self.attacks = pygame.sprite.LayeredUpdates()
         self.createTilemap(None)
         #self.player = Player(self, 1, 2)
     def events(self):
