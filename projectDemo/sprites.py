@@ -530,6 +530,7 @@ class Enemy(pygame.sprite.Sprite):
 
         self.xChange = 0
         self.yChange = 0
+        self.state = 'standing'
 
         self.imagelist = ['Sprites/npcs/sampleEnemy/sampleEnemyLeft.png', 'Sprites/npcs/sampleEnemy/sampleEnemyRight.png']
         self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (self.width, self.height))
@@ -538,10 +539,29 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
-    def dealtDamage(self, damage):
-        self.health -= damage
+    #Authored: Max Chiu 4/18/2024
+    def dealtDamage(self, damage, type):
+        if type == 'bubble':
+            self.health -= damage
+            self.state = 'standing'
+        elif type == 'swordfish':
+            pass
         if self.health < 0:
             self.kill()
+
+    #Authored: Max Chiu 4/18/2024
+    def update(self):
+        if self.state == 'standing':
+            self.state = 'moving'
+        elif self.state == 'knockback':
+            pass
+        else: #self.state == 'moving'
+
+            self.x += self.xChange
+            self.y += self.yChange
+
+            self.rect.x = self.x
+            self.rect.y = self.y
             
         
 class Teleport(pygame.sprite.Sprite):
