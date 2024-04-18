@@ -99,8 +99,12 @@ class Weapon(pygame.sprite.Sprite):
             self.timer = 0
 
         #moves the Weapon sprite with the player
-        self.x = self.player.x
-        self.y = self.player.y
+        if self.type == 'bubble':
+            self.x = self.player.x
+            self.y = self.player.y
+        else:
+            self.x = -2000
+            self.y = -2000
         self.rect.x = self.x
         self.rect.y = self.y
 
@@ -198,7 +202,7 @@ class MeleeAttack(pygame.sprite.Sprite):
         self.height = TILESIZE // 1.2
 
         self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(GREEN)
+        #self.image.fill(GREEN)
         self.rect = self.image.get_rect()
 
         # Starting the weapon rectangles offscreen, just for fun, but also because they did it in the tutorial
@@ -215,91 +219,95 @@ class MeleeAttack(pygame.sprite.Sprite):
 
     # For when attacking while facing upward
     def facingUp(self):
-        self.x = self.player.x + TILESIZE // 1.4
-        self.y = self.player.y - TILESIZE + 8
-        self.rect.x = self.player.rect.x
-        self.rect.y = self.player.rect.y - TILESIZE + 8
-        #print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
+        if self.player.weapon.type == 'swordfish':
+            self.x = self.player.x + TILESIZE // 1.4
+            self.y = self.player.y - TILESIZE + 8
+            self.rect.x = self.player.rect.x
+            self.rect.y = self.player.rect.y - TILESIZE + 8
+            #print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
 
-        if self.animationPhase == 1:
-            self.x = self.player.x + (TILESIZE // 1.4)
-            self.rect.x = self.player.rect.x + (TILESIZE // 1.4)
-            # self.hitbox = (self.rect.x + TILESIZE//1.5, self.rect.y + TILESIZE // 2, TILESIZE//2, TILESIZE//2)
-        elif self.animationPhase == 2:
-            self.x = self.player.x + (TILESIZE // 1.4) - self.width
-            self.rect.x = self.player.rect.x + (TILESIZE // 1.4) - self.width
-            # self.hitbox = (self.rect.x - TILESIZE//4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
-        elif self.animationPhase == 3:
-            self.x = self.player.x + (TILESIZE // 1.4) - self.width * 2
-            self.rect.x = self.player.rect.x + (TILESIZE // 1.4) - self.width * 2
-            # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
+            if self.animationPhase == 1:
+                self.x = self.player.x + (TILESIZE // 1.4)
+                self.rect.x = self.player.rect.x + (TILESIZE // 1.4)
+                # self.hitbox = (self.rect.x + TILESIZE//1.5, self.rect.y + TILESIZE // 2, TILESIZE//2, TILESIZE//2)
+            elif self.animationPhase == 2:
+                self.x = self.player.x + (TILESIZE // 1.4) - self.width
+                self.rect.x = self.player.rect.x + (TILESIZE // 1.4) - self.width
+                # self.hitbox = (self.rect.x - TILESIZE//4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
+            elif self.animationPhase == 3:
+                self.x = self.player.x + (TILESIZE // 1.4) - self.width * 2
+                self.rect.x = self.player.rect.x + (TILESIZE // 1.4) - self.width * 2
+                # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
 
 
 
     # For when attacking while facing downward
     def facingDown(self):
-        self.x = self.player.x + (TILESIZE // 1.4) - self.width * 2
-        self.y = self.player.y + TILESIZE - 8
-        self.rect.x = self.player.rect.x
-        self.rect.y = self.player.rect.y + TILESIZE - 8
-        # print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
-
-        if self.animationPhase == 1:
+        if self.player.weapon.type == 'swordfish':
             self.x = self.player.x + (TILESIZE // 1.4) - self.width * 2
-            self.rect.x = self.player.rect.x + (TILESIZE // 1.4) - self.width * 2
-            # self.hitbox = (self.rect.x + TILESIZE//1.5, self.rect.y + TILESIZE // 2, TILESIZE//2, TILESIZE//2)
-        elif self.animationPhase == 2:
-            self.x = self.player.x + (TILESIZE // 1.4) - self.width
-            self.rect.x = self.player.rect.x + (TILESIZE // 1.4) - self.width
-            # self.hitbox = (self.rect.x - TILESIZE//4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
-        elif self.animationPhase == 3:
-            self.x = self.player.x + (TILESIZE // 1.4)
-            self.rect.x = self.player.rect.x + (TILESIZE // 1.4)
-            # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
+            self.y = self.player.y + TILESIZE - 8
+            self.rect.x = self.player.rect.x
+            self.rect.y = self.player.rect.y + TILESIZE - 8
+            # print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
+
+            if self.animationPhase == 1:
+                self.x = self.player.x + (TILESIZE // 1.4) - self.width * 2
+                self.rect.x = self.player.rect.x + (TILESIZE // 1.4) - self.width * 2
+                # self.hitbox = (self.rect.x + TILESIZE//1.5, self.rect.y + TILESIZE // 2, TILESIZE//2, TILESIZE//2)
+            elif self.animationPhase == 2:
+                self.x = self.player.x + (TILESIZE // 1.4) - self.width
+                self.rect.x = self.player.rect.x + (TILESIZE // 1.4) - self.width
+                # self.hitbox = (self.rect.x - TILESIZE//4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
+            elif self.animationPhase == 3:
+                self.x = self.player.x + (TILESIZE // 1.4)
+                self.rect.x = self.player.rect.x + (TILESIZE // 1.4)
+                # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
     pass
 
     # For when attacking while facing left
     def facingLeft(self):
-        self.x = self.player.x - (TILESIZE // 1.2)
-        self.y = self.player.y + TILESIZE - 8
-        self.rect.x = self.player.rect.x - (TILESIZE // 1.2)
-        self.rect.y = self.player.rect.y + TILESIZE - 8
-        # print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
+        if self.player.weapon.type == 'swordfish':
+            self.x = self.player.x - (TILESIZE // 1.2)
+            self.y = self.player.y + TILESIZE - 8
+            self.rect.x = self.player.rect.x - (TILESIZE // 1.2)
+            self.rect.y = self.player.rect.y + TILESIZE - 8
+            # print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
 
-        if self.animationPhase == 1:
-            self.y = self.player.y + (TILESIZE // 1.4) - self.height * 2
-            self.rect.y = self.player.rect.y + (TILESIZE // 1.4) - self.height * 2
-            # self.hitbox = (self.rect.x + TILESIZE//1.5, self.rect.y + TILESIZE // 2, TILESIZE//2, TILESIZE//2)
-        elif self.animationPhase == 2:
-            self.y = self.player.y + (TILESIZE // 1.4) - self.height
-            self.rect.y = self.player.rect.y + (TILESIZE // 1.4) - self.height
-            # self.hitbox = (self.rect.x - TILESIZE//4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
-        elif self.animationPhase == 3:
-            self.y = self.player.y + (TILESIZE // 1.4)
-            self.rect.y = self.player.rect.y + (TILESIZE // 1.4)
-            # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
+            if self.animationPhase == 1:
+                self.y = self.player.y + (TILESIZE // 1.4) - self.height * 2
+                self.rect.y = self.player.rect.y + (TILESIZE // 1.4) - self.height * 2
+                # self.hitbox = (self.rect.x + TILESIZE//1.5, self.rect.y + TILESIZE // 2, TILESIZE//2, TILESIZE//2)
+            elif self.animationPhase == 2:
+                self.y = self.player.y + (TILESIZE // 1.4) - self.height
+                self.rect.y = self.player.rect.y + (TILESIZE // 1.4) - self.height
+                # self.hitbox = (self.rect.x - TILESIZE//4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
+            elif self.animationPhase == 3:
+                self.y = self.player.y + (TILESIZE // 1.4)
+                self.rect.y = self.player.rect.y + (TILESIZE // 1.4)
+                # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
         pass
 
     # For when attacking while facing right
     def facingRight(self):
-        self.x = self.player.x + (TILESIZE * 1.2)
-        self.y = self.player.y + TILESIZE - 8
-        self.rect.x = self.player.rect.x + (TILESIZE * 1.2)
-        self.rect.y = self.player.rect.y + TILESIZE - 8
-        # print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
+        if self.player.weapon.type == 'swordfish':
+            self.x = self.player.x + (TILESIZE * 1.2)
+            self.y = self.player.y + TILESIZE - 8
+            self.rect.x = self.player.rect.x + (TILESIZE * 1.2)
+            self.rect.y = self.player.rect.y + TILESIZE - 8
+            # print(self.animationCount // (self.player.weaponAnimationSpeed // 3) % 3)
 
-        if self.animationPhase == 1:
-            self.y = self.player.y + (TILESIZE // 1.4)
-            self.rect.y = self.player.rect.y + (TILESIZE // 1.4)
-            # self.hitbox = (self.rect.x + TILESIZE//1.5, self.rect.y + TILESIZE // 2, TILESIZE//2, TILESIZE//2)
-        elif self.animationPhase == 2:
-            self.y = self.player.y + (TILESIZE // 1.4) - self.height
-            self.rect.y = self.player.rect.y + (TILESIZE // 1.4) - self.height
-            # self.hitbox = (self.rect.x - TILESIZE//4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
-        elif self.animationPhase == 3:
-            self.y = self.player.y + (TILESIZE // 1.4) - self.height * 2
-            self.rect.y = self.player.rect.y + (TILESIZE // 1.4) - self.height * 2
-            # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
+            if self.animationPhase == 1:
+                self.y = self.player.y + (TILESIZE // 1.4)
+                self.rect.y = self.player.rect.y + (TILESIZE // 1.4)
+                # self.hitbox = (self.rect.x + TILESIZE//1.5, self.rect.y + TILESIZE // 2, TILESIZE//2, TILESIZE//2)
+            elif self.animationPhase == 2:
+                self.y = self.player.y + (TILESIZE // 1.4) - self.height
+                self.rect.y = self.player.rect.y + (TILESIZE // 1.4) - self.height
+                # self.hitbox = (self.rect.x - TILESIZE//4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
+            elif self.animationPhase == 3:
+                self.y = self.player.y + (TILESIZE // 1.4) - self.height * 2
+                self.rect.y = self.player.rect.y + (TILESIZE // 1.4) - self.height * 2
+                # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
         pass
 
     def animate(self):
@@ -307,34 +315,35 @@ class MeleeAttack(pygame.sprite.Sprite):
         # , which weapon the player has currently equipped, and what part of the attack animation is happening
         # This could be done using self.player.facing, self.weaponAnimationSpeed, and self.animationCount
 
-        if self.player.facing == 'up':
-            if self.animationPhase == 1:
-                self.image = pygame.transform.scale(swordfish_imgs[2], (self.width, self.height))
-            elif self.animationPhase == 2:
-                self.image = pygame.transform.scale(swordfish_imgs[1], (self.width, self.height))
-            elif self.animationPhase == 3:
-                self.image = pygame.transform.scale(swordfish_imgs[0], (self.width, self.height))
-        if self.player.facing == 'down':
-            if self.animationPhase == 1:
-                self.image = pygame.transform.scale(swordfish_imgs[3], (self.width, self.height))
-            elif self.animationPhase == 2:
-                self.image = pygame.transform.scale(swordfish_imgs[4], (self.width, self.height))
-            elif self.animationPhase == 3:
-                self.image = pygame.transform.scale(swordfish_imgs[5], (self.width, self.height))
-        if self.player.facing == 'left':
-            if self.animationPhase == 1:
-                self.image = pygame.transform.scale(swordfish_imgs[6], (self.width,  self.height))
-            elif self.animationPhase == 2:
-                self.image = pygame.transform.scale(swordfish_imgs[7], (self.width, self.height))
-            elif self.animationPhase == 3:
-                self.image = pygame.transform.scale(swordfish_imgs[8], (self.width, self.height))
-        if self.player.facing == 'right':
-            if self.animationPhase == 1:
-                self.image = pygame.transform.scale(swordfish_imgs[9], (self.width, self.height))
-            elif self.animationPhase == 2:
-                self.image = pygame.transform.scale(swordfish_imgs[10], (self.width, self.height))
-            elif self.animationPhase == 3:
-                self.image = pygame.transform.scale(swordfish_imgs[11], (self.width, self.height))
+        if self.player.weapon.type == 'swordfish':
+            if self.player.facing == 'up':
+                if self.animationPhase == 1:
+                    self.image = pygame.transform.scale(swordfish_imgs[2], (self.width, self.height))
+                elif self.animationPhase == 2:
+                    self.image = pygame.transform.scale(swordfish_imgs[1], (self.width, self.height))
+                elif self.animationPhase == 3:
+                    self.image = pygame.transform.scale(swordfish_imgs[0], (self.width, self.height))
+            if self.player.facing == 'down':
+                if self.animationPhase == 1:
+                    self.image = pygame.transform.scale(swordfish_imgs[3], (self.width, self.height))
+                elif self.animationPhase == 2:
+                    self.image = pygame.transform.scale(swordfish_imgs[4], (self.width, self.height))
+                elif self.animationPhase == 3:
+                    self.image = pygame.transform.scale(swordfish_imgs[5], (self.width, self.height))
+            if self.player.facing == 'left':
+                if self.animationPhase == 1:
+                    self.image = pygame.transform.scale(swordfish_imgs[6], (self.width,  self.height))
+                elif self.animationPhase == 2:
+                    self.image = pygame.transform.scale(swordfish_imgs[7], (self.width, self.height))
+                elif self.animationPhase == 3:
+                    self.image = pygame.transform.scale(swordfish_imgs[8], (self.width, self.height))
+            if self.player.facing == 'right':
+                if self.animationPhase == 1:
+                    self.image = pygame.transform.scale(swordfish_imgs[9], (self.width, self.height))
+                elif self.animationPhase == 2:
+                    self.image = pygame.transform.scale(swordfish_imgs[10], (self.width, self.height))
+                elif self.animationPhase == 3:
+                    self.image = pygame.transform.scale(swordfish_imgs[11], (self.width, self.height))
 
         pass
 
@@ -356,6 +365,7 @@ class MeleeAttack(pygame.sprite.Sprite):
             if self.animationCount >= self.player.weaponAnimationSpeed:
                 self.animationCount = 0
                 self.player.itemUsed = False
+                self.player.swordUsed = False
                 self.kill()
 
             if self.animationCount < (self.player.weaponAnimationSpeed // 3):
@@ -374,6 +384,7 @@ class MeleeAttack(pygame.sprite.Sprite):
             else:
                 self.facingDown()
 
+            self.player.attack(self)
         else:
             self.rect.x = -2000
             self.rect.y = -2000
@@ -382,6 +393,9 @@ class MeleeAttack(pygame.sprite.Sprite):
             
         self.animate()
         self.collide()
+
+        # Could add sounds effects for using a melee attack in this method, or within the Player class attack() method
+        # So that the proper sound would play whenever the attack is used
 
     pass
 
