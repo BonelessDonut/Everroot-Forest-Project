@@ -568,7 +568,7 @@ class Enemy(pygame.sprite.Sprite):
 
         self.imagelist = ['Sprites/npcs/sampleEnemy/sampleEnemyLeft.png', 'Sprites/npcs/sampleEnemy/sampleEnemyRight.png']
         #self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (2*self.width, 2*self.height))
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/bokoblinLeft.png'), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/joker.jpeg'), (self.width, self.height))
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
