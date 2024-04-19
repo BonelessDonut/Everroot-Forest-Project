@@ -450,11 +450,11 @@ class MeleeAttack(pygame.sprite.Sprite):
                 elif self.animationCount < (self.player.weaponAnimationSpeed):
                     self.animationPhase = 3
             else:
-                if self.animationCount < (self.player.weaponAnimationSpeed * 1.3 // 3):
+                if self.animationCount < (self.player.weaponAnimationSpeed * 1.4 // 3):
                     self.animationPhase = 1
-                elif self.animationCount < (self.player.weaponAnimationSpeed * 1.3 // 3 * 2):
+                elif self.animationCount < (self.player.weaponAnimationSpeed * 1.4 // 3 * 2):
                     self.animationPhase = 2
-                elif self.animationCount < (self.player.weaponAnimationSpeed * 1.3):
+                elif self.animationCount < (self.player.weaponAnimationSpeed * 1.4):
                     self.animationPhase = 3
 
             if self.player.facing == 'up':
