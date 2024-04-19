@@ -589,7 +589,7 @@ class Enemy(pygame.sprite.Sprite):
         if type == 'bubble':
             self.health -= damage
             self.state = 'standing'
-        elif type == 'swordfish':
+        elif type == 'swordfish' or type == 'hammershark':
             self.health -= damage
             self.state = 'knockback'
         if self.health < 0:
