@@ -7,7 +7,6 @@ import re
 import os
 
 
-
 class Player(pygame.sprite.Sprite):
     itemUsed = False
 
@@ -502,6 +501,7 @@ class NPC(pygame.sprite.Sprite):
     def interaction(self):
         #Going into dialogue from explore
         if self.game.state == 'explore':
+            self.game.play_music('dialogue')
             self.meetings += 1
             self.TextBox = TextBox(self.game)
             self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 28, 'Garamond', self.name)
@@ -519,6 +519,7 @@ class NPC(pygame.sprite.Sprite):
                     self.TextBox.kill()
                     self.updateDialogue()
                     self.game.state = 'explore'
+                    self.game.play_music('stop')
                 else:
                     self.interaction()
             #If the next dialogue to display is a choice list
@@ -538,6 +539,7 @@ class NPC(pygame.sprite.Sprite):
             self.TextBox.kill()
             self.updateDialogue()
             self.game.state = 'explore'
+            self.game.play_music('stop')
 
     #READ ME, FINISH WHEN CHOICES ARE DEFINED
     def choiceResponse(self, isFlavor):

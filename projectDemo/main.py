@@ -2,6 +2,7 @@ import pygame, sys
 import settings
 from items import *
 from sprites import *
+from pygame import mixer
 from pygame.locals import(
     K_w,
     K_s,
@@ -19,6 +20,7 @@ from pygame.locals import(
 
 class Game():
     def __init__(self):
+        mixer.init()
         pygame.init()
         pygame.font.init()
         self.screen = pygame.display.set_mode((WIDTH,HEIGHT))
@@ -35,6 +37,16 @@ class Game():
         
         #self.font = pygame.font.Font('Arial', 32)
         self.running = True
+    
+    #written by Rachel Tang 4/19/24
+    def play_music(self, songType):
+        if songType == 'dialogue':
+            mixer.music.load('Music/CI103_-_normal_dialogue_background.mp3')
+            mixer.music.set_volume(0.3)
+            mixer.music.play()
+        if songType == 'stop':
+            mixer.music.stop()
+
 
     def createTilemap(self, prevPosition):
         #Only for initial map creation
