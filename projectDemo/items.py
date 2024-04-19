@@ -526,11 +526,11 @@ class MeleeAttack(pygame.sprite.Sprite):
         self.collide()
 
         # Uncomment the lines below to see the attack's hitbox as a transparent blue rectangle
-        hitbox = pygame.surface.Surface([self.width, self.height])
-        hitbox.set_alpha(128)
-        hitbox.fill(GREEN)
-        self.game.screen.blit(hitbox, (self.rect.x, self.rect.y))
-        pygame.display.update()
+        # hitbox = pygame.surface.Surface([self.width, self.height])
+        # hitbox.set_alpha(128)
+        # hitbox.fill(GREEN)
+        # self.game.screen.blit(hitbox, (self.rect.x, self.rect.y))
+        # pygame.display.update()
 
         # Could add sounds effects for using a melee attack in this method, or within the Player class attack() method
         # So that the proper sound would play whenever the attack is used
