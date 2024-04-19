@@ -84,6 +84,7 @@ class Game():
             self.npcs.empty()
             self.teleport.empty()
             self.enemies.empty()
+            self.teleport.empty()
 
 
             # This is a variable to allow the weapon that was equipped in the current room to stay equipped
@@ -181,9 +182,9 @@ class Game():
             if mapNumber == -1:
                 for i in mapList:
                     print(i) 
-            # print('Current Map:')
-            # for i in currentTileMap[mapNumber]:
-            #     print(i)
+            print('Current Map:')
+            for i in currentTileMap[mapNumber]:
+                print(i)
 
                      
             for row in range(len(settings.currentTileMap[mapNumber])):
@@ -256,7 +257,7 @@ class Game():
         #game loop events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.playing == Falsed
+                self.playing == False
                 self.running == False
                 pygame.font.quit()
                 pygame.quit()
