@@ -35,7 +35,6 @@ class Game():
 
         self.map = [-1, -1]
         
-        #self.font = pygame.font.Font('Arial', 32)
         self.running = True
     
     #written by Rachel Tang 4/19/24
@@ -83,6 +82,7 @@ class Game():
             self.ores.empty()
             self.npcs.empty()
             self.teleport.empty()
+            self.enemies.empty()
 
 
             # This is a variable to allow the weapon that was equipped in the current room to stay equipped
@@ -116,7 +116,7 @@ class Game():
                         Ore(self, col, row, self.clock)
                     elif (settings.currentTilemap[mapNumber][row])[col] == 'N':
                         NPC(self, col, row)
-                    elif (settings.currentTilemap[0][row])[col] == 'E':
+                    elif (settings.currentTilemap[mapNumber][row])[col] == 'E':
                         Enemy(self, col, row)
                     elif (settings.currentTilemap[mapNumber][row])[col] == 'T':
                         # teleports the player's position on the screen when they move rooms
@@ -145,7 +145,6 @@ class Game():
         self.weapons = pygame.sprite.LayeredUpdates()
         self.attacks = pygame.sprite.LayeredUpdates()
         self.bullets = pygame.sprite.LayeredUpdates()
-        self.attacks = pygame.sprite.LayeredUpdates()
         self.createTilemap(None)
         #self.player = Player(self, 1, 2)
     def events(self):
