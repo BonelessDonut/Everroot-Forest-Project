@@ -16,14 +16,7 @@ looked up procedural generation done in 3d from a new coder's POV and looked for
 - 
 
 
-<<<<<<< HEAD
-for randomizing enemies, walls, flowers..
-pre-make the inside walls of differing rooms
-set rooms into a class
-randomize which rooms 
-- loop to check if there is a wall
-- - if yes, randomize again to place enemies and flowers (flowers static, enemies moving)
-=======
+
 for randomizing enemies, walls, flowers...
 pre-make the inside walls of differing rooms (purple rooms would have a premade list of possible rooms with walls and enemy number combinations that get randomized between purple rooms, same with others colors)
 set colored rooms into a class?
@@ -32,4 +25,3 @@ to place flowers:
 - loop to check if there is a wall or enemy
 - - if yes, randomize again to place flowers until there are a certain number of flowers in the room
 - - if not, place the flower in that tile
->>>>>>> generationTest
