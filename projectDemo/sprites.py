@@ -21,11 +21,13 @@ class Player(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
         # The weapons available to the player are stored in a list
+
         self.weaponList = ['bubble', 'swordfish']
         self.weaponNum = 0
         self.weapon = items.Weapon(self.game, self.weaponList[self.weaponNum], self)
         self.weaponAnimationCount = 0
         self.weaponAnimationSpeed = 18
+        self.swordUsed = False
 
         self.mouseRect = pygame.Rect(0, 0, 40, 40)
         self.mouseRect.center = pygame.mouse.get_pos()
@@ -361,6 +363,46 @@ class Player(pygame.sprite.Sprite):
                     self.rect.y = hits[0].rect.bottom
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.y -= yDiff
+
+    def attack(self, attackInstance):
+        # This method will change the player's sprite when a melee attack is used, there will be separate images / animations
+        # Depending on which melee weapon is in use
+        # This method should only be getting called if the player's weapon type is one of the melee weapons
+        if self.swordUsed:
+            if self.facing == 'up':
+                if attackInstance.animationPhase == 1:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingUp.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 2:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingUp2.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 3:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingUp3.png'), (self.width, self.height))
+
+            elif self.facing == 'down':
+                if attackInstance.animationPhase == 1:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 2:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown2.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 3:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown3.png'), (self.width, self.height))
+
+            elif self.facing == 'left':
+                if attackInstance.animationPhase == 1:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingLeft.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 2:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingLeft2.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 3:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingLeft3.png'), (self.width, self.height))
+
+            elif self.facing == 'right':
+                if attackInstance.animationPhase == 1:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingRight.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 2:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingRight2.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 3:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingRight3.png'), (self.width, self.height))
+
+            pygame.display.update()
+
     def switchWeapons(self):
         # Method written by Eddie Suber
         if self.game.state == 'explore':
@@ -390,32 +432,6 @@ class Block(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
-
-'''class Ground(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-
-        self.game = game
-        self._layer = GROUND_LAYER
-        self.groups = self.game.all_sprites, self.game.ground
-        pygame.sprite.Sprite.__init__(self, self.groups)
-
-        self.x = x*TILESIZE
-        self.y = y*TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/tiles/ground2.png'), (self.width, self.height))
-        #self.image.fill(RED)
-
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y'''
-
-
-
-
-
-
 
 
 class NPC(pygame.sprite.Sprite):
