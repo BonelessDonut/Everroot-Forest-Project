@@ -84,6 +84,7 @@ class Game():
             self.npcs.empty()
             self.teleport.empty()
             self.enemies.empty()
+            self.teleport.empty()
 
 
             # This is a variable to allow the weapon that was equipped in the current room to stay equipped
@@ -126,6 +127,20 @@ class Game():
                 currentTileMap.append(redMap)
                 mapNumber = len(currentTileMap)-1
                 mapList[self.map[0]][self.map[1]] = mapNumber
+
+            print(self.map, mapNumber)
+            print('up:', self.map[0]-1 >= 0, end = ' ')
+            if self.map[0]-1 >= 0:
+                print(mapList[self.map[0]-1][self.map[1]] != -1, end = ' ')
+            print('down:', self.map[0]+1 <= 5, end = ' ')
+            if self.map[0]+1 <= 5:
+                print(mapList[self.map[0]+1][self.map[1]] != -1, end = ' ')
+            print('left:', self.map[1]-1 >= 0, end = ' ')
+            if self.map[1]-1 >= 0:
+                print(mapList[self.map[0]][self.map[1]-1] != -1, end = ' ')
+            print('right:', self.map[1]+1 <= 12, end = ' ')
+            if self.map[1]+1 <= 12:
+                print(mapList[self.map[0]][self.map[1]+1] != -1)
             
             # print(self.map[1]-1)
             # print(mapList[self.map[0]][self.map[1]-1])
@@ -163,11 +178,13 @@ class Game():
                 currentTileMap[mapNumber][9] = row2
                 
             # print(self.map, mapNumber)
-            # for i in mapList:
-            #     print(i) 
-            # print('Current Map:')
-            # for i in currentTileMap[mapNumber]:
-            #     print(i)
+
+            if mapNumber == -1:
+                for i in mapList:
+                    print(i) 
+            print('Current Map:')
+            for i in currentTileMap[mapNumber]:
+                print(i)
 
                      
             for row in range(len(settings.currentTileMap[mapNumber])):
@@ -240,7 +257,7 @@ class Game():
         #game loop events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.playing == Falsed
+                self.playing == False
                 self.running == False
                 pygame.font.quit()
                 pygame.quit()

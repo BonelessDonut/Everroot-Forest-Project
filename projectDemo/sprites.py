@@ -296,8 +296,9 @@ class Player(pygame.sprite.Sprite):
         if teleportIndex != -1:
             tpSprite = self.game.teleport.get_sprite(teleportIndex)
             self.kill()
+            pygame.time.wait(50)
             self.game.createTilemap((tpSprite.x//TILESIZE, tpSprite.y//TILESIZE))
-            pygame.time.wait(60)
+            pygame.time.wait(50)
 
 
     
