@@ -49,8 +49,8 @@ class Weapon(pygame.sprite.Sprite):
         self.imagelist.append(pygame.transform.flip(pygame.image.load('Sprites/items/bubblegun.png'), True, False))
         self.image = pygame.transform.scale(self.imagelist[1], (self.width, self.height))
         self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+        self.rect.x = -100
+        self.rect.y = -100
 
 
         #bubble is a burst of 3 bullets with 15 bullet ammo
@@ -129,12 +129,11 @@ class Weapon(pygame.sprite.Sprite):
                 self.x = self.player.x+TILESIZE//1.5
                 self.y = self.player.y
                 self.image = pygame.transform.scale(self.imagelist[0], (self.width, self.height))
-
-        #if self.image != :
-        self.rect = self.image.get_rect()
-
-        self.rect.x = self.x
-        self.rect.y = self.y
+            self.rect.x = self.x
+            self.rect.y = self.y
+        else:
+            self.rect.x = -100
+            self.rect.y = -100
 
     #Author: Max Chiu 4/12/2024
     def calculateAngle(self):
