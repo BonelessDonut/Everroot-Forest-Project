@@ -47,8 +47,8 @@ class Weapon(pygame.sprite.Sprite):
 
         self.imagelist = [pygame.image.load('Sprites/items/bubblegun.png'), pygame.image.load('Sprites/items/bubblegunDown.png'), pygame.image.load('Sprites/items/bubblegunUp.png')]
         self.imagelist.append(pygame.transform.flip(pygame.image.load('Sprites/items/bubblegun.png'), True, False))
-        self.image = None
-        self.rect = self.player.rect
+        self.image = pygame.transform.scale(self.imagelist[1], (self.width, self.height))
+        self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
 
@@ -107,7 +107,6 @@ class Weapon(pygame.sprite.Sprite):
             self.timer = 0
             self.player.itemUsed = False
             self.used = False
-            self.image = None
 
         #moves the Weapon sprite with the player and updates weapon image
         if self.player.itemUsed and self.used:
@@ -131,11 +130,11 @@ class Weapon(pygame.sprite.Sprite):
                 self.y = self.player.y
                 self.image = pygame.transform.scale(self.imagelist[0], (self.width, self.height))
 
-        if self.image != None:
-            self.rect = self.image.get_rect()
+        #if self.image != :
+        self.rect = self.image.get_rect()
 
-            self.rect.x = self.x
-            self.rect.y = self.y
+        self.rect.x = self.x
+        self.rect.y = self.y
 
     #Author: Max Chiu 4/12/2024
     def calculateAngle(self):
@@ -188,14 +187,16 @@ class Bullet(pygame.sprite.Sprite):
             self.timepassed += self.clock.get_time()
         if self.timepassed > 50:
             self.kill()
+            self.timepassed = 0
 
 
         enemyIndex = self.rect.collidelist(list(enemy.rect for enemy in self.game.enemies))
         if enemyIndex != -1:
             self.timepassed += self.clock.get_time()
-        if self.timepassed > 50:
-            self.game.enemies.get_sprite(enemyIndex).dealtDamage(self.damage, 'bubble')
-            self.kill()
+            if self.timepassed > 50:
+                self.game.enemies.get_sprite(enemyIndex).dealtDamage(self.damage, 'bubble')
+                self.kill()
+                self.timepassed = 0
 
             
 
@@ -383,7 +384,7 @@ class MeleeAttack(pygame.sprite.Sprite):
 
         for enemy in self.game.enemies:
             if pygame.sprite.collide_rect(self, enemy):
-                enemy.dealtDamage(self.weapon.damage)
+                enemy.dealtDamage(self.weapon.damage, 'swordfish')
         pass
 
 

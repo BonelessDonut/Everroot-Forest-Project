@@ -68,12 +68,12 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]).convert_alpha(), (self.width, self.height))
         
 
-        #self.rect = self.image.get_rect().
-        #self.rect.x = self.x
-        #self.rect.y = self.y
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
         #Below line is to decrease the rectangle collision slightly
         #Was having trouble fitting in 1 tile gaps
-        self.rect = pygame.Rect(self.x, self.y, 30, 30)
+        #self.rect = pygame.Rect(self.x, self.y, 30, 30)
 
     def update(self):
         self.movement()
@@ -573,7 +573,8 @@ class Enemy(pygame.sprite.Sprite):
             self.health -= damage
             self.state = 'standing'
         elif type == 'swordfish':
-            pass
+            self.health -= damage
+            self.state = 'knockback'
         if self.health < 0:
             self.kill()
 

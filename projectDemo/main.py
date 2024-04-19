@@ -146,12 +146,14 @@ class Game():
                 pygame.quit()
                 sys.exit()
             # Use E to attack using a melee weapon
-            if event.type == pygame.KEYUP and (event.key == pygame.K_e and not self.player.itemUsed) and (self.player.weapon.type == 'swordfish' and self.state == 'explore'):
+            if event.type == pygame.KEYUP and (event.key == pygame.K_e and not self.player.itemUsed) and ((self.player.weapon.type == 'swordfish' or self.player.weapon.type == 'hammershark') and self.state == 'explore'):
                 self.player.itemUsed = True
                 if False: # This line is a placeholder for a conditional that will check if the melee weapon type is the spear weapon or swordfish
                     pass
                 elif self.player.weapon.type == 'swordfish':
                     self.player.swordUsed = True
+                elif self.player.weapon.type == 'hammershark':
+                    self.player.spearUsed = True
                 MeleeAttack(self, self.player.weapon, self.player)
             # Q is used to switch weapons for the player
             if event.type == pygame.KEYUP and event.key == pygame.K_q:
