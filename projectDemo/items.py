@@ -169,6 +169,10 @@ class Bullet(pygame.sprite.Sprite):
                 self.game.enemies.get_sprite(enemyIndex).dealtDamage(self.damage, self.game.player.weapon.type)
                 self.kill()
             except TypeError:
+                print("TypeError avoided")
+                return
+            except IndexError:
+                print("IndexError avoided")
                 return
 
 
