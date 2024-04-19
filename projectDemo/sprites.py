@@ -478,7 +478,7 @@ class NPC(pygame.sprite.Sprite):
         self.dialogueStageIndex = 1
         #Always leave a space/punctuation at the end of the quote!
         self.dialogueList = {'01:First Meet':[{'Meetings': 1},
-                                                "Would you rather cum in the sink or sink in the cum? That is indeed the question for which we must all ponder and arrive at our own answers.",
+                                                "? That is indeed the question for which we must all ponder and arrive at our own answers.",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
                                                 "Boom Boom Boom Boom ",
                                                 "%Choices; Cats are cute?; Yes; Of Course; Meow"],
