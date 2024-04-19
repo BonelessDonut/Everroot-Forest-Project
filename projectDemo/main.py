@@ -38,6 +38,7 @@ class Game():
         self.running = True
     
     #written by Rachel Tang 4/19/24
+    #used this website: https://www.educative.io/answers/how-to-play-an-audio-file-in-pygame
     def play_music(self, songType):
         if songType == 'dialogue':
             mixer.music.load('Music/CI103_-_normal_dialogue_background.mp3')
@@ -255,7 +256,7 @@ class Game():
         #game loop events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.playing == False
+                self.playing == Falsed
                 self.running == False
                 pygame.font.quit()
                 pygame.quit()
