@@ -40,13 +40,18 @@ class Weapon(pygame.sprite.Sprite):
         self.reloadTime = None
         self.ammo = None
         self.x = self.player.x
-        self.y = self.player.y
+        self.y = self.player.y+50
         self.width = TILESIZE//2
         self.height = TILESIZE//2
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/items/bubblegun.png'), (self.width, self.height))
-        self.rect = self.image.get_rect()
+        self.used = False
+
+        self.imagelist = [pygame.image.load('Sprites/items/bubblegun.png'), pygame.image.load('Sprites/items/bubblegunDown.png'), pygame.image.load('Sprites/items/bubblegunUp.png')]
+        self.imagelist.append(pygame.transform.flip(pygame.image.load('Sprites/items/bubblegun.png'), True, False))
+        self.image = None
+        self.rect = self.player.rect
         self.rect.x = self.x
         self.rect.y = self.y
+
 
         #bubble is a burst of 3 bullets with 15 bullet ammo
         if type == 'bubble':
@@ -74,6 +79,8 @@ class Weapon(pygame.sprite.Sprite):
     #Author: Max Chiu 4/10/2024
     def attack(self):
         if self.timer == 0:
+            self.player.itemUsed = True
+            self.used = True
             #Can only shoot if having enough ammo
             #Since it's a burst weapon, you're only allowed to shoot after each burst is done shooting
             #After the first shot of each burst here, the other 2 bubbles are shot in the update method
@@ -83,6 +90,7 @@ class Weapon(pygame.sprite.Sprite):
                 self.timer = self.pause
             elif self.type == 'swordfish':
                 MeleeAttack(self.game, self, self.player)
+
         
     #Author: Max Chiu 4/12/2024
     def update(self):
@@ -95,14 +103,39 @@ class Weapon(pygame.sprite.Sprite):
 
         #editing the timer between shots
         self.timer -= self.timepassed
-        if self.timer < 0:
+        if self.timer <= 0:
             self.timer = 0
+            self.player.itemUsed = False
+            self.used = False
+            self.image = None
 
-        #moves the Weapon sprite with the player
-        self.x = self.player.x
-        self.y = self.player.y
-        self.rect.x = self.x
-        self.rect.y = self.y
+        #moves the Weapon sprite with the player and updates weapon image
+        if self.player.itemUsed and self.used:
+            if self.player.facing == 'up':
+                self.x = self.player.x
+                self.y = self.player.y-TILESIZE//2
+                self.image = pygame.transform.scale(self.imagelist[2], (self.width, self.height))
+
+            elif self.player.facing == 'down':
+                self.x = self.player.x
+                self.y = self.player.y+TILESIZE//2
+                self.image = pygame.transform.scale(self.imagelist[1], (self.width, self.height))
+
+            elif self.player.facing == 'left':
+                self.x = self.player.x-TILESIZE//3
+                self.y = self.player.y
+                self.image = pygame.transform.scale(self.imagelist[3], (self.width, self.height))
+
+            else:
+                self.x = self.player.x+TILESIZE//1.5
+                self.y = self.player.y
+                self.image = pygame.transform.scale(self.imagelist[0], (self.width, self.height))
+
+        if self.image != None:
+            self.rect = self.image.get_rect()
+
+            self.rect.x = self.x
+            self.rect.y = self.y
 
     #Author: Max Chiu 4/12/2024
     def calculateAngle(self):
@@ -161,7 +194,7 @@ class Bullet(pygame.sprite.Sprite):
         if enemyIndex != -1:
             self.timepassed += self.clock.get_time()
         if self.timepassed > 50:
-            self.game.enemies.get_sprite(enemyIndex).dealtDamage(self.damage)
+            self.game.enemies.get_sprite(enemyIndex).dealtDamage(self.damage, 'bubble')
             self.kill()
 
             

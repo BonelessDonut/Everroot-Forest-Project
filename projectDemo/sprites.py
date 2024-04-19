@@ -57,6 +57,9 @@ class Player(pygame.sprite.Sprite):
         self.mineDownImgList = ['Sprites/protag/protagMineDown.png', 'Sprites/protag/protagMineRedDown.png','Sprites/protag/protagMineBlueDown.png', 'Sprites/protag/protagMinePlatDown.png']
         self.mineUpgrade = 0
 
+        self.rangedWeaponList = [pygame.image.load('Sprites/protag/protagRangedRight.png'), pygame.image.load('Sprites/protag/protagRangedDown.png'), pygame.image.load('Sprites/protag/protagRangedUp.png')]
+        self.rangedWeaponList.append(pygame.transform.flip(self.rangedWeaponList[0], True, False))
+
         self.clock = clock
         self.timepassed = 0
 
@@ -83,7 +86,7 @@ class Player(pygame.sprite.Sprite):
 
         self.timepassed += self.clock.get_time()/1000
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
-        if self.game.state == 'explore':
+        if self.game.state == 'explore' and not self.weapon.used:
             if self.facing == 'right':
                 self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
             elif self.facing == 'left':
@@ -92,6 +95,15 @@ class Player(pygame.sprite.Sprite):
                 self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
             else: # self.facing == 'down':
                 self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+        elif self.weapon.used:
+            if self.facing == 'right':
+                self.image = pygame.transform.scale(self.rangedWeaponList[0], (self.width * 1.02, self.height * 1.02))
+            elif self.facing == 'left':
+                self.image = pygame.transform.scale(self.rangedWeaponList[3], (self.width * 1.02, self.height * 1.02))
+            elif self.facing == 'up':
+                self.image = pygame.transform.scale(self.rangedWeaponList[2], (self.width * 1.02, self.height * 1.02))
+            else: # self.facing == 'down':
+                self.image = pygame.transform.scale(self.rangedWeaponList[1], (self.width * 1.02, self.height * 1.02))
         self.xChange = 0
         self.yChange = 0
 
@@ -122,7 +134,7 @@ class Player(pygame.sprite.Sprite):
 
         if self.itemUsed:
             if self.facing == 'right':
-                self.image = self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+                self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
             elif self.facing == 'left':
                 self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]),(self.width * 1.02, self.height * 1.02))
             elif self.facing == 'up':
