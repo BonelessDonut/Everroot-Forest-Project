@@ -40,7 +40,7 @@ class Weapon(pygame.sprite.Sprite):
         self.reloadTime = None
         self.ammo = None
         self.x = self.player.x
-        self.y = self.player.y+50
+        self.y = self.player.y
         self.width = TILESIZE//2
         self.height = TILESIZE//2
         self.used = False
@@ -74,7 +74,8 @@ class Weapon(pygame.sprite.Sprite):
             self.pause = 0.4
 
     def reload(self):
-        pass
+        if self.type == 'bubble':
+            self.ammo = 60
     
     #Author: Max Chiu 4/10/2024
     def attack(self):

@@ -97,7 +97,7 @@ class Player(pygame.sprite.Sprite):
                 self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
             else: # self.facing == 'down':
                 self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
-        elif self.weapon.used:
+        elif self.weapon.used and self.weapon.ammo != 0:
             if self.facing == 'right':
                 self.image = pygame.transform.scale(self.rangedWeaponList[0], (self.width * 1.02, self.height * 1.02))
             elif self.facing == 'left':
@@ -201,6 +201,10 @@ class Player(pygame.sprite.Sprite):
 
             if not interacted:
                 self.weapon.attack()
+
+        #EDIT AFTER INVENTORY MADE
+        elif keys[pygame.K_r]:
+            self.weapon.reload()
 
 
         elif self.game.state == 'dialogue' and (keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_UP] or keys[pygame.K_DOWN]):
