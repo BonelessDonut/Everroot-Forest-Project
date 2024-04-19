@@ -571,6 +571,7 @@ class Enemy(pygame.sprite.Sprite):
             self.health -= damage
             self.state = 'standing'
         elif type == 'swordfish':
+            self.health -= damage
             pass
         if self.health < 0:
             self.kill()

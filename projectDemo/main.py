@@ -140,7 +140,7 @@ class Game():
         #game loop events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.playing == Falsed
+                self.playing == False
                 self.running == False
                 pygame.font.quit()
                 pygame.quit()

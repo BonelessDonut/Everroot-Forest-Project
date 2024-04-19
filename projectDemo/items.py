@@ -165,8 +165,11 @@ class Bullet(pygame.sprite.Sprite):
         if enemyIndex != -1:
             self.timepassed += self.clock.get_time()
         if self.timepassed > 50:
-            self.game.enemies.get_sprite(enemyIndex).dealtDamage(self.damage, self.game.player.weapon.type)
-            self.kill()
+            try:
+                self.game.enemies.get_sprite(enemyIndex).dealtDamage(self.damage, self.game.player.weapon.type)
+                self.kill()
+            except TypeError:
+                return
 
 
             
@@ -288,16 +291,16 @@ class MeleeAttack(pygame.sprite.Sprite):
             self.x = self.player.x + self.width // 7
             self.rect.x = self.player.rect.x + self.width // 7
             if self.animationPhase == 1:
-                self.y = self.player.y + (self.height * 2)
-                self.rect.y = self.player.rect.y + (self.height * 2)
+                self.y = self.player.y + (self.height * 1.5)
+                self.rect.y = self.player.rect.y + (self.height * 1.5)
                 # self.hitbox = (self.rect.x + TILESIZE//1.5, self.rect.y + TILESIZE // 2, TILESIZE//2, TILESIZE//2)
             elif self.animationPhase == 2:
-                self.y = self.player.y + (self.height * 2) + self.height
-                self.rect.y = self.player.rect.y + (self.height * 2) + self.height
+                self.y = self.player.y + (self.height * 1.5) + self.height
+                self.rect.y = self.player.rect.y + (self.height * 1.5) + self.height
                 # self.hitbox = (self.rect.x - TILESIZE//4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
             elif self.animationPhase == 3:
-                self.y = self.player.y + (self.height * 2) + self.height * 2
-                self.rect.y = self.player.rect.y + (self.height * 2) + self.height * 2
+                self.y = self.player.y + (self.height * 1.5) + self.height * 2
+                self.rect.y = self.player.rect.y + (self.height * 1.5) + self.height * 2
                 # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
             pass
 
