@@ -165,8 +165,9 @@ class Bullet(pygame.sprite.Sprite):
         if enemyIndex != -1:
             self.timepassed += self.clock.get_time()
         if self.timepassed > 50:
-            self.game.enemies.get_sprite(enemyIndex).dealtDamage(self.damage)
+            self.game.enemies.get_sprite(enemyIndex).dealtDamage(self.damage, self.game.player.weapon.type)
             self.kill()
+
 
             
 
@@ -198,11 +199,16 @@ class MeleeAttack(pygame.sprite.Sprite):
 
         self.x = self.player.x
         self.y = self.player.y
-        self.width = TILESIZE // 1.2
-        self.height = TILESIZE // 1.2
+
+        if self.player.weapon.type == 'hammershark':
+            self.width = TILESIZE // 1.6
+            self.height = TILESIZE // 1.6
+        else:
+            self.width = TILESIZE // 1.2
+            self.height = TILESIZE // 1.2
 
         self.image = pygame.Surface([self.width, self.height])
-        #self.image.fill(GREEN)
+        self.image.fill(GREEN)
         self.rect = self.image.get_rect()
 
         # Starting the weapon rectangles offscreen, just for fun, but also because they did it in the tutorial
@@ -231,13 +237,29 @@ class MeleeAttack(pygame.sprite.Sprite):
                 self.rect.x = self.player.rect.x + (TILESIZE // 1.4)
                 # self.hitbox = (self.rect.x + TILESIZE//1.5, self.rect.y + TILESIZE // 2, TILESIZE//2, TILESIZE//2)
             elif self.animationPhase == 2:
-                self.x = self.player.x + (TILESIZE // 1.4) - self.width
-                self.rect.x = self.player.rect.x + (TILESIZE // 1.4) - self.width
+                self.x = self.player.x + (TILESIZE // 1.4) - self.height
+                self.rect.x = self.player.rect.x + (TILESIZE // 1.4) - self.height
                 # self.hitbox = (self.rect.x - TILESIZE//4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
             elif self.animationPhase == 3:
-                self.x = self.player.x + (TILESIZE // 1.4) - self.width * 2
-                self.rect.x = self.player.rect.x + (TILESIZE // 1.4) - self.width * 2
+                self.x = self.player.x + (TILESIZE // 1.4) - self.height * 2
+                self.rect.x = self.player.rect.x + (TILESIZE // 1.4) - self.height * 2
                 # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
+        elif self.player.weapon.type == 'hammershark':
+            self.x = self.player.x + self.width // 7
+            self.rect.x = self.player.rect.x + self.width // 7
+            if self.animationPhase == 1:
+                self.y = self.player.y - (self.height * 1.5)
+                self.rect.y = self.player.rect.y - (self.height * 1.5)
+                # self.hitbox = (self.rect.x + TILESIZE//1.5, self.rect.y + TILESIZE // 2, TILESIZE//2, TILESIZE//2)
+            elif self.animationPhase == 2:
+                self.y = self.player.y - (self.height * 1.5) - self.height
+                self.rect.y = self.player.rect.y - (self.height * 1.5) - self.height
+                # self.hitbox = (self.rect.x - TILESIZE//4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
+            elif self.animationPhase == 3:
+                self.y = self.player.y - (self.height * 1.5) - self.height * 2
+                self.rect.y = self.player.rect.y - (self.height * 1.5) - self.height * 2
+                # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
+            pass
 
 
 
@@ -262,7 +284,22 @@ class MeleeAttack(pygame.sprite.Sprite):
                 self.x = self.player.x + (TILESIZE // 1.4)
                 self.rect.x = self.player.rect.x + (TILESIZE // 1.4)
                 # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
-    pass
+        elif self.player.weapon.type == 'hammershark':
+            self.x = self.player.x + self.width // 7
+            self.rect.x = self.player.rect.x + self.width // 7
+            if self.animationPhase == 1:
+                self.y = self.player.y + (self.height * 2)
+                self.rect.y = self.player.rect.y + (self.height * 2)
+                # self.hitbox = (self.rect.x + TILESIZE//1.5, self.rect.y + TILESIZE // 2, TILESIZE//2, TILESIZE//2)
+            elif self.animationPhase == 2:
+                self.y = self.player.y + (self.height * 2) + self.height
+                self.rect.y = self.player.rect.y + (self.height * 2) + self.height
+                # self.hitbox = (self.rect.x - TILESIZE//4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
+            elif self.animationPhase == 3:
+                self.y = self.player.y + (self.height * 2) + self.height * 2
+                self.rect.y = self.player.rect.y + (self.height * 2) + self.height * 2
+                # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
+            pass
 
     # For when attacking while facing left
     def facingLeft(self):
@@ -285,7 +322,22 @@ class MeleeAttack(pygame.sprite.Sprite):
                 self.y = self.player.y + (TILESIZE // 1.4)
                 self.rect.y = self.player.rect.y + (TILESIZE // 1.4)
                 # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
-        pass
+        elif self.player.weapon.type == 'hammershark':
+            self.y = self.player.y + self.height // 7
+            self.rect.y = self.player.rect.y + self.height // 7
+            if self.animationPhase == 1:
+                self.x = self.player.x - (self.width * 1.5)
+                self.rect.x = self.player.rect.x - (self.width * 1.5)
+                # self.hitbox = (self.rect.x + TILESIZE//1.5, self.rect.y + TILESIZE // 2, TILESIZE//2, TILESIZE//2)
+            elif self.animationPhase == 2:
+                self.x = self.player.x - (self.width * 1.5) - self.width
+                self.rect.x = self.player.rect.x - (self.width * 1.5) - self.width
+                # self.hitbox = (self.rect.x - TILESIZE//4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
+            elif self.animationPhase == 3:
+                self.x = self.player.x - (self.width * 1.5) - self.width * 2
+                self.rect.x = self.player.rect.x - (self.width * 1.5) - self.width * 2
+                # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
+            pass
 
     # For when attacking while facing right
     def facingRight(self):
@@ -308,7 +360,22 @@ class MeleeAttack(pygame.sprite.Sprite):
                 self.y = self.player.y + (TILESIZE // 1.4) - self.height * 2
                 self.rect.y = self.player.rect.y + (TILESIZE // 1.4) - self.height * 2
                 # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
-        pass
+        elif self.player.weapon.type == 'hammershark':
+            self.y = self.player.y + self.height // 7
+            self.rect.y = self.player.rect.y + self.height // 7
+            if self.animationPhase == 1:
+                self.x = self.player.x + (self.width * 2)
+                self.rect.x = self.player.rect.x + (self.width * 2)
+                # self.hitbox = (self.rect.x + TILESIZE//1.5, self.rect.y + TILESIZE // 2, TILESIZE//2, TILESIZE//2)
+            elif self.animationPhase == 2:
+                self.x = self.player.x + (self.width * 2) + self.width
+                self.rect.x = self.player.rect.x + (self.width * 2) + self.width
+                # self.hitbox = (self.rect.x - TILESIZE//4, self.rect.y, TILESIZE * 1.5, TILESIZE * 2)
+            elif self.animationPhase == 3:
+                self.x = self.player.x + (self.width * 2) - self.width * 2
+                self.rect.x = self.player.rect.x + (self.width * 2) + self.width * 2
+                # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
+            pass
 
     def animate(self):
         # This function is intended to handle switching the weapon's sprite based on which direction the player is facing
@@ -345,7 +412,8 @@ class MeleeAttack(pygame.sprite.Sprite):
                 elif self.animationPhase == 3:
                     self.image = pygame.transform.scale(swordfish_imgs[11], (self.width, self.height))
 
-        pass
+        elif self.player.weapon.type == 'hammershark':
+            pass
 
     def collide(self):
         # This function is intended to check for collisions between the attack instance and any enemies on the screen
@@ -354,7 +422,7 @@ class MeleeAttack(pygame.sprite.Sprite):
 
         for enemy in self.game.enemies:
             if pygame.sprite.collide_rect(self, enemy):
-                enemy.dealtDamage(self.weapon.damage)
+                enemy.dealtDamage(self.weapon.damage, self.player.weapon.type)
         pass
 
 
@@ -367,13 +435,20 @@ class MeleeAttack(pygame.sprite.Sprite):
                 self.player.itemUsed = False
                 self.player.swordUsed = False
                 self.kill()
-
-            if self.animationCount < (self.player.weaponAnimationSpeed // 3):
-                self.animationPhase = 1
-            elif self.animationCount < (self.player.weaponAnimationSpeed // 3 * 2):
-                self.animationPhase = 2
-            elif self.animationCount < (self.player.weaponAnimationSpeed):
-                self.animationPhase = 3
+            if self.player.weapon.type == 'swordfish':
+                if self.animationCount < (self.player.weaponAnimationSpeed // 3):
+                    self.animationPhase = 1
+                elif self.animationCount < (self.player.weaponAnimationSpeed // 3 * 2):
+                    self.animationPhase = 2
+                elif self.animationCount < (self.player.weaponAnimationSpeed):
+                    self.animationPhase = 3
+            else:
+                if self.animationCount < (self.player.weaponAnimationSpeed * 1.3 // 3):
+                    self.animationPhase = 1
+                elif self.animationCount < (self.player.weaponAnimationSpeed * 1.3 // 3 * 2):
+                    self.animationPhase = 2
+                elif self.animationCount < (self.player.weaponAnimationSpeed * 1.3):
+                    self.animationPhase = 3
 
             if self.player.facing == 'up':
                 self.facingUp()

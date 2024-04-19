@@ -22,12 +22,13 @@ class Player(pygame.sprite.Sprite):
         self.height = TILESIZE
         # The weapons available to the player are stored in a list
 
-        self.weaponList = ['bubble', 'swordfish']
+        self.weaponList = ['bubble', 'swordfish', 'hammershark']
         self.weaponNum = 0
         self.weapon = items.Weapon(self.game, self.weaponList[self.weaponNum], self)
         self.weaponAnimationCount = 0
         self.weaponAnimationSpeed = 18
         self.swordUsed = False
+        self.spearUsed = False
 
         self.mouseRect = pygame.Rect(0, 0, 40, 40)
         self.mouseRect.center = pygame.mouse.get_pos()
@@ -388,8 +389,17 @@ class Player(pygame.sprite.Sprite):
                     self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingRight2.png'), (self.width, self.height))
                 elif attackInstance.animationPhase == 3:
                     self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingRight3.png'), (self.width, self.height))
+        elif self.spearUsed:
+            if self.facing == 'up':
+                self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagRangedUp.png'), (self.width, self.height))
+            elif self.facing == 'down':
+                self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagRangedDown.png'),(self.width, self.height))
+            elif self.facing == 'left':
+                self.image = pygame.transform.scale(pygame.transform.flip(pygame.image.load('Sprites/protag/protagRangedRight.png'), True, False),(self.width, self.height))
+            elif self.facing == 'right':
+                self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagRangedRight.png'),(self.width, self.height))
 
-            pygame.display.update()
+        pygame.display.update()
 
     def switchWeapons(self):
         # Method written by Eddie Suber
@@ -564,6 +574,7 @@ class Enemy(pygame.sprite.Sprite):
             pass
         if self.health < 0:
             self.kill()
+
 
     #Authored: Max Chiu 4/18/2024
     def update(self):
