@@ -28,6 +28,7 @@ class Weapon(pygame.sprite.Sprite):
         self.clock = game.clock
         self.player = player
         self.groups = self.game.all_sprites, self.game.weapons
+        self._layer = ITEM_LAYER
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.type = type
         #timer used to count the time between attacks
@@ -85,8 +86,9 @@ class Weapon(pygame.sprite.Sprite):
             #Can only shoot if having enough ammo
             #Since it's a burst weapon, you're only allowed to shoot after each burst is done shooting
             #After the first shot of each burst here, the other 2 bubbles are shot in the update method
+            self.updateLocation()
             if self.type == 'bubble' and self.ammo > 0 and self.ammo % 3 == 0:
-                Bullet(self.game, self.player.x, self.player.y, self.calculateAngle(), self.range, self.damage)
+                Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage)
                 self.ammo -= 1
                 self.timer = self.pause
             elif self.type == 'swordfish':
@@ -99,7 +101,7 @@ class Weapon(pygame.sprite.Sprite):
         
         #To space out the bubble shots by burstTime
         if self.ammo % 3 == 2 and -1*self.burstTime < self.timer - self.pause < 0 or self.ammo % 3 == 1 and -2*self.burstTime < self.timer - self.pause < -1*self.burstTime:
-            Bullet(self.game, self.player.x, self.player.y, self.calculateAngle(), self.range, self.damage)
+            Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage)
             self.ammo -= 1
 
         #editing the timer between shots
@@ -111,30 +113,33 @@ class Weapon(pygame.sprite.Sprite):
 
         #moves the Weapon sprite with the player and updates weapon image
         if self.player.itemUsed and self.used:
-            if self.player.facing == 'up':
-                self.x = self.player.x
-                self.y = self.player.y-TILESIZE//2
-                self.image = pygame.transform.scale(self.imagelist[2], (self.width, self.height))
-
-            elif self.player.facing == 'down':
-                self.x = self.player.x
-                self.y = self.player.y+TILESIZE//2
-                self.image = pygame.transform.scale(self.imagelist[1], (self.width, self.height))
-
-            elif self.player.facing == 'left':
-                self.x = self.player.x-TILESIZE//3
-                self.y = self.player.y
-                self.image = pygame.transform.scale(self.imagelist[3], (self.width, self.height))
-
-            else:
-                self.x = self.player.x+TILESIZE//1.5
-                self.y = self.player.y
-                self.image = pygame.transform.scale(self.imagelist[0], (self.width, self.height))
+            self.updateLocation()
             self.rect.x = self.x
             self.rect.y = self.y
         else:
             self.rect.x = -100
             self.rect.y = -100
+
+    def updateLocation(self):
+        if self.player.facing == 'up':
+            self.x = self.player.x+TILESIZE//2
+            self.y = self.player.y-TILESIZE//2
+            self.image = pygame.transform.scale(self.imagelist[2], (self.width, self.height))
+
+        elif self.player.facing == 'down':
+            self.x = self.player.x
+            self.y = self.player.y+TILESIZE//2
+            self.image = pygame.transform.scale(self.imagelist[1], (self.width, self.height))
+
+        elif self.player.facing == 'left':
+            self.x = self.player.x-TILESIZE//3
+            self.y = self.player.y+TILESIZE//2
+            self.image = pygame.transform.scale(self.imagelist[3], (self.width, self.height))
+
+        else:
+            self.x = self.player.x+TILESIZE//1.5
+            self.y = self.player.y+TILESIZE//2
+            self.image = pygame.transform.scale(self.imagelist[0], (self.width, self.height))
 
     #Author: Max Chiu 4/12/2024
     def calculateAngle(self):
