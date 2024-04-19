@@ -28,6 +28,7 @@ class Weapon(pygame.sprite.Sprite):
         self.clock = game.clock
         self.player = player
         self.groups = self.game.all_sprites, self.game.weapons
+        self._layer = ITEM_LAYER
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.type = type
         #timer used to count the time between attacks
@@ -112,7 +113,7 @@ class Weapon(pygame.sprite.Sprite):
         #moves the Weapon sprite with the player and updates weapon image
         if self.player.itemUsed and self.used:
             if self.player.facing == 'up':
-                self.x = self.player.x
+                self.x = self.player.x+TILESIZE//2
                 self.y = self.player.y-TILESIZE//2
                 self.image = pygame.transform.scale(self.imagelist[2], (self.width, self.height))
 
@@ -123,12 +124,12 @@ class Weapon(pygame.sprite.Sprite):
 
             elif self.player.facing == 'left':
                 self.x = self.player.x-TILESIZE//3
-                self.y = self.player.y
+                self.y = self.player.y+TILESIZE//2
                 self.image = pygame.transform.scale(self.imagelist[3], (self.width, self.height))
 
             else:
                 self.x = self.player.x+TILESIZE//1.5
-                self.y = self.player.y
+                self.y = self.player.y+TILESIZE//2
                 self.image = pygame.transform.scale(self.imagelist[0], (self.width, self.height))
             self.rect.x = self.x
             self.rect.y = self.y
