@@ -99,10 +99,10 @@ class Game():
                 mapNumber = len(currentTileMap)-1
                 mapList[self.map[0]][self.map[1]] = mapNumber
             
+            # print(self.map[1]-1)
+            # print(mapList[self.map[0]][self.map[1]-1])
 
-            print(self.map[1]-1)
-            print(mapList[self.map[0]][self.map[1]-1])
-            # create doors to a new room if it is meant to exist
+            # create doors in a new room if it is meant to exist
             # going up
             if self.map[0]-1 >= 0 and mapList[self.map[0]-1][self.map[1]] != -1:
                 # the top row of a map
@@ -110,12 +110,12 @@ class Game():
                 row = row[0:15] + 'TT' + row[17:]
                 currentTileMap[mapNumber][0] = row
             #down
-            elif self.map[0]+1 <= 5 and mapList[self.map[0]+1][self.map[1]] != -1:
+            if self.map[0]+1 <= 5 and mapList[self.map[0]+1][self.map[1]] != -1:
                 row = currentTileMap[mapNumber][17]
                 row = row[0:15] + 'TT' + row[17:]
                 currentTileMap[mapNumber][17] = row
             # left
-            elif self.map[1]-1 >= 0 and mapList[self.map[0]][self.map[1]-1] != -1:
+            if self.map[1]-1 >= 0 and mapList[self.map[0]][self.map[1]-1] != -1:
                 # each row needs to be edited individually => row1 and row2
                 row1 = currentTileMap[mapNumber][8]
                 row1 = 'T' + row1[1:]
@@ -123,23 +123,23 @@ class Game():
                 row2 = 'T' + row2[1:]
                 currentTileMap[mapNumber][8] = row1
                 currentTileMap[mapNumber][9] = row2
-                print('row 1:', row1)
-                print('row 2:', row2)
+                # print('row 1:', row1)
+                # print('row 2:', row2)
             # right
-            elif self.map[1]+1 <= 12 and mapList[self.map[0]-1][self.map[1]+1] != -1:
+            if self.map[1]+1 <= 12 and mapList[self.map[0]][self.map[1]+1] != -1:
                 row1 = currentTileMap[mapNumber][8]
                 row1 = row1[:-1] + 'T'
                 row2 = currentTileMap[mapNumber][9]
                 row2 = row2[:-1] + 'T'
                 currentTileMap[mapNumber][8] = row1
                 currentTileMap[mapNumber][9] = row2
-
-            print(self.map, mapNumber)
-            for i in mapList:
-                print(i) 
-            print('Current Map:')
-            for i in currentTileMap[mapNumber]:
-                print(i)
+                
+            # print(self.map, mapNumber)
+            # for i in mapList:
+            #     print(i) 
+            # print('Current Map:')
+            # for i in currentTileMap[mapNumber]:
+            #     print(i)
 
                      
             for row in range(len(settings.currentTileMap[mapNumber])):

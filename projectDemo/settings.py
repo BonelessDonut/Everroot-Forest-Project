@@ -140,9 +140,9 @@ purpleRandomRooms = [[
     'B.............B..B.............B',
     'B..........E...BB...E..........B',
     'B..............................B',
-    'B.........B..........B.........B',
+    'B....BBBBBB..........BBBBBB....B',
     'B........BB....E.....BB........B',
-    'B....BBBBBB..E....E..BBBBBB....B',
+    'B.........B..E....E..B.........B',
     'B...............E..............B',
     'B..............................B',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
@@ -163,7 +163,7 @@ purpleRandomRooms = [[
     'BB.......BBBBBBBBBBBBBB.......BB',
     'BB.............E..............BB',
     'BBB.............E............BBB',
-    'BBBBB..........E..........BBBBBB',
+    'BBBBBB.........E..........BBBBBB',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ], [
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
@@ -225,20 +225,43 @@ purpleRandomRooms = [[
 ], [
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
     'BBBB........................BBBB',
-    'BBBB....E.E...........E.E...BBBB',
-    'BBB.........B.......B........BBB',
-    'BBB.........BBBBBBBBB........BBB',
-    'BB....BB.....BBBBBBB....BB....BB',
+    'BBBB...E.E............E.E...BBBB',
+    'BBB........B........B........BBB',
+    'BBB........BBBBBBBBBB........BBB',
+    'BB....BB....BBBBBBBB....BB....BB',
     'B.....BB................BB.....B',
     'B.....BB................BB.....B',
     'B....BB.....E.......E....BB....B',
     'B....BB.....E.......E....BB....B',
     'B.....BB................BB.....B',
     'B.....BB................BB.....B',
-    'BB....BB.....BBBBBBB.....B....BB',
-    'BBB.........BBBBBBBBB........BBB',
-    'BBB.........B.......B........BBB',
-    'BBBBB...E.E...........E.E....BBBB',
-    'BBBBB......................BBBBB',
+    'BB....BB....BBBBBBBB....BB....BB',
+    'BBB........BBBBBBBBBB........BBB',
+    'BBB........B........B........BBB',
+    'BBBB...E.E............E.E...BBBB',
+    'BBBB........................BBBB',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ]]
+
+greenRandomRooms
+
+
+#Room template
+'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+'B..............................B',
+'B..............................B',
+'B..............................B',
+'B..............................B',
+'B..............................B',
+'B..............................B',
+'B..............................B',
+'B..............................B',
+'B..............................B',
+'B..............................B',
+'B..............................B',
+'B..............................B',
+'B..............................B',
+'B..............................B',
+'B..............................B',
+'B..............................B',
+'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
