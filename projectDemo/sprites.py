@@ -7,7 +7,6 @@ import re
 import os
 
 
-
 class Player(pygame.sprite.Sprite):
     itemUsed = False
 
@@ -60,18 +59,21 @@ class Player(pygame.sprite.Sprite):
         self.mineDownImgList = ['Sprites/protag/protagMineDown.png', 'Sprites/protag/protagMineRedDown.png','Sprites/protag/protagMineBlueDown.png', 'Sprites/protag/protagMinePlatDown.png']
         self.mineUpgrade = 0
 
+        self.rangedWeaponList = [pygame.image.load('Sprites/protag/protagRangedRight.png'), pygame.image.load('Sprites/protag/protagRangedDown.png'), pygame.image.load('Sprites/protag/protagRangedUp.png')]
+        self.rangedWeaponList.append(pygame.transform.flip(self.rangedWeaponList[0], True, False))
+
         self.clock = clock
         self.timepassed = 0
 
         self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]).convert_alpha(), (self.width, self.height))
         
 
-        #self.rect = self.image.get_rect().
-        #self.rect.x = self.x
-        #self.rect.y = self.y
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
         #Below line is to decrease the rectangle collision slightly
         #Was having trouble fitting in 1 tile gaps
-        self.rect = pygame.Rect(self.x, self.y, 30, 30)
+        #self.rect = pygame.Rect(self.x, self.y, 30, 30)
 
     def update(self):
         self.movement()
@@ -86,15 +88,24 @@ class Player(pygame.sprite.Sprite):
 
         self.timepassed += self.clock.get_time()/1000
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
-        if self.game.state == 'explore':
+        if self.game.state == 'explore' and not self.weapon.used:
             if self.facing == 'right':
-                self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+                self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1, self.height * 1))
             elif self.facing == 'left':
-                self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+                self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]), (self.width * 1, self.height * 1))
             elif self.facing == 'up':
-                self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+                self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width * 1, self.height * 1))
             else: # self.facing == 'down':
-                self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+                self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width * 1, self.height * 1))
+        elif self.weapon.used and self.weapon.type == 'bubble'and self.weapon.ammo != 0:
+            if self.facing == 'right':
+                self.image = pygame.transform.scale(self.rangedWeaponList[0], (self.width * 1, self.height * 1))
+            elif self.facing == 'left':
+                self.image = pygame.transform.scale(self.rangedWeaponList[3], (self.width * 1, self.height * 1))
+            elif self.facing == 'up':
+                self.image = pygame.transform.scale(self.rangedWeaponList[2], (self.width * 1, self.height * 1))
+            else: # self.facing == 'down':
+                self.image = pygame.transform.scale(self.rangedWeaponList[1], (self.width * 1, self.height * 1))
         self.xChange = 0
         self.yChange = 0
 
@@ -125,13 +136,13 @@ class Player(pygame.sprite.Sprite):
 
         if self.itemUsed:
             if self.facing == 'right':
-                self.image = self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+                self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1, self.height * 1))
             elif self.facing == 'left':
-                self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]),(self.width * 1.02, self.height * 1.02))
+                self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]),(self.width * 1, self.height * 1))
             elif self.facing == 'up':
-                self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]),(self.width * 1.02, self.height * 1.02))
+                self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]),(self.width * 1, self.height * 1))
             else:  # self.facing == 'down':
-                self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]),(self.width * 1.02, self.height * 1.02))
+                self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]),(self.width * 1, self.height * 1))
 
 
 
@@ -190,6 +201,10 @@ class Player(pygame.sprite.Sprite):
 
             if not interacted:
                 self.weapon.attack()
+
+        #EDIT AFTER INVENTORY MADE
+        elif keys[pygame.K_r]:
+            self.weapon.reload()
 
 
         elif self.game.state == 'dialogue' and (keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_UP] or keys[pygame.K_DOWN]):
@@ -496,6 +511,7 @@ class NPC(pygame.sprite.Sprite):
     def interaction(self):
         #Going into dialogue from explore
         if self.game.state == 'explore':
+            self.game.play_music('dialogue')
             self.meetings += 1
             self.TextBox = TextBox(self.game)
             self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 28, 'Garamond', self.name)
@@ -513,6 +529,7 @@ class NPC(pygame.sprite.Sprite):
                     self.TextBox.kill()
                     self.updateDialogue()
                     self.game.state = 'explore'
+                    self.game.play_music('stop')
                 else:
                     self.interaction()
             #If the next dialogue to display is a choice list
@@ -532,6 +549,7 @@ class NPC(pygame.sprite.Sprite):
             self.TextBox.kill()
             self.updateDialogue()
             self.game.state = 'explore'
+            self.game.play_music('stop')
 
     #READ ME, FINISH WHEN CHOICES ARE DEFINED
     def choiceResponse(self, isFlavor):
@@ -547,8 +565,8 @@ class Enemy(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.width = 2*TILESIZE
-        self.height = 2*TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
 
         self.health = 100
 
@@ -559,7 +577,8 @@ class Enemy(pygame.sprite.Sprite):
         self.state = 'standing'
 
         self.imagelist = ['Sprites/npcs/sampleEnemy/sampleEnemyLeft.png', 'Sprites/npcs/sampleEnemy/sampleEnemyRight.png']
-        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (self.width, self.height))
+        #self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (2*self.width, 2*self.height))
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/joker.jpeg'), (self.width, self.height))
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -571,7 +590,8 @@ class Enemy(pygame.sprite.Sprite):
             self.health -= damage
             self.state = 'standing'
         elif type == 'swordfish':
-            pass
+            self.health -= damage
+            self.state = 'knockback'
         if self.health < 0:
             self.kill()
 
