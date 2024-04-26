@@ -20,7 +20,7 @@ from pygame.locals import(
 
 class Game():
     def __init__(self):
-        mixer.init()
+        pygame.mixer.pre_init(44100, -16, -1, 64)
         pygame.init()
         pygame.font.init()
         self.screen = pygame.display.set_mode((WIDTH,HEIGHT))
@@ -42,10 +42,11 @@ class Game():
     def play_music(self, songType):
         if songType == 'dialogue':
             mixer.music.load('Music/CI103_-_normal_dialogue_background.mp3')
-            mixer.music.set_volume(0.3)
+            mixer.music.set_volume(0.7)
             mixer.music.play()
         if songType == 'stop':
             mixer.music.stop()
+
 
 
     def createTilemap(self, prevPosition):

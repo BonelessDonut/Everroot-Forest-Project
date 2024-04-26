@@ -105,6 +105,8 @@ class Weapon(pygame.sprite.Sprite):
         if self.ammo % 3 == 2 and -1*self.burstTime < self.timer - self.pause < 0 or self.ammo % 3 == 1 and -2*self.burstTime < self.timer - self.pause < -1*self.burstTime:
             Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage)
             self.ammo -= 1
+            pygame.mixer.Channel(1).set_volume(0.75)
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/shooting-sound-fx-159024.mp3'))
 
         #editing the timer between shots
         self.timer -= self.timepassed
@@ -521,7 +523,13 @@ class MeleeAttack(pygame.sprite.Sprite):
             self.rect.y = -2000
             self.hitbox = (self.rect.x, self.rect.y, self.width, self.height)
             self.kill()
-            
+
+        if self.animationCount == 0:
+            pygame.mixer.Channel(1).set_volume(0.6)
+            if self.player.weapon.type == 'trident':
+                pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/movement-swipe-whoosh-3-186577.mp3'))
+            else:
+                pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/sword_swipe.wav'))
         self.animate()
         self.collide()
 
