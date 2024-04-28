@@ -1,5 +1,6 @@
 import pygame, sys, random
 import settings
+import cutscenes
 from items import *
 from sprites import *
 from pygame import mixer
@@ -27,15 +28,18 @@ class Game():
         self.clock = pygame.time.Clock() 
 
         self.player = None
-        self.state = 'explore'
+        self.state = 'opening'
         #Game states:
         #explore - Player can move around
         #dialogue - Player is currently in dialogue, player can't move
         #flowerC - flower animation is playing, player can't move
 
+        self.cutsceneManage = cutscenes.CutsceneManager(self)
         self.map = [-1, -1]
         
         self.running = True
+        self.finishedScene = False
+        self.cutsceneSkip = False
     
     #written by Rachel Tang 4/19/24
     #used this website: https://www.educative.io/answers/how-to-play-an-audio-file-in-pygame
@@ -44,7 +48,15 @@ class Game():
             mixer.music.load('Music/CI103_-_normal_dialogue_background.mp3')
             mixer.music.set_volume(0.7)
             mixer.music.play()
-        if songType == 'stop':
+        elif songType == 'openingCutscene':
+            mixer.music.load('Music/everrootforestVillagetheme.mp3')
+            mixer.music.set_volume(0.9)
+            mixer.music.play(10)
+        elif songType == 'village':
+            mixer.music.load('Music/everrootforestVillagetheme.mp3')
+            mixer.music.set_volume(0.7)
+            mixer.music.play(1000)
+        if songType.lower() == 'stop':
             mixer.music.stop()
 
 
@@ -291,6 +303,8 @@ class Game():
         #game loop
         while self.playing:
             self.events()
+            if self.state == 'opening':
+                self.intro_screen()
             self.update()
             self.draw()
         self.running = False
@@ -303,6 +317,9 @@ class Game():
     def intro_screen(self):
         #Play the intro screen
         #To be created later
+        cutscenes.playIntroScene(self.cutsceneManage)
+        if self.finishedScene:
+            self.state = 'explore'
         pass
 
 
@@ -310,7 +327,8 @@ class Game():
 
 g = Game()
 g.intro_screen()
-g.new()
+# g.new()
+
 while g.running:
     g.main()
     g.game_over()
