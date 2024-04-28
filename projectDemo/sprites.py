@@ -428,7 +428,7 @@ class Player(pygame.sprite.Sprite):
 
 
 class Block(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, index):
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -440,7 +440,8 @@ class Block(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
 
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/tiles/brick1.png'), (self.width, self.height))
+        self.imagelist = ['Sprites/tiles/brick1.png']
+        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[index]), (self.width, self.height))
         #self.image.fill(RED)
 
         self.rect = self.image.get_rect()
@@ -561,6 +562,7 @@ class NPC(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
+        self.map = currentTileMap[mapList[self.game.map[0]][self.game.map[1]]]
         self._layer = PLAYER_LAYER
         self.groups = self.game.all_sprites, self.game.enemies
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -568,6 +570,7 @@ class Enemy(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
+        self.speed = PLAYER_SPEED+1
 
         self.health = 100
 
@@ -610,6 +613,23 @@ class Enemy(pygame.sprite.Sprite):
 
             self.rect.x = self.x
             self.rect.y = self.y
+
+    def searchPlayer(self):
+        playerPos = [self.game.player.x, self.game.player.y]
+        dx = (playerPos[0] - self.x)
+        dy = (playerPos[1] - self.y)
+
+        enemyPos = [self.x//TILESIZE, self.y//TILESIZE]
+        playerPos = [playerPos[0]//TILESIZE, playerPos[1]//TILESIZE]
+
+
+        distance = math.sqrt(dx**2+dy**2)
+        dx /= distance
+        dy /= distance
+        self.xChange = dx * self.speed
+        self.yChange = dy * self.speed
+
+
             
         
 class Teleport(pygame.sprite.Sprite):

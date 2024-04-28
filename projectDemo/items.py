@@ -141,6 +141,7 @@ class Weapon(pygame.sprite.Sprite):
             self.y = self.player.y+TILESIZE//2
             self.image = pygame.transform.scale(self.imagelist[0], (self.width, self.height))
 
+    #MAX!!!
     #Author: Max Chiu 4/12/2024
     def calculateAngle(self):
         angle = random.uniform(-1*self.spread, self.spread)
@@ -176,6 +177,7 @@ class Bullet(pygame.sprite.Sprite):
 
         self.xIncrement = self.speed*math.cos(angle)
         self.yIncrement = -1*self.speed*math.sin(angle)
+
 
     #Author: Max Chiu 4/15/2024, 4/16/2024
     def update(self):
@@ -461,7 +463,7 @@ class MeleeAttack(pygame.sprite.Sprite):
                 enemy.dealtDamage(self.weapon.damage, self.player.weapon.type)
         pass
 
-
+    #EDDIE!!!
     def update(self):
 
         if self.player.itemUsed:

@@ -37,12 +37,13 @@ class Game():
         
         self.running = True
     
+    #RACHEL!!!
     #written by Rachel Tang 4/19/24
     #used this website: https://www.educative.io/answers/how-to-play-an-audio-file-in-pygame
     def play_music(self, songType):
         if songType == 'dialogue':
             mixer.music.load('Music/CI103_-_normal_dialogue_background.mp3')
-            mixer.music.set_volume(0.3)
+            mixer.music.set_volume(1.0)
             mixer.music.play()
         if songType == 'stop':
             mixer.music.stop()
@@ -56,7 +57,7 @@ class Game():
                 #print(f"{row} ", end="")   
                 for col in range(len(settings.currentTileMap[0][row])):
                     if (settings.currentTileMap[0][row])[col] == "B":
-                        Block(self, col, row)
+                        Block(self, col, row, 0)
                     elif (settings.currentTileMap[0][row])[col] == "P":
                         self.player = Player(self, col, row, self.clock)
                     elif (settings.currentTileMap[0][row])[col] == "F":
@@ -145,6 +146,7 @@ class Game():
             # print(self.map[1]-1)
             # print(mapList[self.map[0]][self.map[1]-1])
 
+            #CHARLENNE!!!
             # create doors in a new room if it is meant to exist
             # going up
             if self.map[0]-1 >= 0 and mapList[self.map[0]-1][self.map[1]] != -1:
@@ -192,7 +194,7 @@ class Game():
                 for col in range(len(settings.currentTileMap[mapNumber][row])):
                     # looks at the premade room in settings.py, if a tile is on the map, print the corresponding sprite on the new map
                     if (settings.currentTileMap[mapNumber][row])[col] == "B":
-                        Block(self, col, row)
+                        Block(self, col, row, 0)
                     elif (settings.currentTileMap[mapNumber][row])[col] == "F":
                         Flower(self, col, row, self.clock)
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'O':
