@@ -50,12 +50,12 @@ class Game():
             mixer.music.play()
         elif songType == 'openingCutscene':
             mixer.music.load('Music/Chopin-nocturne-op-9-no-2.mp3')
-            mixer.music.set_volume(0.9)
-            mixer.music.play(10)
+            mixer.music.set_volume(1)
+            mixer.music.play()
         elif songType == 'village':
             mixer.music.load('Music/everrootforestVillagetheme.mp3')
-            mixer.music.set_volume(0.7)
-            mixer.music.play(1000)
+            mixer.music.set_volume(0.9)
+            mixer.music.play(100)
         if songType.lower() == 'stop':
             mixer.music.stop()
 
