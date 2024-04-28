@@ -27,6 +27,7 @@ class Game():
         self.clock = pygame.time.Clock() 
 
         self.player = None
+        self.inventory = None
         self.state = 'explore'
         #Game states:
         #explore - Player can move around
@@ -34,7 +35,7 @@ class Game():
         #flowerC - flower animation is playing, player can't move
 
         self.map = [-1, -1]
-        
+       
         self.running = True
     
     #written by Rachel Tang 4/19/24
@@ -52,6 +53,7 @@ class Game():
         #Only for initial map creation
         # -1, -1 is the convention to make known that the map doesnt currently exist
         if self.map == [-1, -1]:
+            self.inventory = Inventory(self)
             for row in range(len(settings.currentTileMap[0])):
                 #print(f"{row} ", end="")   
                 for col in range(len(settings.currentTileMap[0][row])):

@@ -202,6 +202,8 @@ class Player(pygame.sprite.Sprite):
             if not interacted:
                 self.weapon.attack()
 
+            
+
         #EDIT AFTER INVENTORY MADE
         elif keys[pygame.K_r]:
             self.weapon.reload()
@@ -274,6 +276,7 @@ class Player(pygame.sprite.Sprite):
                         self.game.state = 'flowerC'
                         self.game.flowers.get_sprite(interactIndex).state = 'cutting'
                         self.game.flowers.get_sprite(interactIndex).anim()
+
                         #READ ME, USE "self.facing" DIRECTIONS TO DETERMINE WHICH DIRECTION CUTTING SPRITE TO USE
                         if self.facing == 'right':
                             self.image = pygame.transform.scale(pygame.image.load(self.cutRightImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
@@ -738,7 +741,6 @@ class TextBox(pygame.sprite.Sprite):
 
 class Inventory(pygame.sprite.Sprite):
     def __init__(self, game):
-
         self.game = game
         self._layer = TEXT_LAYER
         self.groups = self.game.all_sprites
@@ -756,18 +758,9 @@ class Inventory(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
-        self.slots = {}
+        self.slots = {"flower":0, "ore":0, "potion": 0}
+
     def add_item(self, item):
-        first_available = len(self.slots) 
-        same_slot = len(self.slots) 
-        for index, slot in enumerate(self.slots): 
-            if slot.name == 'blank' and first_available == len(self.slots):
-                first_available = index
-            elif slot.name == item.name: 
-                same_slot = index
-                break
-        if same_slot < len(self.slots): 
-            self.slots[same_slot].quantity += 1 
-        elif first_available < len(self.slots):
-            self.slots[first_available].name = item.name
-            self.slots[first_available].quantity = 1
+        self.slots[item] =  self.slots.get(item) + 1
+
+            

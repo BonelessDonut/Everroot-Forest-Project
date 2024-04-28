@@ -555,6 +555,7 @@ class Flower(pygame.sprite.Sprite):
         self.imgindex = 1
 
         self.state = 'alive'
+        self.name = 'flower'
 
         #READ ME, EDIT ALL OF THE FLOWER SPRITES TO NOT INCLUDE THE CUTTING SHEARS
         #THIS WILL LIKELY IMPROVE ANIMATION FLUIDITY WHEN FLOWERS ARE INTERACTED WITH
@@ -594,6 +595,8 @@ class Flower(pygame.sprite.Sprite):
         else:
             if self.state == 'cutting':
                 self.kill()
+                self.game.inventory.add_item('flower')
+                print(self.game.inventory.slots)
 
 class Ore(pygame.sprite.Sprite):
     def __init__(self, game, x, y, clock):
@@ -612,6 +615,7 @@ class Ore(pygame.sprite.Sprite):
         self.imgindex = 0
 
         self.state = 'alive'
+        self.name = 'ore'
 
         rubyImageL = ['Sprites/items/oreRuby.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png', 'Sprites/items/oreRuby3.png']
         emeraldImageL = ['Sprites/items/oreEmerald.png', 'Sprites/items/oreEmerald2.png', 'Sprites/items/oreEmerald3.png', 'Sprites/items/oreEmerald3.png']
@@ -651,4 +655,6 @@ class Ore(pygame.sprite.Sprite):
         else:
             if self.state == 'mining':
                 self.kill()
+                self.game.inventory.add_item('ore')
+                print(self.game.inventory.slots)
         pass
