@@ -704,6 +704,7 @@ class Inventory(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+        self.slots = {}
     def add_item(self, item):
         first_available = len(self.slots) 
         same_slot = len(self.slots) 
