@@ -1,11 +1,14 @@
 import pygame
 from settings import *
+import items 
 import math
 import random
 import re
 import os
 
+
 class Player(pygame.sprite.Sprite):
+    itemUsed = False
 
     def __init__(self, game, x, y, clock):
         self.game = game
@@ -16,6 +19,15 @@ class Player(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
+        # The weapons available to the player are stored in a list
+
+        self.weaponList = ['bubble', 'swordfish', 'trident']
+        self.weaponNum = 0
+        self.weapon = items.Weapon(self.game, self.weaponList[self.weaponNum], self)
+        self.weaponAnimationCount = 0
+        self.weaponAnimationSpeed = 18
+        self.swordUsed = False
+        self.spearUsed = False
 
         self.mouseRect = pygame.Rect(0, 0, 40, 40)
         self.mouseRect.center = pygame.mouse.get_pos()
@@ -47,18 +59,21 @@ class Player(pygame.sprite.Sprite):
         self.mineDownImgList = ['Sprites/protag/protagMineDown.png', 'Sprites/protag/protagMineRedDown.png','Sprites/protag/protagMineBlueDown.png', 'Sprites/protag/protagMinePlatDown.png']
         self.mineUpgrade = 0
 
+        self.rangedWeaponList = [pygame.image.load('Sprites/protag/protagRangedRight.png'), pygame.image.load('Sprites/protag/protagRangedDown.png'), pygame.image.load('Sprites/protag/protagRangedUp.png')]
+        self.rangedWeaponList.append(pygame.transform.flip(self.rangedWeaponList[0], True, False))
+
         self.clock = clock
         self.timepassed = 0
 
         self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]).convert_alpha(), (self.width, self.height))
         
 
-        #self.rect = self.image.get_rect().
-        #self.rect.x = self.x
-        #self.rect.y = self.y
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
         #Below line is to decrease the rectangle collision slightly
         #Was having trouble fitting in 1 tile gaps
-        self.rect = pygame.Rect(self.x, self.y, 30, 30)
+        #self.rect = pygame.Rect(self.x, self.y, 30, 30)
 
     def update(self):
         self.movement()
@@ -68,18 +83,29 @@ class Player(pygame.sprite.Sprite):
         self.collideBlocks('x')
         self.rect.y += self.yChange
         self.collideBlocks('y')
+        self.x = self.rect.x
+        self.y = self.rect.y
 
         self.timepassed += self.clock.get_time()/1000
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
-        if self.game.state == 'explore':
+        if self.game.state == 'explore' and not self.weapon.used:
             if self.facing == 'right':
-                self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+                self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1, self.height * 1))
             elif self.facing == 'left':
-                self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+                self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]), (self.width * 1, self.height * 1))
             elif self.facing == 'up':
-                self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+                self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width * 1, self.height * 1))
             else: # self.facing == 'down':
-                self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width * 1.02, self.height * 1.02))
+                self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width * 1, self.height * 1))
+        elif self.weapon.used and self.weapon.type == 'bubble'and self.weapon.ammo != 0:
+            if self.facing == 'right':
+                self.image = pygame.transform.scale(self.rangedWeaponList[0], (self.width * 1, self.height * 1))
+            elif self.facing == 'left':
+                self.image = pygame.transform.scale(self.rangedWeaponList[3], (self.width * 1, self.height * 1))
+            elif self.facing == 'up':
+                self.image = pygame.transform.scale(self.rangedWeaponList[2], (self.width * 1, self.height * 1))
+            else: # self.facing == 'down':
+                self.image = pygame.transform.scale(self.rangedWeaponList[1], (self.width * 1, self.height * 1))
         self.xChange = 0
         self.yChange = 0
 
@@ -106,6 +132,20 @@ class Player(pygame.sprite.Sprite):
     def interact(self):
         keys = pygame.key.get_pressed()
         mouses = pygame.mouse.get_pressed()
+        interacted = False
+
+        if self.itemUsed:
+            if self.facing == 'right':
+                self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1, self.height * 1))
+            elif self.facing == 'left':
+                self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]),(self.width * 1, self.height * 1))
+            elif self.facing == 'up':
+                self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]),(self.width * 1, self.height * 1))
+            else:  # self.facing == 'down':
+                self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]),(self.width * 1, self.height * 1))
+
+
+
         if keys[pygame.K_SPACE]:
             interactRect = None
             if self.facing == 'right':
@@ -120,6 +160,7 @@ class Player(pygame.sprite.Sprite):
             #Gets the index of the flower that the player interacted with
             flowerIndex = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
             if flowerIndex != -1:
+                interacted = True
                 self.game.state = 'flowerC'
                 self.game.flowers.get_sprite(flowerIndex).state = 'cutting'
                 self.game.flowers.get_sprite(flowerIndex).anim()
@@ -131,7 +172,6 @@ class Player(pygame.sprite.Sprite):
                 elif self.facing == 'up':
                     self.image = pygame.transform.scale(pygame.image.load(self.cutUpImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
                 else:
-                    print(self.facing)
                     self.image = pygame.transform.scale(pygame.image.load(self.cutDownImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
 
 
@@ -139,6 +179,7 @@ class Player(pygame.sprite.Sprite):
             #Gets the index of the ore that the player interacted with
             oreIndex = interactRect.collidelist(list(ore.rect for ore in self.game.ores))
             if oreIndex != -1:
+                interacted = True
                 self.game.state = 'oreMine'
                 self.game.ores.get_sprite(oreIndex).state = 'mining'
                 self.game.ores.get_sprite(oreIndex).killAnim()
@@ -149,15 +190,23 @@ class Player(pygame.sprite.Sprite):
                 elif self.facing == 'up':
                     self.image = pygame.transform.scale(pygame.image.load(self.mineUpImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
                 else:
-                    self.image = pygame.transform.scale(pygame.image.load(self.mineDownImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))\
-
-
+                    self.image = pygame.transform.scale(pygame.image.load(self.mineDownImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
 
             #Gets the index of the npc that the player interacted with
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
             if npcIndex != -1:
+                interacted = True
                 self.game.npcs.get_sprite(npcIndex).interaction()
                 pygame.time.wait(250)
+
+            if not interacted:
+                self.weapon.attack()
+
+        #EDIT AFTER INVENTORY MADE
+        elif keys[pygame.K_r]:
+            self.weapon.reload()
+
+
         elif self.game.state == 'dialogue' and (keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_UP] or keys[pygame.K_DOWN]):
             interactRect = None
             if self.facing == 'right':
@@ -172,6 +221,7 @@ class Player(pygame.sprite.Sprite):
             #Gets the index of the npc that the player interacted with
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
             if npcIndex != -1:
+                interacted = True
                 npc = self.game.npcs.get_sprite(npcIndex)
                 if keys[pygame.K_w] or keys[pygame.K_UP]:
                     npc.TextBox.selectedRect = npc.TextBox.selectedRect - 1 if npc.TextBox.selectedRect > 0 else npc.TextBox.selectedRect
@@ -179,7 +229,6 @@ class Player(pygame.sprite.Sprite):
                 else:
                     npc.TextBox.selectedRect = npc.TextBox.selectedRect + 1 if npc.TextBox.selectedRect < len(npc.TextBox.choiceRectList)-1 else npc.TextBox.selectedRect
                     pygame.time.wait(150)
-
 
 
         #Allows mouse click functionality for interactions
@@ -192,6 +241,7 @@ class Player(pygame.sprite.Sprite):
                 npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
                 npc = self.game.npcs.get_sprite(npcIndex)
                 rectCollisionList = npc.TextBox.choiceRectList[:]
+
                 for rect in range(len(rectCollisionList)):
                     rectCollisionList[rect].x = npc.TextBox.x + 13
                     rectCollisionList[rect].y = npc.TextBox.y + 25 + 30*rect
@@ -202,17 +252,39 @@ class Player(pygame.sprite.Sprite):
 
             else:
                 #Checks if the player is within a square's range of side length 60 pixels of the mouse
-                if abs(mouseRect.x-self.rect.x) <= 60 and abs(mouseRect.y-self.rect.y) <= 60:
+                if ((mouseRect.x-self.rect.x)**2+(mouseRect.y-self.rect.y)**2)**(1/2) <= 60:
+
                     interactIndex = mouseRect.collidelist(list(ore.rect for ore in self.game.ores))
                     if interactIndex != -1:
-                        self.game.ores.get_sprite(interactIndex).kill()
+                        self.game.state = 'oreMine'
+                        self.game.ores.get_sprite(interactIndex).state = 'mining'
+                        self.game.ores.get_sprite(interactIndex).killAnim()
+                        if self.facing == 'right':
+                            self.image = pygame.transform.scale(pygame.image.load(self.mineRightImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                        elif self.facing == 'left':
+                            self.image = pygame.transform.scale(pygame.image.load(self.mineLeftImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                        elif self.facing == 'up':
+                            self.image = pygame.transform.scale(pygame.image.load(self.mineUpImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                        else:
+                            self.image = pygame.transform.scale(pygame.image.load(self.mineDownImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))\
+
+                    
                     interactIndex = mouseRect.collidelist(list(flower.rect for flower in self.game.flowers))
                     if interactIndex != -1:
                         self.game.state = 'flowerC'
                         self.game.flowers.get_sprite(interactIndex).state = 'cutting'
-                        #READ ME, USE "self.facing" DIRECTIONS TO DETERMINE WHICH DIRECTION CUTTING SPRITE TO USE
-                        self.image = pygame.transform.scale(pygame.image.load(self.cutImgList[self.cutIndex]), (self.width * 1.02, self.height * 1.02))
                         self.game.flowers.get_sprite(interactIndex).anim()
+                        #READ ME, USE "self.facing" DIRECTIONS TO DETERMINE WHICH DIRECTION CUTTING SPRITE TO USE
+                        if self.facing == 'right':
+                            self.image = pygame.transform.scale(pygame.image.load(self.cutRightImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
+                        elif self.facing == 'left':
+                            self.image = pygame.transform.scale(pygame.image.load(self.cutLeftImgList[self.cutUpgrade]),   (self.width * 1.06, self.height * 1.06))
+                        elif self.facing == 'up':
+                            self.image = pygame.transform.scale(pygame.image.load(self.cutUpImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
+                        else:
+                            self.image = pygame.transform.scale(pygame.image.load(self.cutDownImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
+
+
                     interactIndex = mouseRect.collidelist(list(npc.rect for npc in self.game.npcs))
                     if interactIndex != -1:
                         self.game.npcs.get_sprite(interactIndex).interaction()
@@ -224,8 +296,9 @@ class Player(pygame.sprite.Sprite):
         if teleportIndex != -1:
             tpSprite = self.game.teleport.get_sprite(teleportIndex)
             self.kill()
+            pygame.time.wait(50)
             self.game.createTilemap((tpSprite.x//TILESIZE, tpSprite.y//TILESIZE))
-            pygame.time.wait(60)
+            pygame.time.wait(50)
 
 
     
@@ -237,37 +310,38 @@ class Player(pygame.sprite.Sprite):
         #The key press segments came from viewing this tutorial
         #https://www.youtube.com/watch?v=GakNgbiAxzs&list=PLkkm3wcQHjT7gn81Wn-e78cAyhwBW3FIc&index=2
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-            # Two lines below change camera to move around player character, moving all other sprites
-            # comment them out to create a static camera
-            #for sprite in self.game.all_sprites:
-                #sprite.rect.x += PLAYER_SPEED
-            self.xChange -= PLAYER_SPEED
-            self.facing = 'left'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
+        if not self.itemUsed:
+            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+                # Two lines below change camera to move around player character, moving all other sprites
+                # comment them out to create a static camera
+                #for sprite in self.game.all_sprites:
+                    #sprite.rect.x += PLAYER_SPEED
+                self.xChange -= PLAYER_SPEED
+                self.facing = 'left'
+                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
 
 
-        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-            #for sprite in self.game.all_sprites:
-                #sprite.rect.x -= PLAYER_SPEED
-            self.xChange += PLAYER_SPEED
-            self.facing = 'right'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
-            
-        if keys[pygame.K_w] or keys[pygame.K_UP]:
-            #for sprite in self.game.all_sprites:
-                #sprite.rect.y += PLAYER_SPEED
-            self.yChange -= PLAYER_SPEED
-            self.facing = 'up'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.18)%4 == self.imgindex) else self.imgindex
-            
+            if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+                #for sprite in self.game.all_sprites:
+                    #sprite.rect.x -= PLAYER_SPEED
+                self.xChange += PLAYER_SPEED
+                self.facing = 'right'
+                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
 
-        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
-            #for sprite in self.game.all_sprites:
-                #sprite.rect.y -= PLAYER_SPEED
-            self.yChange += PLAYER_SPEED
-            self.facing = 'down'
-            self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.25)%4 == self.imgindex) else self.imgindex
+            if keys[pygame.K_w] or keys[pygame.K_UP]:
+                #for sprite in self.game.all_sprites:
+                    #sprite.rect.y += PLAYER_SPEED
+                self.yChange -= PLAYER_SPEED
+                self.facing = 'up'
+                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.18)%4 == self.imgindex) else self.imgindex
+
+
+            if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+                #for sprite in self.game.all_sprites:
+                    #sprite.rect.y -= PLAYER_SPEED
+                self.yChange += PLAYER_SPEED
+                self.facing = 'down'
+                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.25)%4 == self.imgindex) else self.imgindex
 
     def collideBlocks(self, direction):
         if direction == 'x':
@@ -295,6 +369,64 @@ class Player(pygame.sprite.Sprite):
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.y -= yDiff
 
+    def attack(self, attackInstance):
+        # This method will change the player's sprite when a melee attack is used, there will be separate images / animations
+        # Depending on which melee weapon is in use
+        # This method should only be getting called if the player's weapon type is one of the melee weapons
+        if self.swordUsed:
+            if self.facing == 'up':
+                if attackInstance.animationPhase == 1:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingUp.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 2:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingUp2.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 3:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingUp3.png'), (self.width, self.height))
+
+            elif self.facing == 'down':
+                if attackInstance.animationPhase == 1:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 2:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown2.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 3:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown3.png'), (self.width, self.height))
+
+            elif self.facing == 'left':
+                if attackInstance.animationPhase == 1:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingLeft.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 2:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingLeft2.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 3:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingLeft3.png'), (self.width, self.height))
+
+            elif self.facing == 'right':
+                if attackInstance.animationPhase == 1:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingRight.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 2:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingRight2.png'), (self.width, self.height))
+                elif attackInstance.animationPhase == 3:
+                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingRight3.png'), (self.width, self.height))
+        elif self.spearUsed:
+            if self.facing == 'up':
+                self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagThrowUp.png'), (self.width, self.height))
+            elif self.facing == 'down':
+                self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagThrowDown.png'),(self.width, self.height))
+            elif self.facing == 'left':
+                self.image = pygame.transform.scale(pygame.transform.flip(pygame.image.load('Sprites/protag/protagThrowRight.png'), True, False),(self.width, self.height))
+            elif self.facing == 'right':
+                self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagThrowRight.png'),(self.width, self.height))
+
+        pygame.display.update()
+
+    def switchWeapons(self):
+        # Method written by Eddie Suber
+        if self.game.state == 'explore':
+            # Player can use Q to switch weapons
+            self.weaponNum += 1
+            self.weaponNum %= len(self.weaponList)
+            self.weapon.type = self.weaponList[self.weaponNum]
+        pass
+
+
 class Block(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
 
@@ -314,144 +446,6 @@ class Block(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
-
-'''class Ground(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-
-        self.game = game
-        self._layer = GROUND_LAYER
-        self.groups = self.game.all_sprites, self.game.ground
-        pygame.sprite.Sprite.__init__(self, self.groups)
-
-        self.x = x*TILESIZE
-        self.y = y*TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/tiles/ground2.png'), (self.width, self.height))
-        #self.image.fill(RED)
-
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y'''
-
-
-
-class Flower(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, clock):
-        self.game = game
-        self._layer = ITEM_LAYER
-        self.groups = self.game.all_sprites, self.game.flowers
-        pygame.sprite.Sprite.__init__(self, self.groups)
-
-        self.x = x*TILESIZE
-        self.y = y*TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-
-        self.clock = clock
-        self.timepassed = 0
-        self.imgindex = 1
-
-        self.state = 'alive'
-
-        #READ ME, EDIT ALL OF THE FLOWER SPRITES TO NOT INCLUDE THE CUTTING SHEARS
-        #THIS WILL LIKELY IMPROVE ANIMATION FLUIDITY WHEN FLOWERS ARE INTERACTED WITH
-        #WILL ALSO REMOVE DUPLICATE SHEARS WITH THE PLAYER CUTTING ANIMATION
-
-        hyacinImgL = ['Sprites/items/hyacinth.png', 'Sprites/items/hyacinth3New.png', 'Sprites/items/hyacinth5.png']
-        sunFloImgL = ['Sprites/items/sunflowernew.png', 'Sprites/items/sunflower3New.png', 'Sprites/items/sunflower5.png']
-        silentFImgL = ['Sprites/items/silentFlower.png', 'Sprites/items/silentFlower3New.png', 'Sprites/items/silentFlower5.png']
-
-        self.imageList = [['Sprites/items/hyacinth.png', hyacinImgL], ['Sprites/items/sunflowernew.png', sunFloImgL], ['Sprites/items/silentFlower.png', silentFImgL]]
-        #Randomly selects the flower to spawn as one of the flower options:
-        #either a hyacinth, sunflower, or silent princess flower
-        self.flowerSpriteNum = random.randint(0, len(self.imageList)-1)
-        self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][0]), (self.width, self.height))
-
-
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
-
-    def update(self):
-        self.timepassed += self.clock.get_time() / 1000
-        if self.game.state == 'flowerC':
-            if self.state == 'cutting':
-                #READ ME, THIS UPDATES ALL THE FLOWERS AT ONCE AFTER INTERACTING WITH ONLY ONE FLOWER. - UNINTENDED OUTCOME, NEEDS FIXING
-                self.anim()
-                self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][1][self.imgindex % 3]), (self.width, self.height))
-
-    def anim(self): 
-        #realized it was setting the state to flowerC every single loop from the Player.interact() method, so it never went to the else to kill
-        #moved it in front to make sure it switched states when the imgindex got to 4
-        if self.imgindex > 2:
-            self.game.state = 'explore'
-        if self.game.state == 'flowerC':
-            self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.31) % 3 == self.imgindex) else self.imgindex
-
-        else:
-            if self.state == 'cutting':
-                self.kill()
-
-class Ore(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, clock):
-        self.game = game
-        self._layer = ITEM_LAYER
-        self.groups = self.game.all_sprites, self.game.ores
-        pygame.sprite.Sprite.__init__(self, self.groups)
-
-        self.x = x*TILESIZE
-        self.y = y*TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
-
-        self.clock = clock
-        self.timepassed = 0
-        self.imgindex = 0
-
-        self.state = 'alive'
-
-        rubyImageL = ['Sprites/items/oreRuby.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png', 'Sprites/items/oreRuby3.png']
-        emeraldImageL = ['Sprites/items/oreEmerald.png', 'Sprites/items/oreEmerald2.png', 'Sprites/items/oreEmerald3.png', 'Sprites/items/oreEmerald3.png']
-        copperImageL = ['Sprites/items/oreCopper.png', 'Sprites/items/oreCopper2.png', 'Sprites/items/oreCopper3.png', 'Sprites/items/oreCopper3.png']
-        amethImageL = ['Sprites/items/oreAmethyst.png', 'Sprites/items/oreAmethyst2.png', 'Sprites/items/oreAmethyst3.png', 'Sprites/items/oreAmethyst3.png']
-        ironImageL = ['Sprites/items/oreIron.png', 'Sprites/items/oreIron2.png', 'Sprites/items/oreIron3.png', 'Sprites/items/oreIron3.png']
-
-
-
-        self.imageList = [['Sprites/items/oreRuby.png', rubyImageL], ['Sprites/items/oreEmerald.png', emeraldImageL], ['Sprites/items/oreCopper.png', copperImageL], ['Sprites/items/oreAmethyst.png', amethImageL], ['Sprites/items/oreIron.png', ironImageL]]
-        self.oreSpriteNum = random.randint(0, len(self.imageList) - 1)
-
-        self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.oreSpriteNum][0]), (self.width, self.height))
-        #self.image = pygame.Surface([self.width, self.height])
-        #self.image.fill(GREEN)
-
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
-
-    def update(self):
-        self.timepassed += self.clock.get_time() / 1000
-        if self.game.state == 'oreMine':
-            if self.state == 'mining':
-                #READ ME, THIS UPDATES ALL THE FLOWERS AT ONCE AFTER INTERACTING WITH ONLY ONE FLOWER. - UNINTENDED OUTCOME, NEEDS FIXING
-                self.killAnim()
-                self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.oreSpriteNum][1][self.imgindex % 4]), (self.width, self.height))
-
-
-        pass
-
-    def killAnim(self):
-        if self.imgindex > 2:
-            self.game.state = 'explore'
-        if self.game.state == 'oreMine':
-            self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.31) % 4 == self.imgindex) else self.imgindex
-        else:
-            if self.state == 'mining':
-                self.kill()
-        pass
-
 
 
 class NPC(pygame.sprite.Sprite):
@@ -477,8 +471,9 @@ class NPC(pygame.sprite.Sprite):
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
         #Always leave a space/punctuation at the end of the quote!
+        #Would you rather cum in the sink or sink in the cum? That is indeed the question for which we must all ponder and arrive at our own answers.
         self.dialogueList = {'01:First Meet':[{'Meetings': 1},
-                                                "? That is indeed the question for which we must all ponder and arrive at our own answers.",
+                                                "Testing dialogue ",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
                                                 "Boom Boom Boom Boom ",
                                                 "%Choices; Cats are cute?; Yes; Of Course; Meow"],
@@ -517,9 +512,10 @@ class NPC(pygame.sprite.Sprite):
     def interaction(self):
         #Going into dialogue from explore
         if self.game.state == 'explore':
+            self.game.play_music('dialogue')
             self.meetings += 1
             self.TextBox = TextBox(self.game)
-            self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 20, 'Garamond', self.name)
+            self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 28, 'Garamond', self.name)
             self.dialogueStageIndex += 1
             self.game.state = 'dialogue'
 
@@ -534,6 +530,7 @@ class NPC(pygame.sprite.Sprite):
                     self.TextBox.kill()
                     self.updateDialogue()
                     self.game.state = 'explore'
+                    self.game.play_music('stop')
                 else:
                     self.interaction()
             #If the next dialogue to display is a choice list
@@ -541,23 +538,78 @@ class NPC(pygame.sprite.Sprite):
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game)
                 choicesList = nextDialogue.split(';')
-                self.TextBox.newText(choicesList[1:], 20, 'Garamond', self.name)
+                self.TextBox.newText(choicesList[1:], 28, 'Garamond', self.name)
             #Displaying normal dialogue
             else:
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game)
-                self.TextBox.newText(nextDialogue, 20, 'Garamond', self.name)
+                self.TextBox.newText(nextDialogue, 28, 'Garamond', self.name)
                 self.dialogueStageIndex += 1
         #When finished with dialogue
         else:
             self.TextBox.kill()
             self.updateDialogue()
             self.game.state = 'explore'
+            self.game.play_music('stop')
 
     #READ ME, FINISH WHEN CHOICES ARE DEFINED
     def choiceResponse(self, isFlavor):
         self.TextBox.choiceRectList = []
         pass
+
+#Authored by Max Chiu 4/16/2024
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = PLAYER_LAYER
+        self.groups = self.game.all_sprites, self.game.enemies
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.width = TILESIZE
+        self.height = TILESIZE
+
+        self.health = 100
+
+        self.name = 'Udibudibudib'
+
+        self.xChange = 0
+        self.yChange = 0
+        self.state = 'standing'
+
+        self.imagelist = ['Sprites/npcs/sampleEnemy/sampleEnemyLeft.png', 'Sprites/npcs/sampleEnemy/sampleEnemyRight.png']
+        #self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (2*self.width, 2*self.height))
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/joker.jpeg'), (self.width, self.height))
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+    #Authored: Max Chiu 4/18/2024
+    def dealtDamage(self, damage, type):
+        if type == 'bubble':
+            self.health -= damage
+            self.state = 'standing'
+        elif type == 'swordfish' or type == 'trident':
+            self.health -= damage
+            self.state = 'knockback'
+        if self.health < 0:
+            self.kill()
+
+
+    #Authored: Max Chiu 4/18/2024
+    def update(self):
+        if self.state == 'standing':
+            self.state = 'moving'
+        elif self.state == 'knockback':
+            pass
+        else: #self.state == 'moving'
+
+            self.x += self.xChange
+            self.y += self.yChange
+
+            self.rect.x = self.x
+            self.rect.y = self.y
             
         
 class Teleport(pygame.sprite.Sprite):
@@ -591,8 +643,8 @@ class TextBox(pygame.sprite.Sprite):
         self.timepassed = 0
 
         self.area = pygame.Rect(0, 3, self.width*0.70, self.height*0.6)
-        self.avatarBox = pygame.Rect(self.width*0.72, self.height*0.24, self.width*0.2775, self.height*0.73)
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/textbox1.png').convert_alpha(), (self.width, self.height*1.20))
+        self.avatarBox = pygame.Rect(self.width*0.7134, self.height*0.13, self.width*0.24, self.height*0.73)
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/textbox2.png').convert_alpha(), (self.width, self.height*1.20))
         self.imagelist = os.listdir('Sprites/npcs/chipichipichapachapa')
         self.imgindex = 3
 
@@ -629,7 +681,7 @@ class TextBox(pygame.sprite.Sprite):
     #fontSize is the font size, font is the font, and name is the NPC name
     def newText(self, text, fontSize, font, name):
         #Formula for the maximum number of characters that can fit on the screen assuming it's monospaced font
-        maxLength = int((float(-2.2835*10**(-7))*self.width**2+0.000411706*self.width+0.767647)*self.width/fontSize)+1
+        maxLength = int((float(-2.2835*10**(-7))*self.width**2+0.001*self.width+0.767647)*self.width/fontSize)+1
         self.font = font
         self.fontSize = fontSize
         self.name = name
@@ -647,7 +699,7 @@ class TextBox(pygame.sprite.Sprite):
                 #print("maxlength is ",  maxLength)
                 #print("self.area is ", self.area)
                 #print(15, 10+countRows*fontSize)
-                self.image.blit(boxFont.render(text[0:cutoffIndex].strip(), False, (255, 255, 255)), (15, 40+countRows*fontSize), self.area)
+                self.image.blit(boxFont.render(text[0:cutoffIndex].strip(), False, (255, 255, 255)), (48, 40+countRows*fontSize), self.area)
                 countRows += 1
                 try:
                     text = text[cutoffIndex:]
@@ -657,11 +709,11 @@ class TextBox(pygame.sprite.Sprite):
             #If a choice dialogue
             else:
                 if countRows == 0:
-                    self.image.blit(pygame.font.SysFont(font, int(fontSize*1.2)).render(text[0].strip(), False, (255, 255, 255)), (15, 10+countRows*fontSize*1.2), self.area)
+                    self.image.blit(pygame.font.SysFont(font, int(fontSize*1.2)).render(text[0].strip(), False, (255, 255, 255)), (48, 19+countRows*fontSize*1.2), self.area)
                     #self.choiceRectList.append(pygame.Rect(13, 10+countRows*fontSize*1.5, self.width*0.58, fontSize*1.5))
                 else:
-                    self.image.blit(boxFont.render(text[0].strip(), False, (255, 255, 255)), (15, 15+countRows*fontSize*1.5), self.area)
-                    self.choiceRectList.append(pygame.Rect(13, 10+countRows*fontSize*1.5, self.width*0.58, fontSize*1.5))
+                    self.image.blit(boxFont.render(text[0].strip(), False, (255, 255, 255)), (48, 15+countRows*fontSize*1.5), self.area)
+                    self.choiceRectList.append(pygame.Rect(44, 10+countRows*fontSize*1.5, self.width*0.58, fontSize*1.5))
                 for rect in self.choiceRectList:
                     pygame.draw.rect(self.image, GRAY, rect, 2, 1)
                 countRows += 1
@@ -675,7 +727,7 @@ class TextBox(pygame.sprite.Sprite):
         self.timepassed += self.clock.get_time()/1000
         image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
         self.image.blit(image, self.avatarBox)
-        self.image.blit(pygame.font.SysFont('Courier', 25).render(self.name, False, (255, 255, 255)),(self.avatarBox.x + self.avatarBox.width / 2 - len(self.name) * TILESIZE / 5.5, self.height * 0.79))
+        self.image.blit(pygame.font.SysFont('Courier', 25).render(self.name, False, (255, 255, 255)),(self.avatarBox.x + self.avatarBox.width / 2 - len(self.name) * TILESIZE / 5.5, self.height * 0.89))
         if len(self.choiceRectList) > 0:
             for rect in range(len(self.choiceRectList)):
                 if rect == self.selectedRect:
