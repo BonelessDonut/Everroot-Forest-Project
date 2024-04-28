@@ -49,7 +49,7 @@ class Game():
             mixer.music.set_volume(0.7)
             mixer.music.play()
         elif songType == 'openingCutscene':
-            mixer.music.load('Music/everrootforestVillagetheme.mp3')
+            mixer.music.load('Music/Chopin-nocturne-op-9-no-2.mp3')
             mixer.music.set_volume(0.9)
             mixer.music.play(10)
         elif songType == 'village':
@@ -320,6 +320,7 @@ class Game():
         cutscenes.playIntroScene(self.cutsceneManage)
         if self.finishedScene:
             self.state = 'explore'
+            self.play_music('village')
         pass
 
 

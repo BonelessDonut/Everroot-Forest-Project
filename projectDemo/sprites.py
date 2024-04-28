@@ -533,6 +533,7 @@ class NPC(pygame.sprite.Sprite):
                     self.updateDialogue()
                     self.game.state = 'explore'
                     self.game.play_music('stop')
+                    self.game.play_music('village')
                 else:
                     self.interaction()
             #If the next dialogue to display is a choice list

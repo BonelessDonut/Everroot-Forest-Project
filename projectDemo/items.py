@@ -93,8 +93,6 @@ class Weapon(pygame.sprite.Sprite):
                 Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage)
                 self.ammo -= 1
                 self.timer = self.pause
-            elif self.type == 'swordfish':
-                MeleeAttack(self.game, self, self.player)
 
         
     #Author: Max Chiu 4/12/2024
