@@ -28,6 +28,7 @@ class Game():
 
         self.player = None
         self.state = 'explore'
+        #self.enemy = None #REMOVE
         #Game states:
         #explore - Player can move around
         #dialogue - Player is currently in dialogue, player can't move
@@ -67,6 +68,7 @@ class Game():
                     elif (settings.currentTileMap[0][row])[col] == 'N':
                         NPC(self, col, row)
                     elif (settings.currentTileMap[0][row])[col] == 'E':
+                        #self.enemy = Enemy(self, col, row) #REMOVE self.enemy = 
                         Enemy(self, col, row)
                     elif (settings.currentTileMap[0][row])[col] == 'T':
                         Teleport(self, col, row)
@@ -187,7 +189,6 @@ class Game():
             print('Current Map:')
             for i in currentTileMap[mapNumber]:
                 print(i)
-
                      
             for row in range(len(settings.currentTileMap[mapNumber])):
                 #print(f"{row} ", end="")
@@ -202,6 +203,7 @@ class Game():
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'N':
                         NPC(self, col, row)
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'E':
+                        #self.enemy = Enemy(self, col, row)
                         Enemy(self, col, row)
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'T':
                         # teleports the player's position on the screen when they move rooms
@@ -286,6 +288,24 @@ class Game():
         self.screen.fill(BLACK)
         self.all_sprites.draw(self.screen)
         self.clock.tick(FPS)
+        # n = 20
+        # dx = (self.enemy.x+self.enemy.width/2-(self.player.x+self.player.width/2))/n
+        # dy = (self.enemy.y+self.enemy.height/2-(self.player.y+self.player.height/2))/n
+        # dist = math.sqrt((dx)**2+(dy)**2)
+        # lines=[]
+        # px = self.player.x+self.player.width/2
+        # py = self.player.y+self.player.height/2
+        # ex = self.enemy.x+self.enemy.width/2
+        # ey = self.enemy.y+self.enemy.height/2
+        # for i in range(n):
+        #     lines.append(pygame.draw.line(self.screen, BLUE, (px+dx*i, py+dy*i), (px+dx*(i+1), py+dy*(i+1)), 2))
+        # #line = pygame.draw.line(self.screen, RED, (self.enemy.x+self.enemy.width/2, self.enemy.y+self.enemy.height/2), (self.player.x+self.player.width/2, self.player.y+self.player.height/2), 2)
+        # index = [line.collidelist(list(block.rect for block in self.blocks)) for line in lines]
+        # for i in index:
+        #     if i != -1:
+        #         print(i)
+        #         rect = self.blocks.get_sprite(i)
+        #         rect.image.fill(RED)
         pygame.display.update()
 
     def main(self):
