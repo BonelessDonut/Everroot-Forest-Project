@@ -528,7 +528,7 @@ class MeleeAttack(pygame.sprite.Sprite):
                 pygame.mixer.Channel(1).set_volume(0.3)
                 pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/movement-swipe-whoosh-3-186577.mp3'))
             else:
-                pygame.mixer.Channel(1).set_volume(0.6)
+                pygame.mixer.Channel(1).set_volume(0.55)
                 pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/sword_swipe.wav'))
         self.animate()
         self.collide()
@@ -597,11 +597,16 @@ class Flower(pygame.sprite.Sprite):
         if self.imgindex > 2:
             self.game.state = 'explore'
         if self.game.state == 'flowerC':
-            self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.31) % 3 == self.imgindex) else self.imgindex
+            if ((self.timepassed) // (0.31) % 3 == self.imgindex):
+                self.imgindex = (self.imgindex + 1)
+                pygame.mixer.Channel(3).set_volume(0.5)
+                pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/22_Slash_04.wav'))
 
         else:
             if self.state == 'cutting':
                 self.kill()
+                pygame.mixer.Channel(3).set_volume(0.1)
+                pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
 
 class Ore(pygame.sprite.Sprite):
     def __init__(self, game, x, y, clock):
@@ -655,8 +660,15 @@ class Ore(pygame.sprite.Sprite):
         if self.imgindex > 2:
             self.game.state = 'explore'
         if self.game.state == 'oreMine':
-            self.imgindex = (self.imgindex + 1) if ((self.timepassed) // (0.31) % 4 == self.imgindex) else self.imgindex
+            if ((self.timepassed) // (0.31) % 4 == self.imgindex):
+                self.imgindex = (self.imgindex + 1)
+                pygame.mixer.Channel(3).set_volume(0.5)
+                pygame.mixer.Channel(3).play(
+                pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/08_Bite_04.wav'))
+
         else:
             if self.state == 'mining':
                 self.kill()
+                pygame.mixer.Channel(3).set_volume(0.1)
+                pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
         pass

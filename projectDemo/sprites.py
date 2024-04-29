@@ -318,7 +318,12 @@ class Player(pygame.sprite.Sprite):
                     #sprite.rect.x += PLAYER_SPEED
                 self.xChange -= PLAYER_SPEED
                 self.facing = 'left'
-                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
+                if ((self.timepassed) // (0.20) % 4 == self.imgindex):
+                    self.imgindex = (self.imgindex + 1)%4
+                    pygame.mixer.Channel(2).set_volume(0.4)
+                    pygame.mixer.Channel(2).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav'))
+                else:
+                    self.imgindex
 
 
             if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
@@ -326,14 +331,24 @@ class Player(pygame.sprite.Sprite):
                     #sprite.rect.x -= PLAYER_SPEED
                 self.xChange += PLAYER_SPEED
                 self.facing = 'right'
-                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
+                if ((self.timepassed) // (0.20) % 4 == self.imgindex):
+                    self.imgindex = (self.imgindex + 1)%4
+                    pygame.mixer.Channel(2).set_volume(0.4)
+                    pygame.mixer.Channel(2).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav'))
+                else:
+                    self.imgindex
 
             if keys[pygame.K_w] or keys[pygame.K_UP]:
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.y += PLAYER_SPEED
                 self.yChange -= PLAYER_SPEED
                 self.facing = 'up'
-                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.18)%4 == self.imgindex) else self.imgindex
+                if ((self.timepassed) // (0.18) % 4 == self.imgindex):
+                    self.imgindex = (self.imgindex + 1)%4
+                    pygame.mixer.Channel(2).set_volume(0.4)
+                    pygame.mixer.Channel(2).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav'))
+                else:
+                    self.imgindex
 
 
             if keys[pygame.K_s] or keys[pygame.K_DOWN]:
@@ -341,7 +356,12 @@ class Player(pygame.sprite.Sprite):
                     #sprite.rect.y -= PLAYER_SPEED
                 self.yChange += PLAYER_SPEED
                 self.facing = 'down'
-                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.25)%4 == self.imgindex) else self.imgindex
+                if ((self.timepassed) // (0.25) % 4 == self.imgindex):
+                    self.imgindex = (self.imgindex + 1)%4
+                    pygame.mixer.Channel(2).set_volume(0.4)
+                    pygame.mixer.Channel(2).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav'))
+                else:
+                    self.imgindex
 
     def collideBlocks(self, direction):
         if direction == 'x':
@@ -424,6 +444,8 @@ class Player(pygame.sprite.Sprite):
             self.weaponNum += 1
             self.weaponNum %= len(self.weaponList)
             self.weapon.type = self.weaponList[self.weaponNum]
+            pygame.mixer.Channel(1).set_volume(0.4)
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/070_Equip_10.wav'))
         pass
 
 
@@ -593,11 +615,17 @@ class Enemy(pygame.sprite.Sprite):
         if type == 'bubble':
             self.health -= damage
             self.state = 'standing'
+            pygame.mixer.Channel(4).set_volume(0.4)
+            pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/15_Impact_flesh_02.wav'))
         elif type == 'swordfish' or type == 'trident':
             self.health -= damage
             self.state = 'knockback'
+            pygame.mixer.Channel(4).set_volume(0.4)
+            pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/03_Claw_03.wav'))
         if self.health < 0:
             self.kill()
+            pygame.mixer.Channel(4).set_volume(0.4)
+            pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/69_Enemy_death_01.wav'))
 
 
     #Authored: Max Chiu 4/18/2024

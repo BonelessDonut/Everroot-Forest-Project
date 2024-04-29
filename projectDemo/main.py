@@ -54,8 +54,10 @@ class Game():
             mixer.music.play()
         elif songType == 'village':
             mixer.music.load('Music/everrootforestVillagetheme.mp3')
-            mixer.music.set_volume(0.9)
+            mixer.music.set_volume(0.65)
             mixer.music.play(100)
+        elif songType == 'boss': # Add boss music to be played when facing a boss, perhaps use music Jose recommended? - Eddie
+            pass
         if songType.lower() == 'stop':
             mixer.music.stop()
 
@@ -134,6 +136,7 @@ class Game():
                 currentTileMap.append(randomGreenMap)
                 mapNumber = len(currentTileMap)-1
                 mapList[self.map[0]][self.map[1]] = mapNumber
+                # self.play_music('village') The village bgm would play whenever you enter a peaceful npc room
             # if the room is unloaded and listed as -4, the red boss room will be loaded and added to the map list
             elif mapNumber == -4:
                 redMap = redRoom
