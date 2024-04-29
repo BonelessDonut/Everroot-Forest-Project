@@ -545,7 +545,7 @@ class NPC(pygame.sprite.Sprite):
         elif self.dialogueStageIndex < len(self.dialogueList[self.dialogueStage]):
             nextDialogue = self.dialogueList[self.dialogueStage][self.dialogueStageIndex]
             #If there are choices displayed on the screen
-            pygame.mixer.Channel(1).set_volume(0.75)
+            pygame.mixer.Channel(1).set_volume(0.6)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
             if len(self.TextBox.choiceRectList) > 0:
                 self.choiceResponse(False)
