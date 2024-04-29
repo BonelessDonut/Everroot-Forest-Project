@@ -118,15 +118,15 @@ class Game():
                 mapList[self.map[0]][self.map[1]] = mapNumber
             # if the room is unloaded and listed as -3, a randomly assigned green npc room will be loaded and added to the map list
             elif mapNumber == -3:
-                #greenRandomRoomIndex = random.randint(0, len(greenRandomRooms)-1)
-                #randomGreenMap = greenRandomRooms[greenRandomRoomIndex]
+                greenRandomRoomIndex = random.randint(0, len(greenRandomRooms)-1)
+                randomGreenMap = greenRandomRooms[greenRandomRoomIndex]
                 randomGreenMap = template
                 currentTileMap.append(randomGreenMap)
                 mapNumber = len(currentTileMap)-1
                 mapList[self.map[0]][self.map[1]] = mapNumber
             # if the room is unloaded and listed as -4, the red boss room will be loaded and added to the map list
             elif mapNumber == -4:
-                redMap = redRoom
+                # redMap / boss room
                 currentTileMap.append(redMap)
                 mapNumber = len(currentTileMap)-1
                 mapList[self.map[0]][self.map[1]] = mapNumber
