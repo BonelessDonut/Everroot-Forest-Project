@@ -618,6 +618,7 @@ class Enemy(pygame.sprite.Sprite):
             self.x = self.rect.x
             self.y = self.rect.y
 
+    #Authored: Max Chiu 4/28/2024
     def searchPlayer(self):
         playerPos = [self.game.player.x, self.game.player.y]
 
@@ -657,6 +658,7 @@ class Enemy(pygame.sprite.Sprite):
             self.state = 'standing'
             return
 
+    #Authored: Max Chiu 4/28/2024
     def collideBlocks(self, direction):
         if direction == 'x':
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False) + pygame.sprite.spritecollide(self, self.game.enemies, False)
