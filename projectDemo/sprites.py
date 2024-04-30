@@ -5,6 +5,9 @@ import math
 import random
 import re
 import os
+from pathfinding.core.grid import Grid
+from pathfinding.finder.a_star import AStarFinder
+from pathfinding.core.diagonal_movement import DiagonalMovement
 
 
 class Player(pygame.sprite.Sprite):
@@ -570,7 +573,7 @@ class Enemy(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.speed = PLAYER_SPEED-0.5
+        self.speed = PLAYER_SPEED-1
 
         self.health = 100
 
@@ -626,15 +629,20 @@ class Enemy(pygame.sprite.Sprite):
         py = playerPos[1]+self.game.player.height/2
         ex = self.x+self.width/2
         ey = self.y+self.height/2
-        n = 4
+        n = 10
         dx = (px - ex)/n
         dy = (py - ey)/n
 
         distance = math.sqrt((dx*n)**2+(dy*n)**2)
 
+        if distance > 300: 
+            self.xChange = 0
+            self.yChange = 0
+            self.state = 'standing'
+            return
+
         for i in range(n):
-            lines.append(pygame.draw.line(self.game.screen, BLUE, (ex+dx*i, ey+dy*i), (ex+dx*(i+1), ey+dy*(i+1)), 2))
-        #line = pygame.draw.line(self.screen, RED, (self.enemy.x+self.enemy.width/2, self.enemy.y+self.enemy.height/2), (self.player.x+self.player.width/2, self.player.y+self.player.height/2), 2)
+            lines.append(pygame.draw.line(self.game.screen, BLACK, (ex+dx*i, ey+dy*i), (ex+dx*(i+1), ey+dy*(i+1)), 0))
         index = [line.collidelist(list(block.rect for block in self.game.blocks)) for line in lines]
         move = True
         for i in index:
@@ -650,7 +658,6 @@ class Enemy(pygame.sprite.Sprite):
             dy *= n/distance
             self.xChange = dx * self.speed
             self.yChange = dy * self.speed
-            print(self.xChange, self.yChange)
         elif not move:
             self.xChange = 0
             self.yChange = 0
