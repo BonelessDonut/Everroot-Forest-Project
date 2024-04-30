@@ -104,7 +104,7 @@ class Game():
 
             # This is a variable to allow the weapon that was equipped in the current room to stay equipped
             # Otherwise it would reset to the default weapon everytime the player changes rooms
-            priorWeapon = self.player.weapon.type
+            priorWeaponNum = self.player.weaponNum
 
             # figures out which preloaded map to move the player to. 
             # looks at the direction the player moves in and moves to the appropriate map tile
@@ -228,7 +228,9 @@ class Game():
                             self.player = Player(self, col, row-1, self.clock)
                         elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
                             self.player = Player(self, col, row+1, self.clock)
-                        self.player.weapon.type = priorWeapon
+                        self.player.weaponNum = priorWeaponNum
+                        self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
+                        self.player.weapon.updateDamage()
 
         # print("mapList:", mapList)
         # print("currentTileMap:", currentTileMap)

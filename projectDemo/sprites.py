@@ -205,6 +205,8 @@ class Player(pygame.sprite.Sprite):
         #EDIT AFTER INVENTORY MADE
         elif keys[pygame.K_r]:
             self.weapon.reload()
+            pygame.mixer.Channel(4).set_volume(0.25)
+            pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/mag-slide-in-80901.mp3'))
 
 
         elif self.game.state == 'dialogue' and (keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_UP] or keys[pygame.K_DOWN]):
@@ -444,6 +446,7 @@ class Player(pygame.sprite.Sprite):
             self.weaponNum += 1
             self.weaponNum %= len(self.weaponList)
             self.weapon.type = self.weaponList[self.weaponNum]
+            self.weapon.updateDamage()
             pygame.mixer.Channel(1).set_volume(0.4)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/070_Equip_10.wav'))
         pass
@@ -595,6 +598,7 @@ class Enemy(pygame.sprite.Sprite):
         self.height = TILESIZE
 
         self.health = 100
+        self.hitInvincible = False
 
         self.name = 'Udibudibudib'
 
@@ -612,6 +616,7 @@ class Enemy(pygame.sprite.Sprite):
 
     #Authored: Max Chiu 4/18/2024
     def dealtDamage(self, damage, type):
+        # print(self.hitInvincible)
         if type == 'bubble':
             self.health -= damage
             self.state = 'standing'
@@ -622,10 +627,11 @@ class Enemy(pygame.sprite.Sprite):
             self.state = 'knockback'
             pygame.mixer.Channel(4).set_volume(0.4)
             pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/03_Claw_03.wav'))
-        if self.health < 0:
+        if self.health <= 0:
             self.kill()
-            pygame.mixer.Channel(4).set_volume(0.4)
+            pygame.mixer.Channel(4).set_volume(0.65)
             pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/69_Enemy_death_01.wav'))
+        print(f"enemy (self) health is {self.health}")
 
 
     #Authored: Max Chiu 4/18/2024
@@ -646,7 +652,7 @@ class Enemy(pygame.sprite.Sprite):
 class Teleport(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
-        self._layer = BLOCK_LAYER
+        self._layer = GROUND_LAYER
         self.groups = self.game.all_sprites, self.game.teleport
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.width = TILESIZE

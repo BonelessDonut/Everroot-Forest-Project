@@ -73,7 +73,7 @@ class Weapon(pygame.sprite.Sprite):
         else:
             #75 degrees spread of melee swing
             self.spread = 75
-            self.damage = 5
+            self.damage = 20
             self.pause = 0.4
 
     def reload(self):
@@ -93,6 +93,14 @@ class Weapon(pygame.sprite.Sprite):
                 Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage)
                 self.ammo -= 1
                 self.timer = self.pause
+
+    def updateDamage(self):
+        if self.type == 'bubble':
+            self.damage = 10
+        elif self.type == 'swordfish':
+            self.damage = 20
+        elif self.type == 'trident':
+            self.damage = 35
 
         
     #Author: Max Chiu 4/12/2024
@@ -478,7 +486,17 @@ class MeleeAttack(pygame.sprite.Sprite):
 
         for enemy in self.game.enemies:
             if pygame.sprite.collide_rect(self, enemy):
-                enemy.dealtDamage(self.weapon.damage, self.player.weapon.type)
+                if not enemy.hitInvincible:
+                    #print("colliding")
+                    #print(f"Self damage is {self.weapon.damage}")
+                    enemy.dealtDamage(self.weapon.damage, self.player.weapon.type)
+                    enemy.hitInvincible = True
+                    #print(enemy.hitInvincible)
+                    #print(f"enemy health is {enemy.health}")
+            else:
+                #print("not colliding")
+                enemy.hitInvincible = False
+
         pass
 
 
