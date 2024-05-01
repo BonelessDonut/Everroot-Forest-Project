@@ -68,12 +68,12 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]).convert_alpha(), (self.width, self.height))
         
 
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+        #self.rect = self.image.get_rect()
         #Below line is to decrease the rectangle collision slightly
         #Was having trouble fitting in 1 tile gaps
-        #self.rect = pygame.Rect(self.x, self.y, 30, 30)
+        self.rect = pygame.Rect(self.x, self.y, 30, 30)
+        self.rect.x = self.x
+        self.rect.y = self.y
 
     def update(self):
         self.movement()
@@ -570,7 +570,7 @@ class Enemy(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.speed = PLAYER_SPEED+1
+        self.speed = PLAYER_SPEED-0.5
 
         self.health = 100
 
@@ -599,38 +599,81 @@ class Enemy(pygame.sprite.Sprite):
         if self.health < 0:
             self.kill()
 
-
     #Authored: Max Chiu 4/18/2024
     def update(self):
+        self.searchPlayer()
+
+
         if self.state == 'standing':
-            self.state = 'moving'
+            pass
         elif self.state == 'knockback':
             pass
-        else: #self.state == 'moving'
+        else: #self.state == 'chasing'
 
-            self.x += self.xChange
-            self.y += self.yChange
+            self.rect.x += self.xChange
+            self.collideBlocks('x')
+            self.rect.y += self.yChange
+            self.collideBlocks('y')
 
-            self.rect.x = self.x
-            self.rect.y = self.y
+            self.x = self.rect.x
+            self.y = self.rect.y
 
+    #Authored: Max Chiu 4/28/2024
     def searchPlayer(self):
         playerPos = [self.game.player.x, self.game.player.y]
-        dx = (playerPos[0] - self.x)
-        dy = (playerPos[1] - self.y)
 
-        enemyPos = [self.x//TILESIZE, self.y//TILESIZE]
-        playerPos = [playerPos[0]//TILESIZE, playerPos[1]//TILESIZE]
+        lines=[]
+        px = playerPos[0]+self.game.player.width/2
+        py = playerPos[1]+self.game.player.height/2
+        ex = self.x+self.width/2
+        ey = self.y+self.height/2
+        n = 4
+        dx = (px - ex)/n
+        dy = (py - ey)/n
 
+        distance = math.sqrt((dx*n)**2+(dy*n)**2)
 
-        distance = math.sqrt(dx**2+dy**2)
-        dx /= distance
-        dy /= distance
-        self.xChange = dx * self.speed
-        self.yChange = dy * self.speed
+        for i in range(n):
+            lines.append(pygame.draw.line(self.game.screen, BLUE, (ex+dx*i, ey+dy*i), (ex+dx*(i+1), ey+dy*(i+1)), 2))
+        #line = pygame.draw.line(self.screen, RED, (self.enemy.x+self.enemy.width/2, self.enemy.y+self.enemy.height/2), (self.player.x+self.player.width/2, self.player.y+self.player.height/2), 2)
+        index = [line.collidelist(list(block.rect for block in self.game.blocks)) for line in lines]
+        move = True
+        for i in index:
+            if i != -1:
+                print(i)
+                rect = self.game.blocks.get_sprite(i)
+                #rect.image.fill(BLUE)
+                move = False
 
+        if move:
+            self.state = 'chasing'
+            dx *= n/distance
+            dy *= n/distance
+            self.xChange = dx * self.speed
+            self.yChange = dy * self.speed
+            print(self.xChange, self.yChange)
+        elif not move:
+            self.xChange = 0
+            self.yChange = 0
+            self.state = 'standing'
+            return
 
-            
+    #Authored: Max Chiu 4/28/2024
+    def collideBlocks(self, direction):
+        if direction == 'x':
+            hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False) + pygame.sprite.spritecollide(self, self.game.enemies, False)
+            if hits and hits[0] != self:
+                if self.xChange > 0:
+                    self.rect.x = hits[0].rect.left - self.rect.width
+                if self.xChange < 0:
+                    self.rect.x = hits[0].rect.right
+        else:
+            hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False) + pygame.sprite.spritecollide(self, self.game.enemies, False)
+            if hits and hits[0] != self:
+                if self.yChange > 0:
+                    self.rect.y = hits[0].rect.top - self.rect.height
+                if self.yChange < 0:
+                    self.rect.y = hits[0].rect.bottom
         
 class Teleport(pygame.sprite.Sprite):
     def __init__(self, game, x, y):

@@ -37,7 +37,6 @@ class Game():
         
         self.running = True
     
-    #RACHEL!!!
     #written by Rachel Tang 4/19/24
     #used this website: https://www.educative.io/answers/how-to-play-an-audio-file-in-pygame
     def play_music(self, songType):
@@ -146,7 +145,6 @@ class Game():
             # print(self.map[1]-1)
             # print(mapList[self.map[0]][self.map[1]-1])
 
-            #CHARLENNE!!!
             # create doors in a new room if it is meant to exist
             # going up
             if self.map[0]-1 >= 0 and mapList[self.map[0]-1][self.map[1]] != -1:
@@ -187,7 +185,6 @@ class Game():
             print('Current Map:')
             for i in currentTileMap[mapNumber]:
                 print(i)
-
                      
             for row in range(len(settings.currentTileMap[mapNumber])):
                 #print(f"{row} ", end="")
