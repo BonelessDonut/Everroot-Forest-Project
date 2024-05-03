@@ -25,7 +25,7 @@ class Player(pygame.sprite.Sprite):
         self.weaponNum = 0
         self.weapon = items.Weapon(self.game, self.weaponList[self.weaponNum], self)
         self.weaponAnimationCount = 0
-        self.weaponAnimationSpeed = 18
+        self.weaponAnimationSpeed = 15
         self.swordUsed = False
         self.spearUsed = False
 
