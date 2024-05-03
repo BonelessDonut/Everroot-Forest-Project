@@ -392,6 +392,8 @@ class Game():
                 pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/029_Decline_09.wav'))
             if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:  # Use spacebar to access settings menu when paused
                 # this currently toggles if the tutorials should actively appear on the screen
+                pygame.mixer.Channel(1).set_volume(0.015 * self.soundVol)
+                pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/001_Hover_01.wav'))
                 if self.tutorialsActive:
                     self.tutorialsActive = False
                 else:
