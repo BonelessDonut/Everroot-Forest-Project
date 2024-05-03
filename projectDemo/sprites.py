@@ -29,6 +29,8 @@ class Player(pygame.sprite.Sprite):
         self.swordUsed = False
         self.spearUsed = False
 
+        self.tutorial = Tutorial(self.game)
+
         self.mouseRect = pygame.Rect(0, 0, 40, 40)
         self.mouseRect.center = pygame.mouse.get_pos()
 
@@ -78,6 +80,7 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.movement()
         self.interact()
+        self.tutorial.draw()
 
         self.rect.x += self.xChange
         self.collideBlocks('x')
@@ -205,7 +208,7 @@ class Player(pygame.sprite.Sprite):
         #EDIT AFTER INVENTORY MADE
         elif keys[pygame.K_r]:
             self.weapon.reload()
-            pygame.mixer.Channel(4).set_volume(0.25)
+            pygame.mixer.Channel(4).set_volume(0.025 * self.game.soundVol)
             pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/mag-slide-in-80901.mp3'))
 
 
@@ -322,7 +325,7 @@ class Player(pygame.sprite.Sprite):
                 self.facing = 'left'
                 if ((self.timepassed) // (0.20) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
-                    pygame.mixer.Channel(2).set_volume(0.4)
+                    pygame.mixer.Channel(2).set_volume(0.04 * self.game.soundVol)
                     pygame.mixer.Channel(2).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav'))
                 else:
                     self.imgindex
@@ -335,7 +338,7 @@ class Player(pygame.sprite.Sprite):
                 self.facing = 'right'
                 if ((self.timepassed) // (0.20) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
-                    pygame.mixer.Channel(2).set_volume(0.4)
+                    pygame.mixer.Channel(2).set_volume(0.04 * self.game.soundVol)
                     pygame.mixer.Channel(2).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav'))
                 else:
                     self.imgindex
@@ -347,7 +350,7 @@ class Player(pygame.sprite.Sprite):
                 self.facing = 'up'
                 if ((self.timepassed) // (0.18) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
-                    pygame.mixer.Channel(2).set_volume(0.4)
+                    pygame.mixer.Channel(2).set_volume(0.04 * self.game.soundVol)
                     pygame.mixer.Channel(2).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav'))
                 else:
                     self.imgindex
@@ -360,7 +363,7 @@ class Player(pygame.sprite.Sprite):
                 self.facing = 'down'
                 if ((self.timepassed) // (0.25) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
-                    pygame.mixer.Channel(2).set_volume(0.4)
+                    pygame.mixer.Channel(2).set_volume(0.04 * self.game.soundVol)
                     pygame.mixer.Channel(2).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav'))
                 else:
                     self.imgindex
@@ -447,7 +450,7 @@ class Player(pygame.sprite.Sprite):
             self.weaponNum %= len(self.weaponList)
             self.weapon.type = self.weaponList[self.weaponNum]
             self.weapon.updateDamage()
-            pygame.mixer.Channel(1).set_volume(0.4)
+            pygame.mixer.Channel(1).set_volume(0.04 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/070_Equip_10.wav'))
         pass
 
@@ -548,7 +551,7 @@ class NPC(pygame.sprite.Sprite):
         elif self.dialogueStageIndex < len(self.dialogueList[self.dialogueStage]):
             nextDialogue = self.dialogueList[self.dialogueStage][self.dialogueStageIndex]
             #If there are choices displayed on the screen
-            pygame.mixer.Channel(1).set_volume(0.6)
+            pygame.mixer.Channel(1).set_volume(0.06 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
             if len(self.TextBox.choiceRectList) > 0:
                 self.choiceResponse(False)
@@ -620,16 +623,16 @@ class Enemy(pygame.sprite.Sprite):
         if type == 'bubble':
             self.health -= damage
             self.state = 'standing'
-            pygame.mixer.Channel(4).set_volume(0.4)
+            pygame.mixer.Channel(4).set_volume(0.04 * self.game.soundVol)
             pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/15_Impact_flesh_02.wav'))
         elif type == 'swordfish' or type == 'trident':
             self.health -= damage
             self.state = 'knockback'
-            pygame.mixer.Channel(4).set_volume(0.4)
+            pygame.mixer.Channel(4).set_volume(0.04 * self.game.soundVol)
             pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/03_Claw_03.wav'))
         if self.health <= 0:
             self.kill()
-            pygame.mixer.Channel(4).set_volume(0.65)
+            pygame.mixer.Channel(4).set_volume(0.065 * self.game.soundVol)
             pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/69_Enemy_death_01.wav'))
         print(f"enemy (self) health is {self.health}")
 
@@ -773,4 +776,44 @@ class TextBox(pygame.sprite.Sprite):
                     pygame.draw.rect(self.image, GRAY, self.choiceRectList[rect], 2, 1)
 
 
-        
+class Tutorial:
+    def __init__(self, game):
+        self.game = game
+        self.appear = True
+
+
+    def checkAppear(self):
+        if (self.game.state != 'dialogue') and self.game.tutorialsActive:
+            self.appear = True
+        else:
+            self.appear = False
+
+    def draw(self):
+        if self.appear:
+            tutorialText = ["Use WASD to move, Q to switch weapons",
+                            "E to attack using melee weapons",
+                            "SPACE to fire ranged weapon or interact",
+                            "R to reload ranged weapon",
+                            "Press P to pause, change settings, disable tutorials, or quit."]
+            #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[0].strip(), False, WHITE)
+            #textSurf.set_alpha(127)
+            #self.game.screen.blit(textSurf, (WIDTH * 0.72, HEIGHT * 0.78))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[0].strip(), False, WHITE),(WIDTH * 0.72, HEIGHT * 0.78))
+            #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[1].strip(), False, WHITE)
+            #textSurf.set_alpha(127)
+            #self.game.screen.blit(textSurf, (WIDTH * 0.78, HEIGHT * 0.81))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[1].strip(), False, WHITE),(WIDTH * 0.78, HEIGHT * 0.81))
+            #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[2].strip(), False, WHITE)
+            #textSurf.set_alpha(127)
+            #self.game.screen.blit(textSurf, (WIDTH * 0.73, HEIGHT * 0.84))
+            #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[3].strip(), False, WHITE)
+            #self.game.screen.blit(textSurf, (WIDTH * 0.81, HEIGHT * 0.87))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[2].strip(), False, WHITE),(WIDTH * 0.73, HEIGHT * 0.84))
+            #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[4].strip(), False, WHITE)
+            #textSurf.set_alpha(127)
+            #self.game.screen.blit(textSurf, (WIDTH * 0.64, HEIGHT * 0.9))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[3].strip(), False, WHITE),(WIDTH * 0.81, HEIGHT * 0.87))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[4].strip(), False, WHITE),(WIDTH * 0.64, HEIGHT * 0.9))
+            #pygame.display.update()
+        else:
+            return

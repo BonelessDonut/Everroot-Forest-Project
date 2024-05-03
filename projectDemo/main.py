@@ -25,6 +25,18 @@ class Game():
         pygame.init()
         pygame.font.init()
         self.screen = pygame.display.set_mode((WIDTH,HEIGHT))
+        # The title for the game window is randomly selected at the start, because why not? - Eddie Suber
+        windowTitle = ['Everroot Forrest - A CS Story',
+                       'Everroot Forest - Spelled Correctly This Time',
+                       'Everroot Forest - Unending Torment',
+                       'Everroot Forest - Tranquil Quest',
+                       'Everrot Forest - The Rot Consumes',
+                       'Everroot Forest - PLEASE COMMIT SOMETHING',
+                       'Everroot Forest - Why Hello There',
+                       'Everroot Forest - Pure Bliss',
+                       'Everroot Forest - This Is The One']
+        titleNum = random.randint(0, len(windowTitle) - 1)
+        pygame.display.set_caption(windowTitle[titleNum])
         self.clock = pygame.time.Clock() 
 
         self.player = None
@@ -36,25 +48,29 @@ class Game():
 
         self.cutsceneManage = cutscenes.CutsceneManager(self)
         self.map = [-1, -1]
+
+        self.tutorialsActive = True
         
         self.running = True
         self.finishedScene = False
         self.cutsceneSkip = False
+        self.musicVol = 10
+        self.soundVol = 10
     
     #written by Rachel Tang 4/19/24
     #used this website: https://www.educative.io/answers/how-to-play-an-audio-file-in-pygame
     def play_music(self, songType):
         if songType == 'dialogue':
             mixer.music.load('Music/CI103_-_normal_dialogue_background.mp3')
-            mixer.music.set_volume(0.7)
+            mixer.music.set_volume(0.07 * self.musicVol)
             mixer.music.play()
         elif songType == 'openingCutscene':
             mixer.music.load('Music/Chopin-nocturne-op-9-no-2.mp3')
-            mixer.music.set_volume(1)
+            mixer.music.set_volume(0.1 * self.musicVol)
             mixer.music.play()
         elif songType == 'village':
             mixer.music.load('Music/everrootforestVillagetheme.mp3')
-            mixer.music.set_volume(0.65)
+            mixer.music.set_volume(0.065 * self.musicVol)
             mixer.music.play(100)
         elif songType == 'boss': # Add boss music to be played when facing a boss, perhaps use music Jose recommended? - Eddie
             pass
@@ -275,8 +291,6 @@ class Game():
         #game loop events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.playing == False
-                self.running == False
                 pygame.font.quit()
                 pygame.quit()
                 sys.exit()
@@ -293,14 +307,25 @@ class Game():
             # Q is used to switch weapons for the player
             if event.type == pygame.KEYUP and event.key == pygame.K_q and not self.player.itemUsed:
                 self.player.switchWeapons()
+            if event.type == pygame.KEYUP and event.key == pygame.K_p:
+                self.pause()
+            if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+                pygame.font.quit()
+                pygame.quit()
+                sys.exit()
 
     def update(self):
         #game loop updates
         self.all_sprites.update()
+        # checks if the tutorial should appear based on the settings and state of the game
+        self.player.tutorial.checkAppear()
 
     def draw(self):
         self.screen.fill(BLACK)
         self.all_sprites.draw(self.screen)
+        # draws the tutorial text on screen if needed
+        if self.tutorialsActive:
+            self.player.tutorial.draw()
         self.clock.tick(FPS)
         pygame.display.update()
 
@@ -317,6 +342,101 @@ class Game():
     def game_over(self):
         #Play the game over screen
         #To be created later
+        pass
+
+    def pauseEvents(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.font.quit()
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYUP and event.key == pygame.K_p:
+                self.pause()
+            if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+                pygame.font.quit()
+                pygame.quit()
+                sys.exit()
+            # This lowers the game music volume by using the down arrow key in the pause menu
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                self.musicVol -= 1
+                if self.musicVol < 0:
+                    self.musicVol = 0
+                print(self.musicVol)
+            # This raises the game music volume by using the up arrow key in the pause menu
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                self.musicVol += 1
+                if self.musicVol > 20:
+                    self.musicVol = 20
+                print(self.musicVol)
+            # This raises the game sound effect volume by using the right arrow key in the pause menu
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+                self.soundVol += 1
+                if self.soundVol > 20:
+                    self.soundVol = 20
+                print(self.soundVol)
+            # This lowers the game sound effect volume by using the left arrow key in the pause menu
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+                self.soundVol -= 1
+                if self.soundVol < 0:
+                    self.soundVol = 0
+                print(self.soundVol)
+            if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:  # Use spacebar to access settings menu when paused
+                # this currently toggles if the tutorials should actively appear on the screen
+                if self.tutorialsActive:
+                    self.tutorialsActive = False
+                else:
+                    self.tutorialsActive = True
+
+    def pauseMenuDisplay(self):
+        self.screen.blit(pygame.font.SysFont('Garamond', 38).render(f"Adjust Music with Up/Down Arrows | Music Volume: {(self.musicVol / 20 * 100):.1f}%", False, WHITE), (WIDTH * 0.135 ,HEIGHT * 0.45))
+        self.screen.blit(pygame.font.SysFont('Garamond', 38).render(f"Adjust SoundFX with Left/Right Arrows | Sound FX Volume: {(self.soundVol / 20 * 100):.1f}%", False,WHITE), (WIDTH * 0.105, HEIGHT * 0.55))
+        self.screen.blit(pygame.font.SysFont('Garamond', 38).render(f"Use Spacebar to toggle tutorials", False,WHITE), (WIDTH * 0.32, HEIGHT * 0.65))
+        # In the future, possible replace the text and percentages on screen with buttons to adjust settings
+        # Also maybe work on a way to fix how the numbers look when being adjusted in the pause screen
+        # The old numbers linger partially transparent after a change
+        tutorialStatus = ''
+        if self.tutorialsActive:
+            tutorialStatus = "On"
+        else:
+            tutorialStatus = "Off"
+        self.screen.blit(pygame.font.SysFont('Garamond', 38).render(f"Tutorials: {tutorialStatus}", False, WHITE),(WIDTH * 0.42, HEIGHT * 0.75))
+        pass
+
+    def pause(self):
+        if self.state == 'explore':
+            self.state = 'pause'
+            # lowers the volume of music when the game is paused
+            mixer.music.set_volume(0.035 * self.musicVol)
+            while self.state == 'pause':
+                # Text to be displayed in the pause screen as a string below
+                pauseText = (["Game Paused", "Press P again to unpause", "Press ESC to quit at anytime"])
+                # alpha value for the gray screen filter rectangle that is applied when the game is paused
+                # the lines of code below implement and create that rectangle
+                alpha = 4
+                pauseRect = pygame.Surface((WIDTH, HEIGHT))
+                #pauseRect = pauseRect.convert_alpha()
+                pauseRect.set_alpha(alpha)
+                #print(f"Alpha is {pauseRect.get_alpha()}")
+                pauseRect.fill(pygame.Color(100, 100, 100, alpha))
+                self.screen.blit(pauseRect, (0,0))
+                #pygame.draw.rect(self.screen, (128, 128, 128, 128), [0, 0, WIDTH, HEIGHT])
+                # putting the pause text on the screen while the game is paused
+                self.screen.blit(pygame.font.SysFont('Garamond', 55).render(pauseText[0].strip(), False, WHITE),  (WIDTH * 0.4225, HEIGHT * 0.1))
+                self.screen.blit(pygame.font.SysFont('Garamond', 55).render(pauseText[1].strip(), False, WHITE),(WIDTH * 0.3271875, HEIGHT * 0.2277))
+                self.screen.blit(pygame.font.SysFont('Garamond', 45).render(pauseText[2].strip(), False, ORANGE),(WIDTH * 0.3446875, HEIGHT * 0.34166))
+                # handling events while the game is paused
+                self.pauseEvents()
+                self.pauseMenuDisplay()
+                pygame.display.update()
+
+                # SOMEWHERE DURING THE PAUSE MENU, ADD TEXT TO EXPLAIN USING THE SPACEBAR TO TOGGLE TUTORIALS
+                # ALSO ADD TEXT TO EXPLAIN USING THE ARROW KEYS TO ADJUST SOUND EFFECT AND MUSIC VOLUME
+                # EITHER REPRESENT THE VOLUME STATUS USING SLIDERS OR JUST DISPLAY THE NUMBER AS A FRACTION OF THE MAX VOLUME
+                
+        else:
+            self.state = 'explore'
+            # returns the music to the former volume
+            mixer.music.set_volume(0.065 * self.musicVol)
         pass
 
     def intro_screen(self):

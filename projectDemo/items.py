@@ -111,7 +111,7 @@ class Weapon(pygame.sprite.Sprite):
         if self.ammo % 3 == 2 and -1*self.burstTime < self.timer - self.pause < 0 or self.ammo % 3 == 1 and -2*self.burstTime < self.timer - self.pause < -1*self.burstTime:
             Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage)
             self.ammo -= 1
-            pygame.mixer.Channel(1).set_volume(0.9)
+            pygame.mixer.Channel(1).set_volume(0.09 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/shooting-sound-fx-159024.mp3'))
 
         #editing the timer between shots
@@ -543,10 +543,10 @@ class MeleeAttack(pygame.sprite.Sprite):
         if self.animationCount == 0:
 
             if self.player.weapon.type == 'trident':
-                pygame.mixer.Channel(1).set_volume(0.3)
+                pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
                 pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/movement-swipe-whoosh-3-186577.mp3'))
             else:
-                pygame.mixer.Channel(1).set_volume(0.55)
+                pygame.mixer.Channel(1).set_volume(0.055 * self.game.soundVol)
                 pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/sword_swipe.wav'))
         self.animate()
         self.collide()
@@ -617,13 +617,13 @@ class Flower(pygame.sprite.Sprite):
         if self.game.state == 'flowerC':
             if ((self.timepassed) // (0.31) % 3 == self.imgindex):
                 self.imgindex = (self.imgindex + 1)
-                pygame.mixer.Channel(3).set_volume(0.5)
+                pygame.mixer.Channel(3).set_volume(0.05 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/22_Slash_04.wav'))
 
         else:
             if self.state == 'cutting':
                 self.kill()
-                pygame.mixer.Channel(3).set_volume(0.1)
+                pygame.mixer.Channel(3).set_volume(0.01 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
 
 class Ore(pygame.sprite.Sprite):
@@ -680,13 +680,13 @@ class Ore(pygame.sprite.Sprite):
         if self.game.state == 'oreMine':
             if ((self.timepassed) // (0.31) % 4 == self.imgindex):
                 self.imgindex = (self.imgindex + 1)
-                pygame.mixer.Channel(3).set_volume(0.5)
+                pygame.mixer.Channel(3).set_volume(0.05 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(
                 pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/08_Bite_04.wav'))
 
         else:
             if self.state == 'mining':
                 self.kill()
-                pygame.mixer.Channel(3).set_volume(0.1)
+                pygame.mixer.Channel(3).set_volume(0.01 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
         pass
