@@ -40,6 +40,18 @@ class Player(pygame.sprite.Sprite):
         self.imgindex = 0
         self.facing = 'down'
 
+        self.maxHealth = 1000
+        self.currentHealth = 0
+        self.targetHealth = self.maxHealth
+        self.maxHealthBarLength = 320
+        self.healthBarHeight = 20
+        self.healthRatio = self.maxHealth / self.maxHealthBarLength
+        self.healthChangeSpeed = 12
+        self.transitionWidth = 0
+        self.transitionColor = (255, 0, 0)
+        self.health_bar_rect = pygame.Rect(10, 10, self.currentHealth / self.healthRatio - 3, self.healthBarHeight)
+        self.transition_bar_rect = pygame.Rect(self.health_bar_rect.right, 10, self.transitionWidth, self.healthBarHeight)
+
         #Shows the file paths for each image, depending on which direction the player is facing
         self.rightImgList = ['Sprites/protag/protagLattern(1).png', 'Sprites/protag/protagLatternAlt(2).png', 'Sprites/protag/protagblobRight3.png', 'Sprites/protag/protagLatternAlt(2).png']
         self.leftImgList = ['Sprites/protag/protagBlobLeft.png', 'Sprites/protag/protagBlobLeftAlt.png', 'Sprites/protag/protagBlobLeft3.png', 'Sprites/protag/protagBlobLeftAlt.png']
@@ -131,6 +143,43 @@ class Player(pygame.sprite.Sprite):
                     npc.TextBox.selectedRect = highlighted
 
 
+    def getDamage(self, amount):
+        # self.currentHealth = self.targetHealth
+        if self.targetHealth > 0:
+            self.targetHealth = self.targetHealth - amount
+        if self.targetHealth <=0:
+            self.targetHealth = 0
+
+    def getHealth(self, amount):
+        if self.targetHealth < self.maxHealth:
+            self.targetHealth = self.targetHealth + amount
+        if self.targetHealth > self.maxHealth:
+            self.targetHealth = self.maxHealth
+
+    def healthBar(self): # Static health bar function
+        pygame.draw.rect(self.game.screen, (255, 0, 0), (10, 10, self.targetHealth/self.healthRatio, self.healthBarHeight))
+        pygame.draw.rect(self.game.screen, (255, 255, 255), (10, 10, self.maxHealthBarLength,self.healthBarHeight), 4)
+
+    def animateHealth(self): # Animated health bar function
+        if self.currentHealth < self.targetHealth:
+            self.currentHealth += self.healthChangeSpeed
+            self.transitionWidth = int((self.targetHealth - self.currentHealth)/self.healthRatio)
+            self.transitionColor = (0, 255, 0)
+            self.health_bar_rect = pygame.Rect(10, 10, self.currentHealth / self.healthRatio - 3, self.healthBarHeight)
+            self.transition_bar_rect = pygame.Rect(self.health_bar_rect.right, 10, self.transitionWidth, self.healthBarHeight)
+        elif self.currentHealth > self.targetHealth:
+            self.currentHealth -= self.healthChangeSpeed
+            self.transitionWidth = int((self.currentHealth - self.targetHealth)/self.healthRatio)
+            self.transitionColor = (255, 255, 0)
+            self.health_bar_rect = pygame.Rect(10, 10, self.targetHealth / self.healthRatio - 3, self.healthBarHeight)
+            self.transition_bar_rect = pygame.Rect(self.health_bar_rect.right, 10, self.transitionWidth, self.healthBarHeight)
+
+
+        pygame.draw.rect(self.game.screen, (255, 0, 0 ), self.health_bar_rect)
+        pygame.draw.rect(self.game.screen, self.transitionColor, self.transition_bar_rect)
+        pygame.draw.rect(self.game.screen, (255, 255, 255), (10, 10, self.maxHealthBarLength, self.healthBarHeight), 4)
+
+
     #Method for different Player interactions
     def interact(self):
         keys = pygame.key.get_pressed()
@@ -206,7 +255,7 @@ class Player(pygame.sprite.Sprite):
                 self.weapon.attack()
 
         #EDIT AFTER INVENTORY MADE
-        elif keys[pygame.K_r]:
+        elif keys[pygame.K_r] and self.weapon.type == 'bubble':
             self.weapon.reload()
             pygame.mixer.Channel(4).set_volume(0.025 * self.game.soundVol)
             pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/mag-slide-in-80901.mp3'))
@@ -541,6 +590,8 @@ class NPC(pygame.sprite.Sprite):
         #Going into dialogue from explore
         if self.game.state == 'explore':
             self.game.play_music('dialogue')
+            pygame.mixer.Channel(1).set_volume(0.06 * self.game.soundVol)
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
             self.meetings += 1
             self.TextBox = TextBox(self.game)
             self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 28, 'Garamond', self.name)

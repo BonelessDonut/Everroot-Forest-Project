@@ -326,6 +326,8 @@ class Game():
         # draws the tutorial text on screen if needed
         if self.tutorialsActive:
             self.player.tutorial.draw()
+        if (self.state == 'explore' or self.state == 'oreMine' or self.state == 'flowerC'):
+            self.player.animateHealth()
         self.clock.tick(FPS)
         pygame.display.update()
 
@@ -361,25 +363,33 @@ class Game():
                 self.musicVol -= 1
                 if self.musicVol < 0:
                     self.musicVol = 0
-                print(self.musicVol)
+                #print(self.musicVol)
+                pygame.mixer.Channel(1).set_volume(0.015 * self.soundVol)
+                pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/029_Decline_09.wav'))
             # This raises the game music volume by using the up arrow key in the pause menu
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
                 self.musicVol += 1
                 if self.musicVol > 20:
                     self.musicVol = 20
-                print(self.musicVol)
+                #print(self.musicVol)
+                pygame.mixer.Channel(1).set_volume(0.025 * self.soundVol)
+                pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/013_Confirm_03.wav'))
             # This raises the game sound effect volume by using the right arrow key in the pause menu
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
                 self.soundVol += 1
                 if self.soundVol > 20:
                     self.soundVol = 20
-                print(self.soundVol)
+                #print(self.soundVol)
+                pygame.mixer.Channel(1).set_volume(0.025 * self.soundVol)
+                pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/013_Confirm_03.wav'))
             # This lowers the game sound effect volume by using the left arrow key in the pause menu
             if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
                 self.soundVol -= 1
                 if self.soundVol < 0:
                     self.soundVol = 0
-                print(self.soundVol)
+                #print(self.soundVol)
+                pygame.mixer.Channel(1).set_volume(0.015 * self.soundVol)
+                pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/029_Decline_09.wav'))
             if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:  # Use spacebar to access settings menu when paused
                 # this currently toggles if the tutorials should actively appear on the screen
                 if self.tutorialsActive:
@@ -407,6 +417,8 @@ class Game():
             self.state = 'pause'
             # lowers the volume of music when the game is paused
             mixer.music.set_volume(0.035 * self.musicVol)
+            pygame.mixer.Channel(1).set_volume(0.025 * self.soundVol)
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/092_Pause_04.wav'))
             while self.state == 'pause':
                 # Text to be displayed in the pause screen as a string below
                 pauseText = (["Game Paused", "Press P again to unpause", "Press ESC to quit at anytime"])
@@ -436,6 +448,8 @@ class Game():
         else:
             self.state = 'explore'
             # returns the music to the former volume
+            pygame.mixer.Channel(1).set_volume(0.025 * self.soundVol)
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/098_Unpause_04.wav'))
             mixer.music.set_volume(0.065 * self.musicVol)
         pass
 
@@ -458,6 +472,3 @@ g.intro_screen()
 while g.running:
     g.main()
     g.game_over()
-
-pygame.quit()
-sys.exit()
