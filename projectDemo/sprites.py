@@ -649,7 +649,7 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
         self.map = currentTileMap[mapList[self.game.map[0]][self.game.map[1]]]
-        self._layer = PLAYER_LAYER
+        self._layer = ENEMY_LAYER
         self.groups = self.game.all_sprites, self.game.enemies
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
