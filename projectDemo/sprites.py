@@ -625,30 +625,37 @@ class Enemy(pygame.sprite.Sprite):
     def searchPlayer(self):
         playerPos = [self.game.player.x, self.game.player.y]
 
+        #px and py are the coordinates for the center of the player
         lines=[]
         px = playerPos[0]+self.game.player.width/2
         py = playerPos[1]+self.game.player.height/2
+        #ex and ey are the coordinates for the center of the enemy
         ex = self.x+self.width/2
         ey = self.y+self.height/2
+        #split up the line of sight into n line segments and calculate the dx and dy for 1 line segment
         n = 10
         dx = (px - ex)/n
         dy = (py - ey)/n
 
+        #find the distance between player and enemy, check if this distance is outside the range of the enemy
         distance = math.sqrt((dx*n)**2+(dy*n)**2)
-
-        if distance > 300: 
+        if distance > 300: #implement pathfinding for the last 4-5 tiles of the player
             self.xChange = 0
             self.yChange = 0
             self.state = 'standing'
             return
 
+        #if within the distance, draw all n line segments from the player to the enemy with a width of 0, so it doesn't show
         for i in range(n):
             lines.append(pygame.draw.line(self.game.screen, BLACK, (ex+dx*i, ey+dy*i), (ex+dx*(i+1), ey+dy*(i+1)), 0))
+        #get a list of the indices at which a line segment collides with a wall
         index = [line.collidelist(list(block.rect for block in self.game.blocks)) for line in lines]
         move = True
+
+        #if any of these indices are not -1, there is no line of sight between the player and the enemy
         for i in index:
             if i != -1:
-                print(i)
+                #print(i)
                 rect = self.game.blocks.get_sprite(i)
                 #rect.image.fill(BLUE)
                 move = False
