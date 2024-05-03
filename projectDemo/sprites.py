@@ -40,6 +40,8 @@ class Player(pygame.sprite.Sprite):
         self.imgindex = 0
         self.facing = 'down'
 
+        self.walkingSound = pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav')
+
         self.maxHealth = 1000
         self.currentHealth = 0
         self.targetHealth = self.maxHealth
@@ -378,8 +380,8 @@ class Player(pygame.sprite.Sprite):
                 self.facing = 'left'
                 if ((self.timepassed) // (0.20) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
-                    pygame.mixer.Channel(2).set_volume(0.04 * self.game.soundVol)
-                    pygame.mixer.Channel(2).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav'))
+                    pygame.mixer.Channel(2).set_volume(0.015 * self.game.soundVol)
+                    pygame.mixer.Channel(2).play(self.walkingSound)
                 else:
                     self.imgindex
 
@@ -391,8 +393,8 @@ class Player(pygame.sprite.Sprite):
                 self.facing = 'right'
                 if ((self.timepassed) // (0.20) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
-                    pygame.mixer.Channel(2).set_volume(0.04 * self.game.soundVol)
-                    pygame.mixer.Channel(2).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav'))
+                    pygame.mixer.Channel(2).set_volume(0.015 * self.game.soundVol)
+                    pygame.mixer.Channel(2).play(self.walkingSound)
                 else:
                     self.imgindex
 
@@ -403,8 +405,8 @@ class Player(pygame.sprite.Sprite):
                 self.facing = 'up'
                 if ((self.timepassed) // (0.18) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
-                    pygame.mixer.Channel(2).set_volume(0.04 * self.game.soundVol)
-                    pygame.mixer.Channel(2).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav'))
+                    pygame.mixer.Channel(2).set_volume(0.015 * self.game.soundVol)
+                    pygame.mixer.Channel(2).play(self.walkingSound)
                 else:
                     self.imgindex
 
@@ -416,8 +418,8 @@ class Player(pygame.sprite.Sprite):
                 self.facing = 'down'
                 if ((self.timepassed) // (0.25) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
-                    pygame.mixer.Channel(2).set_volume(0.04 * self.game.soundVol)
-                    pygame.mixer.Channel(2).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav'))
+                    pygame.mixer.Channel(2).set_volume(0.015 * self.game.soundVol)
+                    pygame.mixer.Channel(2).play(self.walkingSound)
                 else:
                     self.imgindex
 

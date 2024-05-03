@@ -417,10 +417,10 @@ class Game():
         if self.state == 'explore':
             self.state = 'pause'
             # lowers the volume of music when the game is paused
-            mixer.music.set_volume(0.035 * self.musicVol)
             pygame.mixer.Channel(1).set_volume(0.025 * self.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/092_Pause_04.wav'))
             while self.state == 'pause':
+                mixer.music.set_volume(0.035 * self.musicVol)
                 # Text to be displayed in the pause screen as a string below
                 pauseText = (["Game Paused", "Press P again to unpause", "Press ESC to quit at anytime"])
                 # alpha value for the gray screen filter rectangle that is applied when the game is paused
