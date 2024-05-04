@@ -40,11 +40,21 @@ class Player(pygame.sprite.Sprite):
         self.imgindex = 0
         self.facing = 'down'
 
-        self.walkingList = ['']
-        self.walkingSound = pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/12_Step_wood_03.wav')
+        self.walkingList = [pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/03_Step_grass_03.wav'),
+                            pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/12_Step_wood_03.wav'),
+                            pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav'),
+                            pygame.mixer.Sound('Music/sound_effects/464609__d001447733__grass_footsteps.wav'),
+                            pygame.mixer.Sound('Music/sound_effects/488074__bendrain__footsteps_grass_single_03.wav')]
+        self.walkSoundNum = 0
+        self.walkingSound = self.walkingList[self.walkSoundNum]
         # attribute to be used with the checkIdle function and used to regulate when the walking sound is played.
         # the walking sound should be played on a timer when the player's movement state is 'moving'
         self.movementState = 'idle'
+        self.idleThreshold = 4
+        self.idleTimer = self.idleThreshold
+        self.walkSoundPlaying = False
+
+
 
         self.maxHealth = 1000
         self.currentHealth = 0
@@ -97,6 +107,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         self.movement()
+        self.checkIdle()
         self.interact()
         self.tutorial.draw()
 
@@ -106,6 +117,7 @@ class Player(pygame.sprite.Sprite):
         self.collideBlocks('y')
         self.x = self.rect.x
         self.y = self.rect.y
+
 
         self.timepassed += self.clock.get_time()/1000
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
@@ -371,6 +383,19 @@ class Player(pygame.sprite.Sprite):
     def movement(self):
         if self.game.state != 'explore':
             return
+
+        if self.imgindex == 1:
+            self.playWalkSound()
+            #if self.walkSoundNum == 3:
+            #    self.walkSoundNum = 4
+            #elif self.walkSoundNum == 4:
+            #    self.walkSoundNum = 3
+            #self.walkSoundNum = random.randint(0, len(self.walkingList) - 1)
+            self.walkingSound = self.walkingList[self.walkSoundNum]
+        elif (self.imgindex != 1):
+            self.walkSoundPlaying = False
+
+
         #The key press segments came from viewing this tutorial
         #https://www.youtube.com/watch?v=GakNgbiAxzs&list=PLkkm3wcQHjT7gn81Wn-e78cAyhwBW3FIc&index=2
         keys = pygame.key.get_pressed()
@@ -382,11 +407,12 @@ class Player(pygame.sprite.Sprite):
                     #sprite.rect.x += PLAYER_SPEED
                 self.xChange -= PLAYER_SPEED
                 self.facing = 'left'
+                self.idleTimer = 0
                 if ((self.timepassed) // (0.20) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
-                    if self.imgindex == 1 or self.imgindex == 3:
-                        pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
-                        pygame.mixer.Channel(2).play(self.walkingSound)
+                    #if self.imgindex == 1 or self.imgindex == 3:
+                    #    pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
+                    #    pygame.mixer.Channel(2).play(self.walkingSound)
                 else:
                     self.imgindex
 
@@ -396,11 +422,12 @@ class Player(pygame.sprite.Sprite):
                     #sprite.rect.x -= PLAYER_SPEED
                 self.xChange += PLAYER_SPEED
                 self.facing = 'right'
+                self.idleTimer = 0
                 if ((self.timepassed) // (0.20) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
-                    if self.imgindex == 1 or self.imgindex == 3:
-                        pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
-                        pygame.mixer.Channel(2).play(self.walkingSound)
+                    #if self.imgindex == 1 or self.imgindex == 3:
+                    #    pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
+                    #    pygame.mixer.Channel(2).play(self.walkingSound)
                 else:
                     self.imgindex
 
@@ -409,11 +436,12 @@ class Player(pygame.sprite.Sprite):
                     #sprite.rect.y += PLAYER_SPEED
                 self.yChange -= PLAYER_SPEED
                 self.facing = 'up'
+                self.idleTimer = 0
                 if ((self.timepassed) // (0.18) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
-                    if self.imgindex == 1 or self.imgindex == 3:
-                        pygame.mixer.Channel(2).set_volume(0.08* self.game.soundVol)
-                        pygame.mixer.Channel(2).play(self.walkingSound)
+                    #if self.imgindex == 1 or self.imgindex == 3:
+                    #    pygame.mixer.Channel(2).set_volume(0.08* self.game.soundVol)
+                    #    pygame.mixer.Channel(2).play(self.walkingSound)
                 else:
                     self.imgindex
 
@@ -423,17 +451,41 @@ class Player(pygame.sprite.Sprite):
                     #sprite.rect.y -= PLAYER_SPEED
                 self.yChange += PLAYER_SPEED
                 self.facing = 'down'
+                self.idleTimer = 0
                 if ((self.timepassed) // (0.25) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
-                    if self.imgindex == 1 or self.imgindex == 3:
-                        pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
-                        pygame.mixer.Channel(2).play(self.walkingSound)
+                    #if self.imgindex == 1 or self.imgindex == 3:
+                    #    pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
+                    #    pygame.mixer.Channel(2).play(self.walkingSound)
                 else:
                     self.imgindex
 
     # function that will check if the player is idle from moving. This will be done by using a timer that is decremented unless the player moves, or the movement state will be changed to idle from moving.
     def checkIdle(self):
-        pass
+        self.idleTimer += 1
+        if self.game.state != 'explore':
+            self.movementState = 'idle'
+        elif self.idleTimer >= self.idleThreshold:
+            self.movementState = 'idle'
+        else:
+            self.movementState = 'moving'
+        if self.movementState == 'idle':
+            self.imgindex = 0
+            if self.facing == 'right':
+                self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1, self.height * 1))
+            elif self.facing == 'left':
+                self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]),(self.width * 1, self.height * 1))
+            elif self.facing == 'up':
+                self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]),(self.width * 1, self.height * 1))
+            else:  # self.facing == 'down':
+                self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]),(self.width * 1, self.height * 1))
+
+
+    def playWalkSound(self):
+        if self.movementState != 'idle' and (not self.walkSoundPlaying):
+            pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
+            pygame.mixer.Channel(2).play(self.walkingSound)
+            self.walkSoundPlaying = True
 
     def collideBlocks(self, direction):
         if direction == 'x':
