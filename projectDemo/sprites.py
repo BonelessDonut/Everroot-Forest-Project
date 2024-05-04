@@ -382,7 +382,7 @@ class Player(pygame.sprite.Sprite):
                 if ((self.timepassed) // (0.20) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
                     if self.imgindex == 1 or self.imgindex == 3:
-                        pygame.mixer.Channel(2).set_volume(0.055 * self.game.soundVol)
+                        pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
                         pygame.mixer.Channel(2).play(self.walkingSound)
                 else:
                     self.imgindex
@@ -396,7 +396,7 @@ class Player(pygame.sprite.Sprite):
                 if ((self.timepassed) // (0.20) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
                     if self.imgindex == 1 or self.imgindex == 3:
-                        pygame.mixer.Channel(2).set_volume(0.055 * self.game.soundVol)
+                        pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
                         pygame.mixer.Channel(2).play(self.walkingSound)
                 else:
                     self.imgindex
@@ -409,7 +409,7 @@ class Player(pygame.sprite.Sprite):
                 if ((self.timepassed) // (0.18) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
                     if self.imgindex == 1 or self.imgindex == 3:
-                        pygame.mixer.Channel(2).set_volume(0.055* self.game.soundVol)
+                        pygame.mixer.Channel(2).set_volume(0.08* self.game.soundVol)
                         pygame.mixer.Channel(2).play(self.walkingSound)
                 else:
                     self.imgindex
@@ -423,7 +423,7 @@ class Player(pygame.sprite.Sprite):
                 if ((self.timepassed) // (0.25) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
                     if self.imgindex == 1 or self.imgindex == 3:
-                        pygame.mixer.Channel(2).set_volume(0.055 * self.game.soundVol)
+                        pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
                         pygame.mixer.Channel(2).play(self.walkingSound)
                 else:
                     self.imgindex
@@ -735,8 +735,9 @@ class Enemy(pygame.sprite.Sprite):
 
         distance = math.sqrt((dx*n)**2+(dy*n)**2)
 
+        surface = pygame.Surface(self.game.screen.get_size(), pygame.SRCALPHA)
         for i in range(n):
-            lines.append(pygame.draw.line(self.game.screen, BLUE, (ex+dx*i, ey+dy*i), (ex+dx*(i+1), ey+dy*(i+1)), 2))
+            lines.append(pygame.draw.line(surface, (0, 255, 0, 0), (ex+dx*i, ey+dy*i), (ex+dx*(i+1), ey+dy*(i+1)), 1))
         #line = pygame.draw.line(self.screen, RED, (self.enemy.x+self.enemy.width/2, self.enemy.y+self.enemy.height/2), (self.player.x+self.player.width/2, self.player.y+self.player.height/2), 2)
         index = [line.collidelist(list(block.rect for block in self.game.blocks)) for line in lines]
         move = True
