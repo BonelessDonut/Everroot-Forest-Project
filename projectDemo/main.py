@@ -27,6 +27,7 @@ class Game():
         self.clock = pygame.time.Clock() 
 
         self.player = None
+        self.enemy = None
         self.state = 'explore'
         #Game states:
         #explore - Player can move around
@@ -66,7 +67,7 @@ class Game():
                     elif (settings.currentTileMap[0][row])[col] == 'N':
                         NPC(self, col, row)
                     elif (settings.currentTileMap[0][row])[col] == 'E':
-                        Enemy(self, col, row)
+                        self.enemy = Enemy(self, col, row)
                     elif (settings.currentTileMap[0][row])[col] == 'T':
                         Teleport(self, col, row)
                     #print(f"{col}", end="")
@@ -199,7 +200,7 @@ class Game():
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'N':
                         NPC(self, col, row)
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'E':
-                        Enemy(self, col, row)
+                        self.enemy = Enemy(self, col, row)
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'T':
                         # teleports the player's position on the screen when they move rooms
                         Teleport(self, col, row)
@@ -282,6 +283,13 @@ class Game():
     def draw(self):
         self.screen.fill(BLACK)
         self.all_sprites.draw(self.screen)
+        self.pathfinder = Pathfinder(currentTileMap[mapList[self.map[0]][self.map[1]]], self.enemy)
+        #self.pathfinder.createPath(((self.enemy.x+TILESIZE//2)//TILESIZE, (self.enemy.y+TILESIZE//2)//TILESIZE), ((self.player.x+TILESIZE//2)//TILESIZE, (self.player.y+TILESIZE//2)//TILESIZE))
+        self.pathfinder.createPath((self.enemy.rect.center[0]//TILESIZE, self.enemy.rect.center[1]//TILESIZE), (self.player.rect.center[0]//TILESIZE, self.player.rect.center[1]//TILESIZE))
+        for i in range(len(self.pathfinder.collision_rects)):
+            pygame.draw.rect(self.screen, (255-5*i,0,0), (self.pathfinder.collision_rects[i]))
+        pygame.draw.rect(self.screen, (0,255,0), (960, 520, 10, 10))
+        pygame.draw.rect(self.screen, (0,0,255), (950, 540, 10, 10))
         self.clock.tick(FPS)
         pygame.display.update()
 
