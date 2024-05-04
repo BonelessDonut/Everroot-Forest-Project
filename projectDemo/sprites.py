@@ -152,7 +152,7 @@ class Player(pygame.sprite.Sprite):
             self.targetHealth = self.targetHealth - amount
         if self.targetHealth <=0:
             self.targetHealth = 0
-        pygame.mixer.Channel(1).set_volume(0.015 * self.soundVol)
+        pygame.mixer.Channel(1).set_volume(0.015 * self.game.soundVol)
         pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/77_flesh_02.wav'))
 
     def getHealth(self, amount):
@@ -160,7 +160,7 @@ class Player(pygame.sprite.Sprite):
             self.targetHealth = self.targetHealth + amount
         if self.targetHealth > self.maxHealth:
             self.targetHealth = self.maxHealth
-        pygame.mixer.Channel(1).set_volume(0.015 * self.soundVol)
+        pygame.mixer.Channel(1).set_volume(0.015 * self.game.soundVol)
         pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/8_Buffs_Heals_SFX/02_Heal_02.wav'))
 
     def healthBar(self): # Static health bar function
