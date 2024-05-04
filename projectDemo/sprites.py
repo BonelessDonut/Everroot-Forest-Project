@@ -42,6 +42,9 @@ class Player(pygame.sprite.Sprite):
 
         self.walkingList = ['']
         self.walkingSound = pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/12_Step_wood_03.wav')
+        # attribute to be used with the checkIdle function and used to regulate when the walking sound is played.
+        # the walking sound should be played on a timer when the player's movement state is 'moving'
+        self.movementState = 'idle'
 
         self.maxHealth = 1000
         self.currentHealth = 0
@@ -427,6 +430,10 @@ class Player(pygame.sprite.Sprite):
                         pygame.mixer.Channel(2).play(self.walkingSound)
                 else:
                     self.imgindex
+
+    # function that will check if the player is idle from moving. This will be done by using a timer that is decremented unless the player moves, or the movement state will be changed to idle from moving.
+    def checkIdle(self):
+        pass
 
     def collideBlocks(self, direction):
         if direction == 'x':
