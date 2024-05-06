@@ -86,19 +86,25 @@ class Game():
             for row in range(len(settings.currentTileMap[0])):
                 #print(f"{row} ", end="")   
                 for col in range(len(settings.currentTileMap[0][row])):
-                    if (settings.currentTileMap[0][row])[col] == "B":
+                    if (settings.currentTileMap[0][row])[col] == "B": # brick
                         Block(self, col, row, 0)
-                    elif (settings.currentTileMap[0][row])[col] == "P":
+                    elif (settings.currentTileMap[0][row])[col] == "W": # water
+                        Block(self, col, row, 1)
+                    elif (settings.currentTileMap[0][row])[col] == "S": # sapling
+                        Block(self, col, row, 2)
+                    elif (settings.currentTileMap[0][row])[col] == "R": # rock
+                        Block(self, col, row, 3)                                                                        
+                    elif (settings.currentTileMap[0][row])[col] == "P": # player
                         self.player = Player(self, col, row, self.clock)
-                    elif (settings.currentTileMap[0][row])[col] == "F":
+                    elif (settings.currentTileMap[0][row])[col] == "F": # flower
                         Flower(self, col, row, self.clock)
-                    elif (settings.currentTileMap[0][row])[col] == 'O':
+                    elif (settings.currentTileMap[0][row])[col] == 'O': # ore
                         Ore(self, col, row, self.clock)
-                    elif (settings.currentTileMap[0][row])[col] == 'N':
+                    elif (settings.currentTileMap[0][row])[col] == 'N': # NPC
                         NPC(self, col, row)
-                    elif (settings.currentTileMap[0][row])[col] == 'E':
+                    elif (settings.currentTileMap[0][row])[col] == 'E': # enemy
                         Enemy(self, col, row)
-                    elif (settings.currentTileMap[0][row])[col] == 'T':
+                    elif (settings.currentTileMap[0][row])[col] == 'T': # teleport/door
                         Teleport(self, col, row)
                     #print(f"{col}", end="")
                 #print()
@@ -146,12 +152,16 @@ class Game():
                 mapList[self.map[0]][self.map[1]] = mapNumber
             # if the room is unloaded and listed as -3, a randomly assigned green npc room will be loaded and added to the map list
             elif mapNumber == -3:
-                greenRandomRoomIndex = random.randint(0, len(greenRandomRooms)-1)
-                randomGreenMap = greenRandomRooms[greenRandomRoomIndex]
-                randomGreenMap = template
-                currentTileMap.append(randomGreenMap)
-                mapNumber = len(currentTileMap)-1
-                mapList[self.map[0]][self.map[1]] = mapNumber
+                usedGreenRooms = [] # empty list that holds all green room indexes so that green rooms don't repeat throughout exploration
+                while True:
+                    greenRandomRoomIndex = random.randint(0, len(greenRandomRooms)-1) # pick random green room
+                    if greenRandomRoomIndex not in usedGreenRooms:
+                        usedGreenRooms.append(greenRandomRoomIndex)
+                        randomGreenMap = greenRandomRooms[greenRandomRoomIndex]
+                        currentTileMap.append(randomGreenMap) # add the green map 
+                        mapNumber = len(currentTileMap)-1
+                        mapList[self.map[0]][self.map[1]] = mapNumber
+                        break
                 # self.play_music('village') The village bgm would play whenever you enter a peaceful npc room
             # if the room is unloaded and listed as -4, the red boss room will be loaded and added to the map list
             elif mapNumber == -4:
@@ -222,17 +232,23 @@ class Game():
                 #print(f"{row} ", end="")
                 for col in range(len(settings.currentTileMap[mapNumber][row])):
                     # looks at the premade room in settings.py, if a tile is on the map, print the corresponding sprite on the new map
-                    if (settings.currentTileMap[mapNumber][row])[col] == "B":
+                    if (settings.currentTileMap[mapNumber][row])[col] == "B": # brick
                         Block(self, col, row, 0)
-                    elif (settings.currentTileMap[mapNumber][row])[col] == "F":
+                    elif (settings.currentTileMap[mapNumber][row])[col] == "W": # water
+                        Block(self, col, row, 1)
+                    elif (settings.currentTileMap[mapNumber][row])[col] == "S": # sapling
+                        Block(self, col, row, 2)
+                    elif (settings.currentTileMap[mapNumber][row])[col] == "R": # rock
+                        Block(self, col, row, 3)
+                    elif (settings.currentTileMap[mapNumber][row])[col] == "F": # flower
                         Flower(self, col, row, self.clock)
-                    elif (settings.currentTileMap[mapNumber][row])[col] == 'O':
+                    elif (settings.currentTileMap[mapNumber][row])[col] == 'O': # ore
                         Ore(self, col, row, self.clock)
-                    elif (settings.currentTileMap[mapNumber][row])[col] == 'N':
+                    elif (settings.currentTileMap[mapNumber][row])[col] == 'N': # NPC
                         NPC(self, col, row)
-                    elif (settings.currentTileMap[mapNumber][row])[col] == 'E':
+                    elif (settings.currentTileMap[mapNumber][row])[col] == 'E': # enemy
                         Enemy(self, col, row)
-                    elif (settings.currentTileMap[mapNumber][row])[col] == 'T':
+                    elif (settings.currentTileMap[mapNumber][row])[col] == 'T': # teleport door
                         # teleports the player's position on the screen when they move rooms
                         Teleport(self, col, row)
                         if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
