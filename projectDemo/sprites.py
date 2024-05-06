@@ -593,9 +593,10 @@ class Enemy(pygame.sprite.Sprite):
         #REMOVE!!!
         self.map = currentTileMap[mapList[self.game.map[0]][self.game.map[1]]]
         self.path = Pathfinder(self.map, self)
-        playerPos = self.game.player.rect.center
-        enemyPos = self.rect.center
-        self.xChange, self.yChange = self.path.createPath((enemyPos[0]//TILESIZE, enemyPos[1]//TILESIZE), (playerPos[0]//TILESIZE, playerPos[1]//TILESIZE))
+        self.playerPos = self.game.player.rect.center
+        self.enemyPos = self.rect.center
+        self.xChange, self.yChange = self.path.createPath((self.enemyPos[0]//TILESIZE, self.enemyPos[1]//TILESIZE), (self.playerPos[0]//TILESIZE, self.playerPos[1]//TILESIZE))
+        self.newPath = None
 
     #Authored: Max Chiu 4/18/2024
     def dealtDamage(self, damage, type):
@@ -610,19 +611,24 @@ class Enemy(pygame.sprite.Sprite):
 
     #Authored: Max Chiu 4/18/2024
     def update(self):
-        #self.searchPlayer()
         #print(f'pos: {self.game.player.x}, {self.game.player.y}')
         #print(f'pos+middle: {self.game.player.x+self.game.player.width//2}, {self.game.player.y+self.game.player.height//2}')
         #print(f'center: {self.game.player.rect.center}')
-        print(f'pos: {self.x}, {self.y}')
-        print(f'pos+middle: {self.x+self.width//2}, {self.y+self.height//2}')
-        print(f'center: {self.rect.center}')
+        #print(f'pos: {self.x}, {self.y}')
+        #print(f'pos+middle: {self.x+self.width//2}, {self.y+self.height//2}')
+        #print(f'center: {self.rect.center}')
         #playerPos = [self.game.player.x//TILESIZE, self.game.player.y//TILESIZE]
-        playerPos = self.game.player.rect.center
-        #enemyPos = [(self.x+TILESIZE//2)//TILESIZE, (self.y+TILESIZE//2)//TILESIZE]
-        enemyPos = self.rect.center
+        self.enemyPos = [(self.x+TILESIZE//2)//TILESIZE, (self.y+TILESIZE//2)//TILESIZE]
         #self.xChange, self.yChange = self.path.createPath((enemyPos[0]//TILESIZE, enemyPos[1]//TILESIZE), (playerPos[0]//TILESIZE, playerPos[1]//TILESIZE))
-        self.path.checkCollisions()
+        self.path.start = (self.enemyPos[0], self.enemyPos[1])
+        # print('start', enemyPos[0], enemyPos[1])
+        # print('end', self.path.collision_rects[0].center[0], self.path.collision_rects[0].center[1])
+        #print('start', self.start[0]*TILESIZE, self.start[1]*TILESIZE)
+            #print('end', end[0], end[1])
+        change = self.path.checkCollisions()
+        if change:
+            self.xChange, self.yChange = change[0]*self.speed, change[1]*self.speed
+        #self.searchPlayer()
         
 
         if self.state == 'standing':
@@ -659,14 +665,24 @@ class Enemy(pygame.sprite.Sprite):
         #find the distance between player and enemy, check if this distance is outside the range of the enemy
         distance = math.sqrt((dx*n)**2+(dy*n)**2)
         if distance > 300: #implement pathfinding for the last 4-5 tiles of the player
-            self.xChange = 0
-            self.yChange = 0
-            self.state = 'standing'
+            print('distance too far')
+            # self.xChange = 0
+            # self.yChange = 0
+            # self.state = 'standing'
+            #self.xChange, self.yChange = self.path.createPath((int(ex)//TILESIZE, int(ey)//TILESIZE), (int(px)//TILESIZE, int(py)//TILESIZE))
+            # playerPos = self.game.player.rect.center
+            # enemyPos = self.rect.center
+            print(self.enemyPos, self.playerPos)
+            print(self.enemyPos[0]//TILESIZE, self.enemyPos[1]//TILESIZE, self.playerPos[0]//TILESIZE, self.playerPos[1]//TILESIZE)
+            #self.xChange, self.yChange = self.path.createPath((enemyPos[0]//TILESIZE, enemyPos[1]//TILESIZE), (playerPos[0]//TILESIZE, playerPos[1]//TILESIZE))
+            change = self.path.checkCollisions()
+            if change:
+                self.xChange, self.yChange = change[0] * self.speed, change[1] * self.speed
             return
 
         #if within the distance, draw all n line segments from the player to the enemy with a width of 0, so it doesn't show
         for i in range(n):
-            lines.append(pygame.draw.line(self.game.screen, BLACK, (ex+dx*i, ey+dy*i), (ex+dx*(i+1), ey+dy*(i+1)), 0))
+            lines.append(pygame.draw.line(self.game.screen, BLACK, (ex+dx*i, ey+dy*i), (ex+dx*(i+1), ey+dy*(i+1)), 1))
         #get a list of the indices at which a line segment collides with a wall
         index = [line.collidelist(list(block.rect for block in self.game.blocks)) for line in lines]
         move = True
@@ -683,12 +699,23 @@ class Enemy(pygame.sprite.Sprite):
             self.state = 'chasing'
             dx *= n/distance
             dy *= n/distance
-            self.xChange = dx * self.speed
-            self.yChange = dy * self.speed
+            # self.xChange = dx * self.speed
+            # self.yChange = dy * self.speed
         elif not move:
-            self.xChange = 0
-            self.yChange = 0
-            self.state = 'standing'
+            print('not line of sight')
+            #self.xChange, self.yChange = self.path.createPath((int(ex)//TILESIZE, int(ey)//TILESIZE), (int(px)//TILESIZE, int(py)//TILESIZE))
+            self.playerPos = self.game.player.rect.center
+            self.enemyPos = self.rect.center
+            if not self.newPath:
+                self.newPath = self.path.createPath((self.enemyPos[0]//TILESIZE, self.enemyPos[1]//TILESIZE), (self.playerPos[0]//TILESIZE, self.playerPos[1]//TILESIZE))
+                exit()
+            # self.xChange, self.yChange = self.path.createPath((self.enemyPos[0]//TILESIZE, self.enemyPos[1]//TILESIZE), (self.playerPos[0]//TILESIZE, self.playerPos[1]//TILESIZE))
+            # self.xChange = 0
+            # self.yChange = 0
+            # self.state = 'standing'
+            change = self.path.checkCollisions()
+            if change:
+                self.xChange, self.yChange = change[0] * self.speed, change[1] * self.speed
             return
 
     #Authored: Max Chiu 4/28/2024
@@ -744,14 +771,13 @@ class Pathfinder:
     #Followed documentation guide: https://github.com/brean/python-pathfinding/blob/main/docs/01_basic_usage.md
     def createPath(self, startPos, endPos):
         self.start = startPos
-        self.end = endPos
         start = self.grid.node(startPos[0], startPos[1])
         end = self.grid.node(endPos[0], endPos[1])
         finder = AStarFinder(diagonal_movement=DiagonalMovement.only_when_no_obstacle)
         self.path, runs = finder.find_path(start, end, self.grid)
-        #self.grid.cleanup()
+        self.grid.cleanup()
         #print('operations:', runs, 'path length:', len(self.path))
-        #print(self.grid.grid_str(path=self.path, start=start, end=end))
+        print(self.grid.grid_str(path=self.path, start=start, end=end))
         self.getRectPath()
         return self.getDirection()
 
@@ -759,6 +785,7 @@ class Pathfinder:
     #Followed sample code: https://github.com/clear-code-projects/Python-Pathfinder/blob/main/roomba%20project/pathfinding_roomba.py 
     def getRectPath(self):
         if self.path:
+            print('path exists')
             self.collision_rects = []
             for point in self.path:
                 x = (point.x*TILESIZE)+TILESIZE/2
@@ -771,7 +798,7 @@ class Pathfinder:
     #Followed sample code: https://github.com/clear-code-projects/Python-Pathfinder/blob/main/roomba%20project/pathfinding_roomba.py
     def getDirection(self):
         if self.collision_rects:
-            end = self.collision_rects[1].center
+            end = self.collision_rects[0].center
             print('start', self.start[0]*TILESIZE, self.start[1]*TILESIZE)
             print('end', end[0], end[1])
             dx = (end[0] - self.start[0]*TILESIZE)
@@ -782,7 +809,7 @@ class Pathfinder:
             distance = math.sqrt((dx)**2+(dy)**2)
             dx /= distance
             dy /= distance
-            print(dx, dy)
+            #print(dx, dy)
             return dx, dy
         else:
             self.xChange = 0
@@ -794,9 +821,7 @@ class Pathfinder:
             for rect in self.collision_rects:
                 if pygame.Rect.colliderect(rect, self.enemy.rect):
                     del self.collision_rects[0]
-                    self.getDirection()
-                else:
-                    self.path = []
+                    return self.getDirection()
 
 
         
