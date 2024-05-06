@@ -521,7 +521,7 @@ class Block(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
 
-        self.imagelist = ['Sprites/tiles/brick1.png']
+        self.imagelist = ['Sprites/tiles/brick1.png', 'Sprites/tiles/water1.png', 'Sprites/tiles/sapling2.png', 'Sprites/tiles/rock1.png']
         self.image = pygame.transform.scale(pygame.image.load(self.imagelist[index]), (self.width, self.height))
         #self.image.fill(RED)
 
