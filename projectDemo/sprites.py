@@ -174,6 +174,8 @@ class Player(pygame.sprite.Sprite):
                 else:
                     npc.TextBox.selectedRect = highlighted
 
+    # inspiration for this function and the damage flickering effect was gotten from:
+    # https://www.youtube.com/watch?v=QU1pPzEGrqw
     def flicker(self):
         alpha = 0
         value = math.sin(pygame.time.get_ticks())
