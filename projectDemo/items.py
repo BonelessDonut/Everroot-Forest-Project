@@ -308,7 +308,9 @@ class MeleeAttack(pygame.sprite.Sprite):
                 self.y = self.player.y - (self.height * 2.5)
                 self.rect.y = self.player.rect.y - (self.height * 2.5)
                 # self.hitbox = (self.rect.x, self.rect.y + TILESIZE//2, TILESIZE//2, TILESIZE//2)
-            pass
+            if self.checkWalls():
+                print("wall blocking")
+                self.endAttack()
 
 
 
@@ -349,7 +351,9 @@ class MeleeAttack(pygame.sprite.Sprite):
                 self.y = self.player.y + (self.height * 2.5)
                 self.rect.y = self.player.rect.y + (self.height * 2.5)
                 # self.hitbox = (self.rect.x, self.rect.y + self.height, self.width, self.height)
-            pass
+            if self.checkWalls():
+                print("wall blocking")
+                self.endAttack()
 
     # For when attacking while facing left
     def facingLeft(self):
@@ -388,7 +392,9 @@ class MeleeAttack(pygame.sprite.Sprite):
                 self.x = self.player.x - (self.width * 2.5)
                 self.rect.x = self.player.rect.x - (self.width * 2.5)
                 self.hitbox = (self.rect.x, self.rect.y, self.width, self.height)
-            pass
+            if self.checkWalls():
+                print("wall blocking")
+                self.endAttack()
 
     # For when attacking while facing right
     def facingRight(self):
@@ -428,6 +434,9 @@ class MeleeAttack(pygame.sprite.Sprite):
                 self.rect.x = self.player.rect.x + (self.width * 2)
                 self.hitbox = (self.rect.x + self.width, self.rect.y, self.width, self.height)
             pass
+            if self.checkWalls():
+                print("wall blocking")
+                self.endAttack()
 
     def animate(self):
         # This function is intended to handle switching the weapon's sprite based on which direction the player is facing
@@ -481,25 +490,59 @@ class MeleeAttack(pygame.sprite.Sprite):
                 self.image = pygame.transform.scale(trident_imgs[3], (self.width, self.height))
             pass
 
+    def checkWalls(self):
+        # creates lines
+        lines = []
+        # attack instance x and y positional values
+        ax = self.x + self.width / 2
+        ay = self.y + self.height / 2
+        px = self.game.player.x + self.game.player.width / 2
+        py = self.game.player.y + self.game.player.height / 2
+        n = 4
+        dx = (ax - px) / n
+        dy = (ay - py) / n
+        surface = pygame.Surface(self.game.screen.get_size(), pygame.SRCALPHA)
+        for i in range(n):
+            lines.append(pygame.draw.line(surface, (0, 255, 0, 1), (px + dx * i, py + dy * i),
+                                          (px + dx * (i + 1), py + dy * (i + 1)), 1))
+        index = [line.collidelist(list(block.rect for block in self.game.blocks)) for line in lines]
+        wallBlocking = False
+        for i in index:
+            if i != -1:
+                print(i)
+                rect = self.game.blocks.get_sprite(i)
+                # rect.image.fill(BLUE)
+                wallBlocking = True
+        return wallBlocking
+
     def collide(self):
         # This function is intended to check for collisions between the attack instance and any enemies on the screen
         # This could be done in a variety of ways, like making a list of every enemy object (the Enemy class) and using
         # pygame.sprite.collide_rect() to check to see if any enemies have been hit, then decreasing their health appropriately if hit
+        betweenBlocks = False
+
 
         for enemy in self.game.enemies:
             if pygame.sprite.collide_rect(self, enemy):
-                if not enemy.hitInvincible:
-                    #print("colliding")
-                    #print(f"Self damage is {self.weapon.damage}")
-                    enemy.dealtDamage(self.weapon.damage, self.player.weapon.type)
-                    enemy.hitInvincible = True
-                    #print(enemy.hitInvincible)
-                    #print(f"enemy health is {enemy.health}")
+                if not enemy.hitInvincible and not betweenBlocks:
+                    if not self.checkWalls():
+                        #print("colliding")
+                        #print(f"Self damage is {self.weapon.damage}")
+                        enemy.dealtDamage(self.weapon.damage, self.player.weapon.type)
+                        enemy.hitInvincible = True
+                        #print(enemy.hitInvincible)
+                        #print(f"enemy health is {enemy.health}")
             else:
                 #print("not colliding")
                 enemy.hitInvincible = False
 
         pass
+
+    def endAttack(self):
+        self.animationCount = 0
+        self.player.itemUsed = False
+        self.player.swordUsed = False
+        self.kill()
 
     #EDDIE!!!
     def update(self):
@@ -507,10 +550,7 @@ class MeleeAttack(pygame.sprite.Sprite):
         if self.player.itemUsed:
             self.animationCount += 1
             if self.animationCount >= self.player.weaponAnimationSpeed:
-                self.animationCount = 0
-                self.player.itemUsed = False
-                self.player.swordUsed = False
-                self.kill()
+                self.endAttack()
             if self.player.weapon.type == 'swordfish':
                 if self.animationCount < (self.player.weaponAnimationSpeed // 3):
                     self.animationPhase = 1
