@@ -25,6 +25,7 @@ class Game():
         pygame.init()
         pygame.font.init()
         self.screen = pygame.display.set_mode((WIDTH,HEIGHT))
+
         # The title for the game window is randomly selected at the start, because why not? - Eddie Suber
         windowTitle = ['Everroot Forrest - A CS Story',
                        'Everroot Forest - Spelled Correctly This Time',
@@ -56,6 +57,8 @@ class Game():
         self.cutsceneSkip = False
         self.musicVol = 10
         self.soundVol = 10
+        self.startPlayerMaxHealth = 1000
+        self.priorPlayerHealth = self.startPlayerMaxHealth
     
     #written by Rachel Tang 4/19/24
     #used this website: https://www.educative.io/answers/how-to-play-an-audio-file-in-pygame
@@ -127,6 +130,7 @@ class Game():
             # This is a variable to allow the weapon that was equipped in the current room to stay equipped
             # Otherwise it would reset to the default weapon everytime the player changes rooms
             priorWeaponNum = self.player.weaponNum
+            self.priorPlayerHealth = self.player.targetHealth
 
             # figures out which preloaded map to move the player to. 
             # looks at the direction the player moves in and moves to the appropriate map tile
