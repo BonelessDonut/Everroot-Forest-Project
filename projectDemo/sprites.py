@@ -198,7 +198,7 @@ class Player(pygame.sprite.Sprite):
                 self.targetHealth = self.targetHealth - amount
             if self.targetHealth <=0:
                 self.targetHealth = 0
-            pygame.mixer.Channel(1).set_volume(0.015 * self.game.soundVol)
+            pygame.mixer.Channel(1).set_volume(0.035 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/77_flesh_02.wav'))
 
     def getHealth(self, amount):
@@ -779,12 +779,12 @@ class Enemy(pygame.sprite.Sprite):
         if type == 'bubble':
             self.health -= damage
             self.state = 'standing'
-            pygame.mixer.Channel(4).set_volume(0.04 * self.game.soundVol)
+            pygame.mixer.Channel(4).set_volume(0.06 * self.game.soundVol)
             pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/15_Impact_flesh_02.wav'))
         elif type == 'swordfish' or type == 'trident':
             self.health -= damage
             self.state = 'knockback'
-            pygame.mixer.Channel(4).set_volume(0.04 * self.game.soundVol)
+            pygame.mixer.Channel(4).set_volume(0.06 * self.game.soundVol)
             pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/03_Claw_03.wav'))
         if self.health <= 0:
             self.kill()
