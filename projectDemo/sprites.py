@@ -469,7 +469,7 @@ class Player(pygame.sprite.Sprite):
             self.movementState = 'idle'
         else:
             self.movementState = 'moving'
-        if self.movementState == 'idle':
+        if self.movementState == 'idle' and self.game.state == 'explore':
             self.imgindex = 0
             if self.facing == 'right':
                 self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1, self.height * 1))

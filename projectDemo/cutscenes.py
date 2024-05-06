@@ -99,6 +99,7 @@ class ImageScene(Scene):
         currentImg = pygame.transform.scale(self.images[self.imageNum], (WIDTH//1.3, HEIGHT//1.68))
         imgRect = (WIDTH - WIDTH//1.125, HEIGHT - HEIGHT // 1.25)
         screen.blit(currentImg, imgRect)
+        pygame.draw.rect(screen, (255, 255, 255),(WIDTH - WIDTH // 1.125, HEIGHT - HEIGHT // 1.25, WIDTH // 1.3, HEIGHT // 1.68), 2)
         render_text = self.font.render(self.text, True, self.fontColor)
         text_rect = render_text.get_rect(center=(WIDTH // 2, HEIGHT // 1.2))
         screen.blit(render_text, text_rect)
