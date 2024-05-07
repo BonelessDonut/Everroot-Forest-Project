@@ -50,7 +50,7 @@ class Game():
         self.cutsceneManage = cutscenes.CutsceneManager(self)
         self.map = [-1, -1]
 
-        self.tutorialsActive = True
+        self.tutorialsActive = False
         
         self.running = True
         self.finishedScene = False

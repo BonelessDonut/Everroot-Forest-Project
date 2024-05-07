@@ -602,6 +602,10 @@ class Player(pygame.sprite.Sprite):
             self.weaponNum %= len(self.weaponList)
             self.weapon.type = self.weaponList[self.weaponNum]
             self.weapon.updateDamage()
+            if self.weapon.type == 'swordfish':
+                self.weaponAnimationSpeed = 10
+            elif self.weapon.type == 'trident':
+                self.weaponAnimationSpeed = 15
             pygame.mixer.Channel(1).set_volume(0.04 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/070_Equip_10.wav'))
         pass
@@ -745,6 +749,13 @@ class NPC(pygame.sprite.Sprite):
 
 #Authored by Max Chiu 4/16/2024
 class Enemy(pygame.sprite.Sprite):
+    #pumpkinImgDown = ['Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png',
+    #                  'Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png',
+    #                  'Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png',
+    #                  'Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png']
+    pumpkinImgDown = ['Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png',
+                      'Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png']
+    pumpkinRobot = {'down': pumpkinImgDown, 'damage' : 120, 'health': 100, 'speed' : PLAYER_SPEED * 0.6}
     def __init__(self, game, x, y):
         self.game = game
         self.map = currentTileMap[mapList[self.game.map[0]][self.game.map[1]]]
@@ -755,57 +766,127 @@ class Enemy(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
-        self.speed = PLAYER_SPEED * 0.6
+        self.type = 'pumpkinRobot'
 
         self.health = 100
-        self.hitInvincible = False
         self.damage = 120
+        self.speed = PLAYER_SPEED * 0.6
+
+
+
+        self.hitInvincible = False
+        self.hitInvulnerable = False
+        self.hitInvulnerableTime = 0
+        self.invulnerableTimer = 24
+        self.stunned = False
+        self.stunCount = 0
+        self.stunTimer = 8
 
         self.name = 'Udibudibudib'
 
         self.xChange = 0
         self.yChange = 0
         self.state = 'standing'
+        self.moving = False
+        self.facingDirection = 'down'
 
-        self.imagelist = ['Sprites/npcs/sampleEnemy/sampleEnemyLeft.png', 'Sprites/npcs/sampleEnemy/sampleEnemyRight.png']
+        self.imagelist = self.pumpkinRobot['down']
         #self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (2*self.width, 2*self.height))
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/joker.jpeg'), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png'), (self.width, self.height))
+        self.imageIndex = 0
+        self.animationCount = 0
+        self.animationSpeed = 36
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+        self.setup()
+
+    def setup(self):
+        if self.type == 'pumpkinRobot':
+            self.health = self.pumpkinRobot['health']
+            self.speed = self.pumpkinRobot['speed']
+            self.damage = self.pumpkinRobot['damage']
+            self.imagelist = self.pumpkinRobot['down']
+
+    def flicker(self):
+        alpha = 0
+        value = math.sin(pygame.time.get_ticks())
+        if value >= 0:
+            alpha = 255
+        else:
+            alpha = 0
+        if self.hitInvulnerable:
+            self.image.set_alpha(alpha)
+            print(self.image.get_alpha())
+        else:
+            self.image.set_alpha(255)
+        pass
 
     #Authored: Max Chiu 4/18/2024
     def dealtDamage(self, damage, type):
         # print(self.hitInvincible)
-        if type == 'bubble':
-            self.health -= damage
-            self.state = 'standing'
-            pygame.mixer.Channel(4).set_volume(0.06 * self.game.soundVol)
-            pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/15_Impact_flesh_02.wav'))
-        elif type == 'swordfish' or type == 'trident':
-            self.health -= damage
-            self.state = 'knockback'
-            pygame.mixer.Channel(4).set_volume(0.06 * self.game.soundVol)
-            pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/03_Claw_03.wav'))
-        if self.health <= 0:
-            self.kill()
-            pygame.mixer.Channel(4).set_volume(0.065 * self.game.soundVol)
-            pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/69_Enemy_death_01.wav'))
-        print(f"enemy (self) health is {self.health}")
+        if not self.hitInvulnerable:
+            if type == 'bubble':
+                self.health -= damage
+                self.stunned = True
+                self.state = 'standing'
+                pygame.mixer.Channel(4).set_volume(0.06 * self.game.soundVol)
+                pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/15_Impact_flesh_02.wav'))
+            elif type == 'swordfish' or type == 'trident':
+                self.speed *= 0.7
+                self.hitInvulnerable = True
+                self.health -= damage
+                self.state = 'knockback'
+                pygame.mixer.Channel(4).set_volume(0.06 * self.game.soundVol)
+                pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/03_Claw_03.wav'))
+            if self.health <= 0:
+                self.kill()
+                pygame.mixer.Channel(4).set_volume(0.065 * self.game.soundVol)
+                pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/69_Enemy_death_01.wav'))
+            print(f"enemy (self) health is {self.health}")
+        else:
+            return
+
+    def animate(self):
+
+        if self.moving:
+            self.animationCount+= 1
+            if self.animationCount >= self.animationSpeed:
+                self.animationCount = 0
+            for i in range(len(self.imagelist)):
+                if self.animationCount < (self.animationSpeed // len(self.imagelist) * (i + 1)):
+                    self.imageIndex = i
+                    break
+            self.image = pygame.transform.scale(pygame.image.load(self.imagelist[self.imageIndex]).convert_alpha(), (self.width, self.height))
+        self.flicker()
 
     #Authored: Max Chiu 4/18/2024
     def update(self):
         self.searchPlayer()
+        self.animate()
         self.attack()
 
 
         if self.state == 'standing':
-            pass
+            self.yChange = 0
+            self.xChange = 0
+            if self.stunned:
+                self.stunCount += 1
+                if self.stunCount > self.stunTimer:
+                    self.stunned = False
+                    self.stunCount = 0
+
         elif self.state == 'knockback':
+            self.rect.x += self.xChange * -1
+            self.collideBlocks('x')
+            self.rect.y += self.yChange * -1
+            self.collideBlocks('y')
+
+            self.x = self.rect.x
+            self.y = self.rect.y
             pass
         else: #self.state == 'chasing'
-
             self.rect.x += self.xChange
             self.collideBlocks('x')
             self.rect.y += self.yChange
@@ -813,6 +894,13 @@ class Enemy(pygame.sprite.Sprite):
 
             self.x = self.rect.x
             self.y = self.rect.y
+
+        if self.hitInvulnerable:
+            self.hitInvulnerableTime += 1
+            if self.hitInvulnerableTime > self.invulnerableTimer:
+                self.hitInvulnerable = False
+                self.hitInvulnerableTime = 0
+                self.speed *= (1/0.7)
 
     #Authored: Max Chiu 4/28/2024
     def searchPlayer(self):
@@ -843,7 +931,9 @@ class Enemy(pygame.sprite.Sprite):
                 move = False
 
         if move:
-            self.state = 'chasing'
+            self.moving = True
+            if not self.hitInvulnerable and not self.stunned:
+                self.state = 'chasing'
             try:
                 dx *= n/distance
                 dy *= n/distance
@@ -857,6 +947,7 @@ class Enemy(pygame.sprite.Sprite):
             self.xChange = 0
             self.yChange = 0
             self.state = 'standing'
+            self.moving = False
             return
 
     #Authored: Max Chiu 4/28/2024
