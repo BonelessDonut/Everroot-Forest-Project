@@ -209,7 +209,7 @@ def playIntroScene(cutscene_manager):
 def playGameOver(cutscene_manager):
     cutscene_manager.game.play_music('openingCutscene')
     cutscene_manager.clear_scenes()
-    cutscene_manager.add_scene(ImageScene('You Died', 300, [pygame.image.load('Sprites/deth.jpg').convert_alpha()], 0))
+    cutscene_manager.add_scene(ImageScene('You Died. Press R to restart', 300, [pygame.image.load('Sprites/deth.jpg').convert_alpha()], 0))
     cutscene_manager.start()
     sceneTimeDuration = 300
     start_ticks = 0
@@ -223,6 +223,10 @@ def playGameOver(cutscene_manager):
         for event in pygame.event.get():
             if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
                 cutscene_manager.game.cutsceneSkip = True
+            if event.type == pygame.KEYUP and event.key == pygame.K_r:
+                cutscene_manager.game.__init__()
+                #cutscene_manager.game.new()
+                cutscene_manager.game.intro_screen()
             if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 pygame.font.quit()
                 pygame.quit()
