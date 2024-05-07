@@ -749,12 +749,12 @@ class NPC(pygame.sprite.Sprite):
 
 #Authored by Max Chiu 4/16/2024
 class Enemy(pygame.sprite.Sprite):
-    #pumpkinImgDown = ['Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png',
-    #                  'Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png',
-    #                  'Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png',
-    #                  'Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png']
-    pumpkinImgDown = ['Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png',
+    pumpkinImgDown = ['Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png',
+                      'Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png',
+                      'Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png',
                       'Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png']
+    #pumpkinImgDown = ['Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png',
+    #                  'Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png']
     pumpkinRobot = {'down': pumpkinImgDown, 'damage' : 120, 'health': 100, 'speed' : PLAYER_SPEED * 0.6}
     def __init__(self, game, x, y):
         self.game = game
@@ -854,10 +854,18 @@ class Enemy(pygame.sprite.Sprite):
             self.animationCount+= 1
             if self.animationCount >= self.animationSpeed:
                 self.animationCount = 0
-            for i in range(len(self.imagelist)):
-                if self.animationCount < (self.animationSpeed // len(self.imagelist) * (i + 1)):
-                    self.imageIndex = i
-                    break
+           # for i in range(len(self.imagelist)):
+                #if self.animationCount < (self.animationSpeed // len(self.imagelist) * (i + 1)):
+                    #self.imageIndex = i
+                    #break
+            if self.animationCount < (self.animationSpeed // len(self.imagelist)):
+                self.imageIndex = 0
+            elif self.animationCount < (self.animationSpeed // len(self.imagelist) * 2):
+                self.imageIndex = 1
+            elif self.animationCount < (self.animationSpeed // len(self.imagelist) * 3):
+                self.imageIndex = 2
+            elif self.animationCount < (self.animationSpeed // len(self.imagelist) * 4):
+                self.imageIndex = 3
             self.image = pygame.transform.scale(pygame.image.load(self.imagelist[self.imageIndex]).convert_alpha(), (self.width, self.height))
         self.flicker()
 
