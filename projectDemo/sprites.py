@@ -830,8 +830,6 @@ class Enemy(pygame.sprite.Sprite):
         self.damage = 120
         self.speed = PLAYER_SPEED * 0.6
 
-
-
         self.hitInvincible = False
         self.hitInvulnerable = False
         self.hitInvulnerableTime = 0
@@ -859,6 +857,7 @@ class Enemy(pygame.sprite.Sprite):
         self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 120, 'health': 100, 'speed': PLAYER_SPEED * 0.6}
 
         self.imagelist = self.pumpkinRobot['down']
+        #self.deathImgList = [pygame.transform.scale(pygame.image.load('').convert_alpha(), (self.width, self.height))]
         #self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (2*self.width, 2*self.height))
         self.imageIndex = 0
         self.image = self.imagelist[self.imageIndex]
@@ -876,6 +875,9 @@ class Enemy(pygame.sprite.Sprite):
             self.speed = self.pumpkinRobot['speed']
             self.damage = self.pumpkinRobot['damage']
             self.imagelist = self.pumpkinRobot['down']
+
+    def deathAnimation(self):
+        pass
 
     def flicker(self):
         alpha = 0
