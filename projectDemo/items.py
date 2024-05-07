@@ -628,15 +628,21 @@ class Flower(pygame.sprite.Sprite):
         #THIS WILL LIKELY IMPROVE ANIMATION FLUIDITY WHEN FLOWERS ARE INTERACTED WITH
         #WILL ALSO REMOVE DUPLICATE SHEARS WITH THE PLAYER CUTTING ANIMATION
 
-        hyacinImgL = ['Sprites/items/hyacinth.png', 'Sprites/items/hyacinth3New.png', 'Sprites/items/hyacinth5.png']
-        sunFloImgL = ['Sprites/items/sunflowernew.png', 'Sprites/items/sunflower3New.png', 'Sprites/items/sunflower5.png']
-        silentFImgL = ['Sprites/items/silentFlower.png', 'Sprites/items/silentFlower3New.png', 'Sprites/items/silentFlower5.png']
+        hyacinImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth.png').convert_alpha(), (self.width, self.height)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth3New.png').convert_alpha(), (self.width, self.height)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth5.png').convert_alpha(), (self.width, self.height))]
+        sunFloImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/sunflowernew.png').convert_alpha(), (self.width, self.height)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/sunflower3New.png').convert_alpha(), (self.width, self.height)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/sunflower5.png').convert_alpha(), (self.width, self.height))]
+        silentFImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower.png').convert_alpha(), (self.width, self.height)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower3New.png').convert_alpha(), (self.width, self.height)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower5.png').convert_alpha(), (self.width, self.height))]
 
-        self.imageList = [['Sprites/items/hyacinth.png', hyacinImgL], ['Sprites/items/sunflowernew.png', sunFloImgL], ['Sprites/items/silentFlower.png', silentFImgL]]
+        self.imageList = [[hyacinImgL[0], hyacinImgL], [sunFloImgL[0], sunFloImgL], [silentFImgL[0], silentFImgL]]
         #Randomly selects the flower to spawn as one of the flower options:
         #either a hyacinth, sunflower, or silent princess flower
         self.flowerSpriteNum = random.randint(0, len(self.imageList)-1)
-        self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][0]), (self.width, self.height))
+        self.image = self.imageList[self.flowerSpriteNum][0]
 
 
         self.rect = self.image.get_rect()
@@ -649,7 +655,7 @@ class Flower(pygame.sprite.Sprite):
             if self.state == 'cutting':
                 #READ ME, THIS UPDATES ALL THE FLOWERS AT ONCE AFTER INTERACTING WITH ONLY ONE FLOWER. - UNINTENDED OUTCOME, NEEDS FIXING
                 self.anim()
-                self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.flowerSpriteNum][1][self.imgindex % 3]), (self.width, self.height))
+                self.image = self.imageList[self.flowerSpriteNum][1][self.imgindex % 3]
 
     def anim(self):
         #realized it was setting the state to flowerC every single loop from the Player.interact() method, so it never went to the else to kill
@@ -686,18 +692,33 @@ class Ore(pygame.sprite.Sprite):
 
         self.state = 'alive'
 
-        rubyImageL = ['Sprites/items/oreRuby.png', 'Sprites/items/oreRuby2.png', 'Sprites/items/oreRuby3.png', 'Sprites/items/oreRuby3.png']
-        emeraldImageL = ['Sprites/items/oreEmerald.png', 'Sprites/items/oreEmerald2.png', 'Sprites/items/oreEmerald3.png', 'Sprites/items/oreEmerald3.png']
-        copperImageL = ['Sprites/items/oreCopper.png', 'Sprites/items/oreCopper2.png', 'Sprites/items/oreCopper3.png', 'Sprites/items/oreCopper3.png']
-        amethImageL = ['Sprites/items/oreAmethyst.png', 'Sprites/items/oreAmethyst2.png', 'Sprites/items/oreAmethyst3.png', 'Sprites/items/oreAmethyst3.png']
-        ironImageL = ['Sprites/items/oreIron.png', 'Sprites/items/oreIron2.png', 'Sprites/items/oreIron3.png', 'Sprites/items/oreIron3.png']
+        rubyImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby.png').convert_alpha(), (self.width, self.height)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby2.png').convert_alpha(), (self.width, self.height)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby3.png').convert_alpha(), (self.width, self.height)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby3.png').convert_alpha(), (self.width, self.height))]
+        emeraldImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald.png').convert_alpha(), (self.width, self.height)),
+                         pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald2.png').convert_alpha(), (self.width, self.height)),
+                         pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald3.png').convert_alpha(), (self.width, self.height)),
+                         pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald3.png').convert_alpha(), (self.width, self.height))]
+        copperImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper.png').convert_alpha(), (self.width, self.height)),
+                        pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper2.png').convert_alpha(), (self.width, self.height)),
+                        pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper3.png').convert_alpha(), (self.width, self.height)),
+                        pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper3.png').convert_alpha(), (self.width, self.height))]
+        amethImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst.png').convert_alpha(), (self.width, self.height)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst2.png').convert_alpha(), (self.width, self.height)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst3.png').convert_alpha(), (self.width, self.height)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst3.png').convert_alpha(), (self.width, self.height))]
+        ironImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreIron.png').convert_alpha(), (self.width, self.height)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreIron2.png').convert_alpha(), (self.width, self.height)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(), (self.width, self.height)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(), (self.width, self.height))]
 
 
 
-        self.imageList = [['Sprites/items/oreRuby.png', rubyImageL], ['Sprites/items/oreEmerald.png', emeraldImageL], ['Sprites/items/oreCopper.png', copperImageL], ['Sprites/items/oreAmethyst.png', amethImageL], ['Sprites/items/oreIron.png', ironImageL]]
+        self.imageList = [[rubyImageL[0], rubyImageL], [emeraldImageL[0], emeraldImageL], [copperImageL[0], copperImageL], [amethImageL[0], amethImageL], [ironImageL[0], ironImageL]]
         self.oreSpriteNum = random.randint(0, len(self.imageList) - 1)
 
-        self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.oreSpriteNum][0]), (self.width, self.height))
+        self.image = self.imageList[self.oreSpriteNum][0]
         #self.image = pygame.Surface([self.width, self.height])
         #self.image.fill(GREEN)
 
@@ -711,7 +732,7 @@ class Ore(pygame.sprite.Sprite):
             if self.state == 'mining':
                 #READ ME, THIS UPDATES ALL THE FLOWERS AT ONCE AFTER INTERACTING WITH ONLY ONE FLOWER. - UNINTENDED OUTCOME, NEEDS FIXING
                 self.killAnim()
-                self.image = pygame.transform.scale(pygame.image.load(self.imageList[self.oreSpriteNum][1][self.imgindex % 4]), (self.width, self.height))
+                self.image = self.imageList[self.oreSpriteNum][1][self.imgindex % 4]
 
 
         pass

@@ -340,15 +340,16 @@ class Game():
         self.player.tutorial.checkAppear()
 
     def draw(self):
-        self.screen.fill(BLACK)
-        self.all_sprites.draw(self.screen)
-        # draws the tutorial text on screen if needed
-        if self.tutorialsActive:
-            self.player.tutorial.draw()
-        if (self.state == 'explore' or self.state == 'oreMine' or self.state == 'flowerC'):
-            self.player.animateHealth()
-        self.clock.tick(FPS)
-        pygame.display.update()
+        if self.state != 'game over':
+            self.screen.fill(BLACK)
+            self.all_sprites.draw(self.screen)
+            # draws the tutorial text on screen if needed
+            if self.tutorialsActive:
+                self.player.tutorial.draw()
+            if (self.state == 'explore' or self.state == 'oreMine' or self.state == 'flowerC'):
+                self.player.animateHealth()
+            self.clock.tick(FPS)
+            pygame.display.update()
 
     def main(self):
         #game loop
@@ -356,6 +357,8 @@ class Game():
             self.events()
             if self.state == 'opening':
                 self.intro_screen()
+            if self.state == 'game over':
+                self.game_over()
             self.update()
             self.draw()
         self.running = False
@@ -363,6 +366,8 @@ class Game():
     def game_over(self):
         #Play the game over screen
         #To be created later
+        self.screen.fill(BLACK)
+        cutscenes.playGameOver(self.cutsceneManage)
         pass
 
     def pauseEvents(self):

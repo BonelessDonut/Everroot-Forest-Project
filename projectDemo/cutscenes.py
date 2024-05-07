@@ -21,6 +21,9 @@ class CutsceneManager:
     def add_scene(self, scene):
         self.scenes.append(scene)
 
+    def clear_scenes(self):
+        self.scenes = []
+
     def start(self):
         if self.scenes:
             # print("Started")
@@ -202,6 +205,41 @@ def playIntroScene(cutscene_manager):
             #cutscene_manager.game.createTilemap(None)
             cutscene_manager.game.cutsceneSkip = False
             cutscene_manager.game.play_music('stop')
+
+def playGameOver(cutscene_manager):
+    cutscene_manager.game.play_music('openingCutscene')
+    cutscene_manager.clear_scenes()
+    cutscene_manager.add_scene(ImageScene('You Died', 300, [pygame.image.load('Sprites/deth.jpg').convert_alpha()], 0))
+    cutscene_manager.start()
+    sceneTimeDuration = 300
+    start_ticks = 0
+    elapsedTime = 0
+    cutscene_manager.game.finishedScene = False
+    while not cutscene_manager.game.finishedScene:
+        cutscene_manager.update()
+        cutscene_manager.draw(cutscene_manager.game.screen)
+        current_ticks = pygame.time.get_ticks()
+        elapsedTime = (current_ticks - start_ticks) / 1000
+        for event in pygame.event.get():
+            if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+                cutscene_manager.game.cutsceneSkip = True
+            if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+                pygame.font.quit()
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.QUIT:
+                pygame.font.quit()
+                pygame.quit()
+                sys.exit()
+        if cutscene_manager.game.cutsceneSkip:
+            elapsedTime = sceneTimeDuration + 1
+        if elapsedTime > sceneTimeDuration:
+            cutscene_manager.game.finishedScene = True
+            cutscene_manager.game.cutsceneSkip = False
+            cutscene_manager.game.play_music('stop')
+            pygame.quit()
+            sys.exit()
+    pass
 
 def transition_Out(game):
 
