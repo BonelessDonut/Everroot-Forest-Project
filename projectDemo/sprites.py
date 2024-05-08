@@ -854,7 +854,7 @@ class Enemy(pygame.sprite.Sprite):
         # pumpkinImgDown = [pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99)),
         #                  pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99))]
 
-        self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 120, 'health': 100, 'speed': PLAYER_SPEED * 0.6}
+        self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 120, 'health': 100, 'speed': PLAYER_SPEED * 0.5}
 
         self.imagelist = self.pumpkinRobot['down']
         #self.deathImgList = [pygame.transform.scale(pygame.image.load('').convert_alpha(), (self.width, self.height))]

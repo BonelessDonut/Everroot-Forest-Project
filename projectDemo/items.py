@@ -529,6 +529,7 @@ class MeleeAttack(pygame.sprite.Sprite):
                         #print("colliding")
                         #print(f"Self damage is {self.weapon.damage}")
                         enemy.dealtDamage(self.weapon.damage, self.player.weapon.type)
+                        #self.player.getHealth(self.weapon.damage * 0.8)
                         enemy.hitInvincible = True
                         #print(enemy.hitInvincible)
                         #print(f"enemy health is {enemy.health}")
