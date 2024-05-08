@@ -77,6 +77,10 @@ class Game():
             mixer.music.play(100)
         elif songType == 'boss': # Add boss music to be played when facing a boss, perhaps use music Jose recommended? - Eddie
             pass
+        elif songType == 'death':
+            mixer.music.load('Music/Bleach_-_Never_meant_to_belong.mp3')
+            mixer.music.set_volume(0.070 * self.musicVol)
+            mixer.music.play(10)
         if songType.lower() == 'stop':
             mixer.music.stop()
 
