@@ -21,6 +21,9 @@ class CutsceneManager:
     def add_scene(self, scene):
         self.scenes.append(scene)
 
+    def clear_scenes(self):
+        self.scenes = []
+
     def start(self):
         if self.scenes:
             # print("Started")
@@ -64,7 +67,7 @@ class Scene:
         render_text = pygame.font.SysFont('Arial', 24).render(text, True, GRAY)
         text_rect = render_text.get_rect(center=(WIDTH // 2, HEIGHT // 1.1))
         screen.blit(render_text, text_rect)
-        pygame.display.update()
+
 
     def draw(self, screen):
         pass
@@ -73,7 +76,7 @@ class Scene:
         return True
 
 class ImageScene(Scene):
-    def __init__(self, text, duration, images, imageNum, fontColor=WHITE):
+    def __init__(self, text, duration, images, imageNum, fontColor=WHITE, skip=True):
         self.text = text
         self.duration = duration
         self.images = images
@@ -82,6 +85,7 @@ class ImageScene(Scene):
         self.fontColor = fontColor
         self.start_ticks = pygame.time.get_ticks()
         self.elapsed_time = 0
+        self.skipAppear = skip
         pass
 
     def __str__(self):
@@ -99,11 +103,17 @@ class ImageScene(Scene):
         currentImg = pygame.transform.scale(self.images[self.imageNum], (WIDTH//1.3, HEIGHT//1.68))
         imgRect = (WIDTH - WIDTH//1.125, HEIGHT - HEIGHT // 1.25)
         screen.blit(currentImg, imgRect)
+        pygame.draw.rect(screen, (255, 255, 255),(WIDTH - WIDTH // 1.125, HEIGHT - HEIGHT // 1.25, WIDTH // 1.3, HEIGHT // 1.68), 2)
         render_text = self.font.render(self.text, True, self.fontColor)
         text_rect = render_text.get_rect(center=(WIDTH // 2, HEIGHT // 1.2))
         screen.blit(render_text, text_rect)
-        self.printSkip(screen)
+        if self.skipAppear:
+            self.printSkip(screen)
+        pygame.display.update()
         pass
+
+    def setSkip(self, skip):
+        self.skipAppear = skip # skip should be a boolean value
 
     def is_finished(self):
         return self.elapsed_time >= self.duration
@@ -201,6 +211,45 @@ def playIntroScene(cutscene_manager):
             #cutscene_manager.game.createTilemap(None)
             cutscene_manager.game.cutsceneSkip = False
             cutscene_manager.game.play_music('stop')
+
+def playGameOver(cutscene_manager):
+    cutscene_manager.game.play_music('death')
+    cutscene_manager.clear_scenes()
+    cutscene_manager.add_scene(ImageScene('You Died. Press R to restart or exit with Space / Escape', 300, [pygame.image.load('Sprites/deth.jpg').convert_alpha()], 0, WHITE, False))
+    cutscene_manager.start()
+    sceneTimeDuration = 300
+    start_ticks = 0
+    elapsedTime = 0
+    cutscene_manager.game.finishedScene = False
+    while not cutscene_manager.game.finishedScene:
+        cutscene_manager.update()
+        cutscene_manager.draw(cutscene_manager.game.screen)
+        current_ticks = pygame.time.get_ticks()
+        elapsedTime = (current_ticks - start_ticks) / 1000
+        for event in pygame.event.get():
+            if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+                cutscene_manager.game.cutsceneSkip = True
+            if event.type == pygame.KEYUP and event.key == pygame.K_r:
+                cutscene_manager.game.__init__()
+                #cutscene_manager.game.new()
+                cutscene_manager.game.intro_screen()
+            if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+                pygame.font.quit()
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.QUIT:
+                pygame.font.quit()
+                pygame.quit()
+                sys.exit()
+        if cutscene_manager.game.cutsceneSkip:
+            elapsedTime = sceneTimeDuration + 1
+        if elapsedTime > sceneTimeDuration:
+            cutscene_manager.game.finishedScene = True
+            cutscene_manager.game.cutsceneSkip = False
+            cutscene_manager.game.play_music('stop')
+            pygame.quit()
+            sys.exit()
+    pass
 
 def transition_Out(game):
 

@@ -25,6 +25,7 @@ class Game():
         pygame.init()
         pygame.font.init()
         self.screen = pygame.display.set_mode((WIDTH,HEIGHT))
+
         # The title for the game window is randomly selected at the start, because why not? - Eddie Suber
         windowTitle = ['Everroot Forrest - A CS Story',
                        'Everroot Forest - Spelled Correctly This Time',
@@ -49,13 +50,15 @@ class Game():
         self.cutsceneManage = cutscenes.CutsceneManager(self)
         self.map = [-1, -1]
 
-        self.tutorialsActive = True
+        self.tutorialsActive = False
         
         self.running = True
         self.finishedScene = False
         self.cutsceneSkip = False
         self.musicVol = 10
         self.soundVol = 10
+        self.startPlayerMaxHealth = 1000
+        self.priorPlayerHealth = self.startPlayerMaxHealth
     
     #written by Rachel Tang 4/19/24
     #used this website: https://www.educative.io/answers/how-to-play-an-audio-file-in-pygame
@@ -74,6 +77,10 @@ class Game():
             mixer.music.play(100)
         elif songType == 'boss': # Add boss music to be played when facing a boss, perhaps use music Jose recommended? - Eddie
             pass
+        elif songType == 'death':
+            mixer.music.load('Music/Bleach_-_Never_meant_to_belong.mp3')
+            mixer.music.set_volume(0.070 * self.musicVol)
+            mixer.music.play(10)
         if songType.lower() == 'stop':
             mixer.music.stop()
 
@@ -127,6 +134,7 @@ class Game():
             # This is a variable to allow the weapon that was equipped in the current room to stay equipped
             # Otherwise it would reset to the default weapon everytime the player changes rooms
             priorWeaponNum = self.player.weaponNum
+            self.priorPlayerHealth = self.player.targetHealth
 
             # figures out which preloaded map to move the player to. 
             # looks at the direction the player moves in and moves to the appropriate map tile
@@ -336,15 +344,16 @@ class Game():
         self.player.tutorial.checkAppear()
 
     def draw(self):
-        self.screen.fill(BLACK)
-        self.all_sprites.draw(self.screen)
-        # draws the tutorial text on screen if needed
-        if self.tutorialsActive:
-            self.player.tutorial.draw()
-        if (self.state == 'explore' or self.state == 'oreMine' or self.state == 'flowerC'):
-            self.player.animateHealth()
-        self.clock.tick(FPS)
-        pygame.display.update()
+        if self.state != 'game over':
+            self.screen.fill(BLACK)
+            self.all_sprites.draw(self.screen)
+            # draws the tutorial text on screen if needed
+            if self.tutorialsActive:
+                self.player.tutorial.draw()
+            if (self.state == 'explore' or self.state == 'oreMine' or self.state == 'flowerC'):
+                self.player.animateHealth()
+            self.clock.tick(FPS)
+            pygame.display.update()
 
     def main(self):
         #game loop
@@ -352,6 +361,8 @@ class Game():
             self.events()
             if self.state == 'opening':
                 self.intro_screen()
+            if self.state == 'game over':
+                self.game_over()
             self.update()
             self.draw()
         self.running = False
@@ -359,6 +370,8 @@ class Game():
     def game_over(self):
         #Play the game over screen
         #To be created later
+        self.screen.fill(BLACK)
+        cutscenes.playGameOver(self.cutsceneManage)
         pass
 
     def pauseEvents(self):
