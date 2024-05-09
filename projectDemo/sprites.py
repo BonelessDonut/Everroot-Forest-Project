@@ -570,8 +570,8 @@ class Enemy(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.width = 35
-        self.height = 35
+        self.width = 40
+        self.height = 40
         self.speed = PLAYER_SPEED-1
 
         self.health = 100
@@ -638,13 +638,44 @@ class Enemy(pygame.sprite.Sprite):
 
         elif self.state == 'knockback':
             pass
-        else: #self.state == 'chasing'
+        else: #self.state == 'chasing' or 'searching'
             self.searchPlayer()
             self.rect.x += self.xChange
-            self.collideBlocks('x')
+            collideX = self.collideBlocks('x')
             self.rect.y += self.yChange
-            self.collideBlocks('y')
-            print('dx', self.xChange, 'dy', self.yChange)
+            collideY = self.collideBlocks('y')
+            print('before', self.path.collision_rects)
+            if self.state == 'searching' and (collideX or collideY):
+                if collideX:
+                    print('collided x')
+                    if self.xChange * self.yChange > 0: #need to move up
+                        print('x up')
+                        self.path.collision_rects.insert(0, pygame.Rect(enemyPos[0]-1, enemyPos[1]-TILESIZE-1, 2, 2))
+                    elif self.xChange * self.yChange < 0 and self.xChange > self.yChange * 3: #need to move down
+                        print('x down')
+                        self.path.collision_rects.insert(0, pygame.Rect(enemyPos[0]-1, enemyPos[1]-TILESIZE-1, 2, 2))
+                    elif self.xChange > 0 and self.yChange == 0: #need to move left
+                        print('x left')
+                        self.path.collision_rects.insert(0, pygame.Rect(enemyPos[0]-TILESIZE-1, enemyPos[1]-1, 2, 2))
+                    elif self.xChange < 0 and self.yChange == 0: #need to move right
+                        print('x right')
+                        self.path.collision_rects.insert(0, pygame.Rect(enemyPos[0]+TILESIZE-1, enemyPos[1]-1, 2, 2))
+                elif collideY:
+                    print('collided y')
+                    if self.yChange < 0 and self.yChange > self.xChange * 3: #need to move left
+                        print('y leftt')
+                        self.path.collision_rects.insert(0, pygame.Rect(enemyPos[0]-TILESIZE-1, enemyPos[1]-1, 2, 2))
+                    elif self.yChange > 0 and self.yChange > self.xChange * 3: #need to move right
+                        print('y right')
+                        self.path.collision_rects.insert(0, pygame.Rect(enemyPos[0]+TILESIZE-1, enemyPos[1]-1, 2, 2))
+                    elif self.yChange < 0 and self.xChange == 0: #need to move down
+                        print('y down')
+                        self.path.collision_rects.insert(0, pygame.Rect(enemyPos[0]-1, enemyPos[1]-TILESIZE-1, 2, 2))
+                    elif self.yChange > 0 and self.xChange == 0: #need to move up
+                        print('y up')
+                        self.path.collision_rects.insert(0, pygame.Rect(enemyPos[0]-1, enemyPos[1]-TILESIZE-1, 2, 2))
+            print('after ', self.path.collision_rects)
+            #print('dx', self.xChange, 'dy', self.yChange)
             self.x = self.rect.x
             self.y = self.rect.y
 
@@ -658,9 +689,9 @@ class Enemy(pygame.sprite.Sprite):
                 if self.xChange == 0 and self.yChange == 0:
                     self.state = 'chasing'
             else: 
-                #self.state = 'chasing'
-                print('searching to chasing')
                 self.state = 'chasing'
+                self.path.emptyPath()
+                print('searching to chasing')
                 
             return
         playerPos = [self.game.player.x, self.game.player.y]
@@ -707,9 +738,11 @@ class Enemy(pygame.sprite.Sprite):
                 #rect.image.fill(BLUE)
                 move = False
 
+        #if move and not self.path.collision_rects:
         if move:
             print('line collisions', index)
             self.state = 'chasing'
+            self.path.emptyPath()
             # dx *= n/distance
             # dy *= n/distance
             dx, dy = Multiclass.normalize(dx*n, dy*n)
@@ -742,6 +775,8 @@ class Enemy(pygame.sprite.Sprite):
                     self.rect.x = hits[0].rect.left - self.rect.width
                 if self.xChange < 0:
                     self.rect.x = hits[0].rect.right
+                print('collided method x')
+                return True
         else:
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False) + pygame.sprite.spritecollide(self, self.game.enemies, False)
             if pygame.sprite.collide_rect(self, self.game.player):
@@ -754,6 +789,9 @@ class Enemy(pygame.sprite.Sprite):
                     self.rect.y = hits[0].rect.top - self.rect.height
                 if self.yChange < 0:
                     self.rect.y = hits[0].rect.bottom
+                print('collided method y')
+                return True
+        return False
 
 class Pathfinder:
     
@@ -819,7 +857,8 @@ class Pathfinder:
             # dx /= distance
             # dy /= distance
             dx, dy = Multiclass.normalize(dx, dy)
-            #print('dx', dx, 'dy', dy)
+            if not dx or not dy:
+                print(end[0], self.start[0], end[1], self.start[1])
             return dx, dy
         else:
             self.path = []
@@ -829,8 +868,12 @@ class Pathfinder:
         if self.collision_rects:
             for rect in self.collision_rects:
                 if pygame.Rect.colliderect(rect, self.enemy.rect):
-                    del self.collision_rects[0]
-                    return self.getDirection()
+                    del self.collision_rects[0]        
+            return self.getDirection()
+                
+    def emptyPath(self):
+        self.collision_rects = []
+        self.path = []
 
 
         
