@@ -370,6 +370,8 @@ class Player(pygame.sprite.Sprite):
             if not interacted:
                 self.weapon.attack()
 
+            
+
         #EDIT AFTER INVENTORY MADE
         elif keys[pygame.K_r] and self.weapon.type == 'bubble':
             self.weapon.reload()
@@ -444,6 +446,7 @@ class Player(pygame.sprite.Sprite):
                         self.game.state = 'flowerC'
                         self.game.flowers.get_sprite(interactIndex).state = 'cutting'
                         self.game.flowers.get_sprite(interactIndex).anim()
+
                         #READ ME, USE "self.facing" DIRECTIONS TO DETERMINE WHICH DIRECTION CUTTING SPRITE TO USE
                         if self.facing == 'right':
                             self.image = self.cutRightImgList[self.cutUpgrade]
@@ -466,9 +469,9 @@ class Player(pygame.sprite.Sprite):
         if teleportIndex != -1:
             tpSprite = self.game.teleport.get_sprite(teleportIndex)
             self.kill()
-            pygame.time.wait(50)
+            #pygame.time.wait(50)
             self.game.createTilemap((tpSprite.x//TILESIZE, tpSprite.y//TILESIZE))
-            pygame.time.wait(50)
+            #pygame.time.wait(50)
 
 
     
@@ -682,14 +685,36 @@ class Block(pygame.sprite.Sprite):
 
         self.x = x*TILESIZE
         self.y = y*TILESIZE
+        #self.width = TILESIZE
+        #self.height = TILESIZE
+
+        #self.imagelist = ['Sprites/tiles/brick1.png',
+        #                  'Sprites/tiles/water1.png',
+        #                  'Sprites/tiles/sapling2.png',
+        #                  'Sprites/tiles/rock1.png']
+        self.image = self.game.tileList[1][index]
+        #self.image.fill(RED)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+class WalkableBlock(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, index):
+
+        self.game = game
+        self._layer = GROUND_LAYER
+        self.groups = self.game.all_sprites, self.game.walk_blocks
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        self.x = x*TILESIZE
+        self.y = y*TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
 
-        self.imagelist = ['Sprites/tiles/brick1.png',
-                          'Sprites/tiles/water1.png',
-                          'Sprites/tiles/sapling2.png',
-                          'Sprites/tiles/rock1.png']
-        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[index]), (self.width, self.height))
+        #self.imagelist = [pygame.transform.scale(pygame.image.load('Sprites/tiles/crossBridge1.png').convert_alpha(), (self.width, self.height)),
+        #                pygame.transform.scale(pygame.image.load('Sprites/tiles/growth1.png').convert_alpha(), (self.width, self.height))]
+        self.image = self.game.tileList[0][index]
         #self.image.fill(RED)
 
         self.rect = self.image.get_rect()
@@ -869,7 +894,7 @@ class Enemy(pygame.sprite.Sprite):
         # pumpkinImgDown = [pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99)),
         #                  pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99))]
 
-        self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 120, 'health': 100, 'speed': PLAYER_SPEED * 0.6}
+        self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 120, 'health': 100, 'speed': PLAYER_SPEED * 0.5}
 
         self.imagelist = self.pumpkinRobot['down']
         #self.deathImgList = [pygame.transform.scale(pygame.image.load('').convert_alpha(), (self.width, self.height))]
@@ -1442,6 +1467,47 @@ class Multiclass:
         return dx/distance, dy/distance
         
 
+class Inventory(pygame.sprite.Sprite):
+    def __init__(self, game):
+        self.game = game
+        self._layer = TEXT_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.hotbar_img = [pygame.transform.scale(pygame.image.load('Sprites/items/sunflowernew.png').convert_alpha(), (TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst.png').convert_alpha(), (TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/potion.png').convert_alpha(), (TILESIZE, TILESIZE))]
+
+
+        self.x = 1*TILESIZE
+        self.y = 15.5*TILESIZE
+        self.width = 5.5*TILESIZE
+        self.height = 2.5*TILESIZE
+
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/hudImages/pixil-frame-0_cropped.png'), (self.width, self.height))
+        #self.image.fill(RED)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+        self.font = pygame.font.SysFont("Calibri", 20)
+        self.slots = {"flower":0, "ore":0, "potion": 0}
+
+        for i in range(len(self.hotbar_img)):
+            self.image.blit(self.hotbar_img[i], pygame.Rect(25+65*(i),30,0,0))
+
+        self.numList = []
+        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('flower')),False,(WHITE)),(60,53)))
+        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('ore')),False,(WHITE)),(125,53)))
+        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(190,53)))
+
+    def add_item(self, item):
+        self.slots[item] =  self.slots.get(item) + 1
+        for image in self.numList:
+            pygame.draw.rect(self.image, BLACK, image)
+        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('flower')),False,(WHITE)),(60,53)))
+        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('ore')),False,(WHITE)),(125,53)))
+        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(190,53)))
 class Tutorial:
     def __init__(self, game):
         self.game = game

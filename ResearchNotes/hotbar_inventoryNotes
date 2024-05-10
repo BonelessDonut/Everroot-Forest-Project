@@ -241,13 +241,17 @@ while running:
 '''
 
 def add_item(self, item):
-    first_available_slot = len(self.slots) #first empty slot
-    target_slot = len(self.slot) # first slot of same name
-    for index, slot in enumerate(self.slots): #gives index position of what we're looking for
-        if slot.name == "default" and index < first_available_slot: #gives first available slot
-            first_available_slot = index
-        if slot.name == item.name: 
-            target_slot = index
-    if target_slot < len(self.slots): 
-        self.slots[target_slot].quantity += 1 
-                                 
+    first_available = len(self.slots) 
+    same_slot = len(self.slots) 
+    for index, slot in enumerate(self.slots): 
+        if slot.name == 'blank' and first_available == len(self.slots):
+            first_available = index
+        elif slot.name == item.name: 
+            same_slot = index
+            break
+    if same_slot < len(self.slots): 
+        self.slots[same_slot].quantity += 1 
+    elif first_available < len(self.slots):
+        self.slots[first_available].name = item.name
+        self.slots[first_available].quantity = 1
+

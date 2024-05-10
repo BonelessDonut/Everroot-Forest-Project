@@ -213,7 +213,7 @@ def playIntroScene(cutscene_manager):
             cutscene_manager.game.play_music('stop')
 
 def playGameOver(cutscene_manager):
-    cutscene_manager.game.play_music('openingCutscene')
+    cutscene_manager.game.play_music('death')
     cutscene_manager.clear_scenes()
     cutscene_manager.add_scene(ImageScene('You Died. Press R to restart or exit with Space / Escape', 300, [pygame.image.load('Sprites/deth.jpg').convert_alpha()], 0, WHITE, False))
     cutscene_manager.start()

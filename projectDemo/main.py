@@ -41,6 +41,7 @@ class Game():
         self.clock = pygame.time.Clock() 
 
         self.player = None
+        self.inventory = None
         self.state = 'opening'
         #Game states:
         #explore - Player can move around
@@ -49,6 +50,21 @@ class Game():
 
         self.cutsceneManage = cutscenes.CutsceneManager(self)
         self.map = [-1, -1]
+        # This list contains all the special tiles for the game, preloaded here when the game starts to save loading time
+        # When going from room to room.
+        # The first nested list is for walkable blocks, while the second list is for not walkable ones
+        self.tileList = None
+        self.hyacinImgL = None
+        self.sunFloImgL = None
+        self.silentFImgL = None
+        self.rubyImageL = None
+        self.emeraldImageL = None
+        self.ironImageL = None
+        self.amethImageL = None
+        self.copperImageL = None
+
+
+        self.setupImages()
 
         self.tutorialsActive = False
         
@@ -77,6 +93,10 @@ class Game():
             mixer.music.play(100)
         elif songType == 'boss': # Add boss music to be played when facing a boss, perhaps use music Jose recommended? - Eddie
             pass
+        elif songType == 'death':
+            mixer.music.load('Music/Bleach_-_Never_meant_to_belong.mp3')
+            mixer.music.set_volume(0.070 * self.musicVol)
+            mixer.music.play(10)
         if songType.lower() == 'stop':
             mixer.music.stop()
 
@@ -88,6 +108,7 @@ class Game():
         if self.map == [-1, -1]:
             # 1, 1 : the map now exists from the list in settings.py
             self.map = [2, 1]
+            self.inventory = Inventory(self)
             for row in range(len(settings.currentTileMap[0])):
                 #print(f"{row} ", end="")   
                 for col in range(len(settings.currentTileMap[0][row])):
@@ -98,7 +119,11 @@ class Game():
                     elif (settings.currentTileMap[0][row])[col] == "S": # sapling
                         Block(self, col, row, 2)
                     elif (settings.currentTileMap[0][row])[col] == "R": # rock
-                        Block(self, col, row, 3)                                                                        
+                        Block(self, col, row, 3)
+                    elif (settings.currentTileMap[0][row])[col] == "C": # crossBridge
+                        WalkableBlock(self, col, row, 0)
+                    elif (settings.currentTileMap[0][row])[col] == "G": # growth
+                        WalkableBlock(self, col, row, 1)                                                                      
                     elif (settings.currentTileMap[0][row])[col] == "P": # player
                         self.player = Player(self, col, row, self.clock)
                     elif (settings.currentTileMap[0][row])[col] == "F": # flower
@@ -120,6 +145,7 @@ class Game():
             # kill all the current sprites in the current room
             self.all_sprites.empty()
             self.blocks.empty()
+            self.walk_blocks.empty()
             self.ground.empty()
             self.flowers.empty()
             self.ores.empty()
@@ -233,7 +259,9 @@ class Game():
             print('Current Map:')
             for i in currentTileMap[mapNumber]:
                 print(i)
-                     
+
+
+            self.all_sprites.add(self.inventory)         
             for row in range(len(settings.currentTileMap[mapNumber])):
                 #print(f"{row} ", end="")
                 for col in range(len(settings.currentTileMap[mapNumber][row])):
@@ -246,6 +274,10 @@ class Game():
                         Block(self, col, row, 2)
                     elif (settings.currentTileMap[mapNumber][row])[col] == "R": # rock
                         Block(self, col, row, 3)
+                    elif (settings.currentTileMap[mapNumber][row])[col] == "C": # crossBridge
+                        WalkableBlock(self, col, row, 0)
+                    elif (settings.currentTileMap[mapNumber][row])[col] == "G": # growth
+                        WalkableBlock(self, col, row, 1)
                     elif (settings.currentTileMap[mapNumber][row])[col] == "F": # flower
                         Flower(self, col, row, self.clock)
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'O': # ore
@@ -299,6 +331,7 @@ class Game():
         self.playing = True
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.blocks = pygame.sprite.LayeredUpdates()
+        self.walk_blocks = pygame.sprite.LayeredUpdates()
         self.ground = pygame.sprite.LayeredUpdates()
         self.flowers = pygame.sprite.LayeredUpdates()
         self.ores = pygame.sprite.LayeredUpdates()
@@ -328,10 +361,12 @@ class Game():
                     self.player.spearUsed = True
                 MeleeAttack(self, self.player.weapon, self.player)
             # Q is used to switch weapons for the player
-            if event.type == pygame.KEYUP and event.key == pygame.K_q and not self.player.itemUsed:
+            if event.type == pygame.KEYUP and event.key == pygame.K_q and not self.player.itemUsed and self.state == 'explore':
                 self.player.switchWeapons()
             if event.type == pygame.KEYUP and event.key == pygame.K_p:
                 self.pause()
+            if event.type == pygame.KEYUP and event.key == pygame.K_g and not self.player.itemUsed and self.state == 'explore': # keybind to heal, will have added functionality with potions in the inventoryy later
+                self.player.getHealth(200)
             if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 pygame.font.quit()
                 pygame.quit()
@@ -500,7 +535,44 @@ class Game():
             self.state = 'explore'
             self.play_music('village')
         pass
+    
 
+    def setupImages(self):
+        self.tileList = [[pygame.transform.scale(pygame.image.load('Sprites/tiles/crossBridge1.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/growth1.png').convert_alpha(),(TILESIZE, TILESIZE))],
+                         [pygame.transform.scale(pygame.image.load('Sprites/tiles/brick1.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/water1.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/sapling2.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/rock1.png').convert_alpha(),(TILESIZE, TILESIZE))]]
+        self.hyacinImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth3New.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth5.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        self.sunFloImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/sunflowernew.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/sunflower3New.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/sunflower5.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        self.silentFImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower3New.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower5.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        self.rubyImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby2.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby3.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby3.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        self.emeraldImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                         pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald2.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                         pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald3.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                         pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald3.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        self.copperImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                        pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper2.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                        pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper3.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                        pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper3.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        self.amethImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst2.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst3.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst3.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        self.ironImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreIron.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreIron2.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE))]
 
 
 
