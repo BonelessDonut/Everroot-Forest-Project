@@ -1240,8 +1240,8 @@ class Enemy(pygame.sprite.Sprite):
                 enemyPos = self.rect.center
                 dy = (playerPos[1] - enemyPos[1])
                 dx = (playerPos[0] - enemyPos[0])
-                print('dx', dx > 0)
-                print('dy', dy > 0)
+                print(dx)
+                print(dy)
                 if dx > 0:
                     angle = math.atan(-1*dy/dx)
                 elif dx < 0 and dy < 0:
