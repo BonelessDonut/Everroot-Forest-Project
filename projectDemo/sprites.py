@@ -894,7 +894,13 @@ class Enemy(pygame.sprite.Sprite):
         # pumpkinImgDown = [pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99)),
         #                  pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99))]
 
+        self.rangedImgL = [pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinRangedIdle.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99)),
+                           pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinRangedLeft.png').convert_alpha(), (TILESIZE *0.99, TILESIZE * 0.99)),
+                           pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinRangedRight.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99)),
+                           pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinRangedUp.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99))]
+
         self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 120, 'health': 100, 'speed': PLAYER_SPEED * 0.5}
+        self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 100, 'health': 80}
 
         self.imagelist = self.pumpkinRobot['down']
         #self.deathImgList = [pygame.transform.scale(pygame.image.load('').convert_alpha(), (self.width, self.height))]
@@ -922,6 +928,11 @@ class Enemy(pygame.sprite.Sprite):
             self.speed = self.pumpkinRobot['speed']
             self.damage = self.pumpkinRobot['damage']
             self.imagelist = self.pumpkinRobot['down']
+        if self.attackType == 'ranged':
+            self.imagelist = self.rangedPumpkin['image']
+            self.image = self.imagelist[self.imageIndex]
+            self.health = self.rangedPumpkin['health']
+            self.damage = self.rangedPumpkin['damage']
 
     def deathAnimation(self):
         pass
@@ -967,24 +978,26 @@ class Enemy(pygame.sprite.Sprite):
             return
 
     def animate(self):
-
-        if self.moving:
-            self.animationCount+= 1
-            if self.animationCount >= self.animationSpeed:
-                self.animationCount = 0
-           # for i in range(len(self.imagelist)):
-                #if self.animationCount < (self.animationSpeed // len(self.imagelist) * (i + 1)):
-                    #self.imageIndex = i
-                    #break
-            if self.animationCount < (self.animationSpeed // len(self.imagelist)):
-                self.imageIndex = 0
-            elif self.animationCount < (self.animationSpeed // len(self.imagelist) * 2):
-                self.imageIndex = 1
-            elif self.animationCount < (self.animationSpeed // len(self.imagelist) * 3):
-                self.imageIndex = 2
-            elif self.animationCount < (self.animationSpeed // len(self.imagelist) * 4):
-                self.imageIndex = 3
-            self.image = self.imagelist[self.imageIndex]
+        if self.attackType != 'ranged':
+            if self.moving:
+                self.animationCount+= 1
+                if self.animationCount >= self.animationSpeed:
+                    self.animationCount = 0
+               # for i in range(len(self.imagelist)):
+                    #if self.animationCount < (self.animationSpeed // len(self.imagelist) * (i + 1)):
+                        #self.imageIndex = i
+                        #break
+                if self.animationCount < (self.animationSpeed // len(self.imagelist)):
+                    self.imageIndex = 0
+                elif self.animationCount < (self.animationSpeed // len(self.imagelist) * 2):
+                    self.imageIndex = 1
+                elif self.animationCount < (self.animationSpeed // len(self.imagelist) * 3):
+                    self.imageIndex = 2
+                elif self.animationCount < (self.animationSpeed // len(self.imagelist) * 4):
+                    self.imageIndex = 3
+                self.image = self.imagelist[self.imageIndex]
+        else:
+            pass
         self.flicker()
 
     #Authored: Max Chiu 4/18/2024
@@ -1014,6 +1027,7 @@ class Enemy(pygame.sprite.Sprite):
                 self.searchPlayer()
             self.animate()
             self.attack()
+
 
             if self.state == 'standing':
                 self.yChange = 0
@@ -1231,7 +1245,7 @@ class Enemy(pygame.sprite.Sprite):
         return False
     
     def attack(self):
-        if self.attackType == 'melee' and pygame.sprite.collide_rect(self, self.game.player):
+        if pygame.sprite.collide_rect(self, self.game.player):
             self.game.player.getDamage(self.damage)
         elif self.attackType == 'ranged': ### MAX !!!
             self.timepassed += self.clock.get_time()/1000
@@ -1248,7 +1262,11 @@ class Enemy(pygame.sprite.Sprite):
                     angle = math.pi - math.atan(dy/dx)
                 elif dx < 0 and dy > 0:
                     angle = math.pi + math.atan(-1*dy/dx)
-                items.Bullet(self.game, self.x, self.y, angle, 1000, 100, 'enemy')
+                try:
+                    print(angle)
+                    items.Bullet(self.game, self.x, self.y, angle, 1000, self.damage, 'enemy')
+                except UnboundLocalError:
+                    pass
                 self.timepassed = 0
             
 
