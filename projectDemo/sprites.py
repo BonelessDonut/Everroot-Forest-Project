@@ -817,8 +817,9 @@ class NPC(pygame.sprite.Sprite):
 #Authored by Max Chiu 4/16/2024
 class Enemy(pygame.sprite.Sprite):
 
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, attackType):
         self.game = game
+        self.clock = self.game.clock
         self.map = currentTileMap[mapList[self.game.map[0]][self.game.map[1]]]
         self._layer = ENEMY_LAYER
         self.groups = self.game.all_sprites, self.game.enemies
@@ -829,6 +830,8 @@ class Enemy(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
         self.type = 'pumpkinRobot'
+        self.attackType = attackType
+        self.timepassed = 0
 
         self.health = 100
         self.damage = 120
@@ -841,6 +844,7 @@ class Enemy(pygame.sprite.Sprite):
         self.stunned = False
         self.stunCount = 0
         self.stunTimer = 8
+        self.attackTimer = 2
 
         self.name = 'Udibudibudib'
 
@@ -850,11 +854,18 @@ class Enemy(pygame.sprite.Sprite):
         self.moving = False
         self.facingDirection = 'down'
 
-        self.pumpkinImgDown = [
-            pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99)),
-            pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99)),
-            pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99)),
-            pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99))]
+        if self.attackType == 'melee':
+            self.pumpkinImgDown = [
+                pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99)),
+                pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99)),
+                pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99)),
+                pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99))]
+        else:
+            self.pumpkinImgDown = [
+                pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99)),
+                pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99)),
+                pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99)),
+                pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99))]
         # pumpkinImgDown = [pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99)),
         #                  pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99))]
 
@@ -973,7 +984,8 @@ class Enemy(pygame.sprite.Sprite):
         # if change:
         #     self.xChange, self.yChange = change[0]*self.speed, change[1]*self.speed
         if self.game.state != 'dialogue' and self.game.state != 'scene' and self.game.state != 'pause' and self.game.state != 'game over':
-            self.searchPlayer()
+            if self.attackType == 'melee':
+                self.searchPlayer()
             self.animate()
             self.attack()
 
@@ -1193,8 +1205,26 @@ class Enemy(pygame.sprite.Sprite):
         return False
     
     def attack(self):
-        if pygame.sprite.collide_rect(self, self.game.player):
+        if self.attackType == 'melee' and pygame.sprite.collide_rect(self, self.game.player):
             self.game.player.getDamage(self.damage)
+        elif self.attackType == 'ranged':
+            self.timepassed += self.clock.get_time()/1000
+            if self.timepassed > self.attackTimer:
+                playerPos = self.game.player.rect.center
+                enemyPos = self.rect.center
+                dy = (playerPos[1] - enemyPos[1])
+                dx = (playerPos[0] - enemyPos[0])
+                print('dx', dx > 0)
+                print('dy', dy > 0)
+                if dx > 0:
+                    angle = math.atan(-1*dy/dx)
+                elif dx < 0 and dy < 0:
+                    angle = math.pi - math.atan(dy/dx)
+                elif dx < 0 and dy > 0:
+                    angle = math.pi + math.atan(-1*dy/dx)
+                items.Bullet(self.game, self.x, self.y, angle, 1000, 100, 'enemy')
+                self.timepassed = 0
+            
 
 class Pathfinder:
     

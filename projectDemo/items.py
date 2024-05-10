@@ -90,7 +90,7 @@ class Weapon(pygame.sprite.Sprite):
             #After the first shot of each burst here, the other 2 bubbles are shot in the update method
             self.updateLocation()
             if self.type == 'bubble' and self.ammo > 0 and self.ammo % 3 == 0:
-                Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage)
+                Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage, 'player')
                 self.ammo -= 1
                 self.timer = self.pause
 
@@ -109,7 +109,7 @@ class Weapon(pygame.sprite.Sprite):
         
         #To space out the bubble shots by burstTime
         if self.ammo % 3 == 2 and -1*self.burstTime < self.timer - self.pause < 0 or self.ammo % 3 == 1 and -2*self.burstTime < self.timer - self.pause < -1*self.burstTime:
-            Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage)
+            Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage, 'player')
             self.ammo -= 1
             pygame.mixer.Channel(1).set_volume(0.09 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/shooting-sound-fx-159024.mp3'))
@@ -166,7 +166,7 @@ class Weapon(pygame.sprite.Sprite):
     
 #Author: Max Chiu 4/10/24
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, angle, range, damage):
+    def __init__(self, game, x, y, angle, range, damage, side):
         self.game = game
         self.clock = game.clock
         self.timepassed = 0
@@ -177,7 +177,11 @@ class Bullet(pygame.sprite.Sprite):
         self.y = y
         self.width = TILESIZE/1.5
         self.height = TILESIZE/1.5
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/items/bubble.png'), (self.width, self.height))
+        self.side = side
+        if self.side == 'player':
+            self.image = pygame.transform.scale(pygame.image.load('Sprites/items/bubble.png'), (self.width, self.height))
+        else: #if it's an enemy bullet
+            self.image = pygame.transform.scale(pygame.image.load('Sprites/items/bubbleStream7.png'), (self.width, self.height))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
@@ -206,15 +210,24 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
             self.timepassed = 0
 
+        if self.side == 'player':
+            enemyIndex = self.rect.collidelist(list(enemy.rect for enemy in self.game.enemies))
+            if enemyIndex != -1:
+                self.timepassed += self.clock.get_time()
 
-        enemyIndex = self.rect.collidelist(list(enemy.rect for enemy in self.game.enemies))
-        if enemyIndex != -1:
-            self.timepassed += self.clock.get_time()
+                if self.timepassed > 50:
+                    self.game.enemies.get_sprite(enemyIndex).dealtDamage(self.damage, 'bubble')
+                    self.kill()
+                    self.timepassed = 0
+        else:
+            playerHit = pygame.Rect.colliderect(self.rect, self.game.player.rect)
+            if playerHit:
+                self.timepassed += self.clock.get_time()
 
-            if self.timepassed > 50:
-                self.game.enemies.get_sprite(enemyIndex).dealtDamage(self.damage, 'bubble')
-                self.kill()
-                self.timepassed = 0
+                if self.timepassed > 50:
+                    self.game.player.getDamage(self.damage)
+                    self.kill()
+                    self.timepassed = 0
 
 
             

@@ -107,8 +107,10 @@ class Game():
                         Ore(self, col, row, self.clock)
                     elif (settings.currentTileMap[0][row])[col] == 'N': # NPC
                         NPC(self, col, row)
-                    elif (settings.currentTileMap[0][row])[col] == 'E': # enemy
-                        Enemy(self, col, row)
+                    elif (settings.currentTileMap[0][row])[col] == 'E': # melee enemy
+                        Enemy(self, col, row, 'melee')
+                    elif (settings.currentTileMap[0][row])[col] == 'D': # ranged enemy
+                        Enemy(self, col, row, 'ranged')
                     elif (settings.currentTileMap[0][row])[col] == 'T': # teleport/door
                         Teleport(self, col, row)
                     #print(f"{col}", end="")
@@ -250,8 +252,10 @@ class Game():
                         Ore(self, col, row, self.clock)
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'N': # NPC
                         NPC(self, col, row)
-                    elif (settings.currentTileMap[mapNumber][row])[col] == 'E': # enemy
-                        Enemy(self, col, row)
+                    elif (settings.currentTileMap[mapNumber][row])[col] == 'E': # melee enemy
+                        Enemy(self, col, row, 'melee')
+                    elif (settings.currentTileMap[mapNumber][row])[col] == 'D': # ranged enemy
+                        Enemy(self, col, row, 'ranged')
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'T': # teleport door
                         # teleports the player's position on the screen when they move rooms
                         Teleport(self, col, row)
