@@ -1505,9 +1505,24 @@ class Inventory(pygame.sprite.Sprite):
         self.slots[item] =  self.slots.get(item) + 1
         for image in self.numList:
             pygame.draw.rect(self.image, BLACK, image)
-        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('flower')),False,(WHITE)),(60,53)))
-        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('ore')),False,(WHITE)),(125,53)))
-        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(190,53)))
+        flowerX = 60
+        oreX = 125
+        potionX = 190
+        if self.slots.get('flower') > 9:
+            flowerX = 55
+            self.numList.append(self.image.blit(self.font.render(str(self.slots.get('flower')),False,(WHITE)),(flowerX,53)))
+        else:
+            self.numList.append(self.image.blit(self.font.render(str(self.slots.get('flower')),False,(WHITE)),(flowerX,53)))
+        if self.slots.get('ore') > 9:
+            oreX = 120
+            self.numList.append(self.image.blit(self.font.render(str(self.slots.get('ore')),False,(WHITE)),(oreX,53)))
+        else:
+            self.numList.append(self.image.blit(self.font.render(str(self.slots.get('ore')),False,(WHITE)),(oreX,53)))
+        if self.slots.get('potion') > 9:
+            potionX = 185
+            self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(potionX,53)))
+        else:
+            self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(potionX,53)))
 class Tutorial:
     def __init__(self, game):
         self.game = game
