@@ -1206,23 +1206,41 @@ class Inventory(pygame.sprite.Sprite):
         self._layer = TEXT_LAYER
         self.groups = self.game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
+        self.hotbar_img = [pygame.transform.scale(pygame.image.load('Sprites/items/sunflowernew.png').convert_alpha(), (TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst.png').convert_alpha(), (TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/potion.png').convert_alpha(), (TILESIZE, TILESIZE))]
+
 
         self.x = 1*TILESIZE
-        self.y = 10.5*TILESIZE
-        self.width = 6*TILESIZE
-        self.height = 13*TILESIZE
+        self.y = 15.5*TILESIZE
+        self.width = 5.5*TILESIZE
+        self.height = 2.5*TILESIZE
 
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/hudImages/pixil-frame-0 (1).png'), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/hudImages/pixil-frame-0_cropped.png'), (self.width, self.height))
         #self.image.fill(RED)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
 
+        self.font = pygame.font.SysFont("Calibri", 20)
         self.slots = {"flower":0, "ore":0, "potion": 0}
+
+        for i in range(len(self.hotbar_img)):
+            self.image.blit(self.hotbar_img[i], pygame.Rect(25+65*(i),30,0,0))
+
+        self.numList = []
+        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('flower')),False,(WHITE)),(60,53)))
+        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('ore')),False,(WHITE)),(125,53)))
+        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(190,53)))
 
     def add_item(self, item):
         self.slots[item] =  self.slots.get(item) + 1
+        for image in self.numList:
+            pygame.draw.rect(self.image, BLACK, image)
+        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('flower')),False,(WHITE)),(60,53)))
+        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('ore')),False,(WHITE)),(125,53)))
+        self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(190,53)))
 class Tutorial:
     def __init__(self, game):
         self.game = game
