@@ -900,7 +900,7 @@ class Enemy(pygame.sprite.Sprite):
                            pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinRangedUp.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99))]
 
         self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 120, 'health': 100, 'speed': PLAYER_SPEED * 0.5}
-        self.rangedPumpkin = {'image': self.rangedImgL}
+        self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 100, 'health': 80}
 
         self.imagelist = self.pumpkinRobot['down']
         #self.deathImgList = [pygame.transform.scale(pygame.image.load('').convert_alpha(), (self.width, self.height))]
@@ -931,6 +931,8 @@ class Enemy(pygame.sprite.Sprite):
         if self.attackType == 'ranged':
             self.imagelist = self.rangedPumpkin['image']
             self.image = self.imagelist[self.imageIndex]
+            self.health = self.rangedPumpkin['health']
+            self.damage = self.rangedPumpkin['damage']
 
     def deathAnimation(self):
         pass
@@ -1243,7 +1245,7 @@ class Enemy(pygame.sprite.Sprite):
         return False
     
     def attack(self):
-        if self.attackType == 'melee' and pygame.sprite.collide_rect(self, self.game.player):
+        if pygame.sprite.collide_rect(self, self.game.player):
             self.game.player.getDamage(self.damage)
         elif self.attackType == 'ranged': ### MAX !!!
             self.timepassed += self.clock.get_time()/1000
@@ -1260,7 +1262,11 @@ class Enemy(pygame.sprite.Sprite):
                     angle = math.pi - math.atan(dy/dx)
                 elif dx < 0 and dy > 0:
                     angle = math.pi + math.atan(-1*dy/dx)
-                items.Bullet(self.game, self.x, self.y, angle, 1000, 100, 'enemy')
+                try:
+                    print(angle)
+                    items.Bullet(self.game, self.x, self.y, angle, 1000, self.damage, 'enemy')
+                except UnboundLocalError:
+                    pass
                 self.timepassed = 0
             
 
