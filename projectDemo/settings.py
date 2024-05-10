@@ -9,14 +9,18 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 GRAY = (128, 128, 128)
+WHITE = (255, 255, 255)
+ORANGE = (255, 200, 120)
+SWAMPGREEN = (114, 134, 57)
 
 FPS = 60
 
-TEXT_LAYER = 5
-ITEM_LAYER = 3
-PLAYER_LAYER = 2
+TEXT_LAYER = 6
+ITEM_LAYER = 4
+PLAYER_LAYER = 3
+ENEMY_LAYER = 2
 PLAYER_SPEED = 4
-BLOCK_LAYER = 4
+BLOCK_LAYER = 5
 GROUND_LAYER = 1
 UNMADE_ROOM = -1
 
@@ -32,15 +36,15 @@ mapList = [[-1, -1, -1, -1, -1, -1, -1, -1, -1, -2, -2, -3, -1,],
 #There are 32 horizontal tiles (width of 1280 / 40) and 18 vertical tiles (height of 720 / 40))
 currentTileMap = [[ #index 0
     'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBB1',
-    'BF.............................B',
-    'B..........BBBB................B',
-    'B.........BBF.BB......O........B',
-    'B.........BB..BB...............B',
+    'B..R...........................B',
+    'B.R.R..........................B',
+    'B.R.R..........................B',
+    'B..R...........................B',
     'B..............................B',
     'B...F..............B.B.........B',
-    'B..............................B',
-    'T.....BBBBBBB..................T',
-    'T...............P......N.......T',
+    'B.................N............B',
+    'T..............................T',
+    'T...............P..............T',
     'B..............................B',
     'B.......O.....F...........O....B',
     'B....................F.........B',
@@ -51,16 +55,16 @@ currentTileMap = [[ #index 0
     'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBB'
 ], [ #index 1
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB2',
-    'BB.............................B',
     'B..............................B',
-    'B.........BBF.BB......O........B',
-    'B.........BB..BB...............B',
-    'B..........BBBB................B',
+    'B.R............................B',
+    'B.R.......BBF.BB......O........B',
+    'B.R.......BB..BB...............B',
+    'B.R........BBBB................B',
     'B...F..............B.B.........B',
-    'B.......B....N.................B',
-    'T.......B......................T',
-    'T.......B......................T',
-    'B.......B......................B',
+    'B............N.................B',
+    'T..............................T',
+    'T..............................T',
+    'B..............................B',
     'B.......O.................O....B',
     'B....................F.........B',
     'B.......F......................B',
@@ -70,15 +74,15 @@ currentTileMap = [[ #index 0
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ], [#index 2
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB3',
-    'BBB............................B',
-    'B..............................B',
-    'B.........BBF.BB......O........B',
-    'B.........BB..BB......N........B',
-    'B..............................B',
-    'B..............................B',
+    'B..RR..........................B',
+    'B.R..R.........................B',
+    'B...R.....BBF.BB......O........B',
+    'B..R......BB..BB......N........B',
+    'B.RRRR.........................B',
     'B.......B........B.............B',
     'B.......B........B.............B',
-    'B.......B........B.............B',
+    'B..............................B',
+    'B..............................B',
     'B..............................B',
     'B....O..............O.....F....B',
     'B.....O............O...........B',
@@ -190,7 +194,7 @@ purpleRandomRooms = [[
     'B..............................B',
     'B....B.........B..........B....B',
     'B............BB.BB.............B',
-    'B.......B.............B........B',
+    'B.......B.............B.......B',
     'B.......BB..E.....E..BB........B',
     'B....E..BB...........BB..E.....B',
     'B........B....B.B....B.........B',
@@ -243,26 +247,161 @@ purpleRandomRooms = [[
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ]]
 
-greenRandomRooms = []
+#Authored by Charlenne Tan 4/27/2024
+# B = block/wall | W = water | F = flower | P = path/bridge | S = stone/rock
+greenRandomRooms = [[ # 0: water swirl room
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BWWWWWWWWWWWWW.......FFWWWWWWWWB',
+    'BWWWWWWWWF............FFWWWWWWWB',
+    'BWWWWWWFF..............FFFFWWWWB',
+    'BWW............FWWFFF...FFFWWWWB',
+    'BFF........CCCCWWWWWWF...FFFWWWB',
+    'B..........CCCCCCWWWWW.....FWWWB',
+    'B........FFWWCCCCCWWWWWF....WWWB',
+    'B.......FFWWWWWCCCCWWWWW....CCCB',
+    'B......FWWWWWWWCCCCCWWWF...CCCCB',
+    'B.....FWWWWWFFFCCCCCCWWF...CFWWB',
+    'B.....FWWWWFNFF.WWCCCCFFF..FFWWB',
+    'BW...FFFWWWWWFFFFWWWCCCC....FWWB',
+    'BW..FFFFWWWWWFFFWFWWWCCC....FFWB',
+    'BWWFFFFFFWWWWWWWWWWWFFCC.....FFB',
+    'BWWWWWWWWWWWWWWWWFFFFFF......FFB',
+    'BWWWWWWWWWWWWWWFFFFF.......FFFFB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
+    ],[ # 1: balance room
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBBBFF....................BBBBB',
+    'BBBFFF...BBBB.............FFFBBB',
+    'BBFF...BB.....B.....BBBBBFFF..BB',
+    'BF...BB.....BB.....B.....BB....B',
+    'B...B......BFF....B........B...B',
+    'B...B.....BFF....B...N......B..B',
+    'B..B......BFF....B..........B..B',
+    'B..B.......BBF....B.........B..B',
+    'B..B.........B.....BB.......B..B',
+    'B..B..........B......B......B..B',
+    'B...B.....N...B......B.....B...B',
+    'B...B........B......B......B...B',
+    'B....BB.....B.....BB.....BB...FB',
+    'BB..FFFBBBBB.....B.....BB...FFBB',
+    'BBBFFF.............BBBB...FFFBBB',
+    'BBBBB....................FFBBBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
+    ],[ # 2: stone walls room
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BRRRB.FFFRRRB....RR..BBRRRRRRF.B',
+    'BRRBB..FFRRB......R....BRRRFFF.B',
+    'BRRB..NFRRBF......BR....BR..NFRB',
+    'BRRB....RRBFFFFF...BR....B..FRRB',
+    'B.RB....RRBRRRFFF...RR.......RBB',
+    'B.RRB..RRRRRRRRRR...........RB.B',
+    'B.RRB..RFRRRRBRRRR..........RB.B',
+    'B..R....FFFRRBBB......RR...RB..B',
+    'B..R.....FRRB.......RRRR...B...B',
+    'B..R......RRB....RRRRRFF..RB...B',
+    'B....R....RB...RRRRRFFF...RB...B',
+    'BFF..RB..RB.....RBBRRFF..RB....B',
+    'BFFRRRB..R.........BRRF.......FB',
+    'BFRRRB......RR......BR.......FFB',
+    'B.RRRB....BRR.......FFR...RRRFFB',
+    'B.RRB....BRR.......FFFFR...RRRRB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
+    ],[ # 3: rocky caves room
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBR...RWWWWR..........RRRWWWWWB',
+    'BBR.....RWWR..............RRWWWB',
+    'BBR.....RWR...........RR....RRWB',
+    'BR.......R...........RRRR....RRB',
+    'B...................RWWWR.....RB',
+    'B.........RRRRR....RRWWWR......B',
+    'B.......RR....RRR.FRRWWR.......B',
+    'B.....RR...N.....FFFFRRR.......B',
+    'B....FFRR.......F...F.R........B',
+    'B.....FFFRR...RR......R........B',
+    'B.......FFFRRR........R........B',
+    'B.........FF...................B',
+    'BR...........................FRB',
+    'BRRW....R..RRRR...........FFRRBB',
+    'BRRWWWWWRRRRR..........FFFFRRRBB',
+    'BBRRWWWWWRRR.........FFFFRRRRBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
+    ],[ # 4: forest room
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BGF......FGGG......GGGGRRGG....B',
+    'BFGF..S.FGGSGGF......FGGRGFF...B',
+    'B.GG....FFFFFF........FGGFF....B',
+    'B.....GG......G.........F..S...B',
+    'B.....GG......G..............FGB',
+    'B....GGG...FGGGG............FFFB',
+    'B...FGRRF.FFGRGGG.....GG.......B',
+    'B...GGGF...FFFGGG...SGGG.......B',
+    'B..............NR..GGGRGG......B',
+    'B...........GG......FFRRG......B',
+    'BG.S.......GGGG......FFFGN.....B',
+    'BGG......GGGRRGF...G...FFF...SGB',
+    'BGGFF...FFGGFFFF..GGG.......FGGB',
+    'BGGGF.....S.......GRGG.....FFGRB',
+    'BRGGGFF.........FGGRGGF....FGGGB',
+    'BRGGGGF.S........FGRRGGF..FFFFFB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
+    ],[ # 5: deforestation room
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'B.............B.........SSSSSGGB',
+    'B..........GG.B........GGGGSSGGB',
+    'B..G..G...G..GB....S.....GGGGG.B',
+    'B..G..G...GGGGB.GSSGG..........B',
+    'B..G.G....GG..B.GSSGG.S........B',
+    'B..G.....G....B.GSGG.SSS.......B',
+    'BBBBBBBBBBBBBBB.GGG..GSSSGG....B',
+    'B...........GGS.GG...GGGSSG....B',
+    'BG..........GGSS.......GGGG....B',
+    'BGG........S.GGSG..............B',
+    'BSSG....GGSSG.GGG.GSSGG.......GB',
+    'BSSG....GSSGG.....GSSSG......G.B',
+    'BSG.....GGGG.......GSSG......GGB',
+    'BGGGSSGG...........GGGG...N.GGSB',
+    'BG.GGSSG...................GGSSB',
+    'B.G.GGGG...GG..............GSSSB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
+    ]]
 
+redMap = [
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'B..............................B',
+    'B....BBB...BB...BB...BB........B',
+    'B....B..B.B..B.B....B..........B',
+    'B....BBB..B..B..BB...BB........B',
+    'B....B..B.B..B....B....B.......B',
+    'B....BBB...BB...BB...BB........B',
+    'B..............................B',
+    'B....RR...BB....BB...B.....B...B',
+    'B....R.R.B..B..B..B..B.B.B.B..B',
+    'B....RR..B..B..B..B..B..B..B...B',
+    'B....R.R..BB....BB...B.....B...B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB']
 
 #Room template
 template = [
-'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
-'B..............................B',
-'B..............................B',
-'B..............................B',
-'B..............................B',
-'B..............................B',
-'B..............................B',
-'B..............................B',
-'B..............................B',
-'B..............................B',
-'B..............................B',
-'B..............................B',
-'B..............................B',
-'B..............................B',
-'B..............................B',
-'B..............................B',
-'B..............................B',
-'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB']
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'B..............................B',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB']

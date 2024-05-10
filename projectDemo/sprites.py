@@ -10,6 +10,7 @@ import os
 class Player(pygame.sprite.Sprite):
     itemUsed = False
 
+
     def __init__(self, game, x, y, clock):
         self.game = game
         self._layer = PLAYER_LAYER
@@ -25,9 +26,11 @@ class Player(pygame.sprite.Sprite):
         self.weaponNum = 0
         self.weapon = items.Weapon(self.game, self.weaponList[self.weaponNum], self)
         self.weaponAnimationCount = 0
-        self.weaponAnimationSpeed = 18
+        self.weaponAnimationSpeed = 15
         self.swordUsed = False
         self.spearUsed = False
+
+        self.tutorial = Tutorial(self.game)
 
         self.mouseRect = pygame.Rect(0, 0, 40, 40)
         self.mouseRect.center = pygame.mouse.get_pos()
@@ -38,46 +41,134 @@ class Player(pygame.sprite.Sprite):
         self.imgindex = 0
         self.facing = 'down'
 
+        self.walkingList = [pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/03_Step_grass_03.wav')]
+        self.walkSoundNum = 0
+        self.walkingSound = self.walkingList[self.walkSoundNum]
+        # attribute to be used with the checkIdle function and used to regulate when the walking sound is played.
+        # the walking sound should be played on a timer when the player's movement state is 'moving'
+        self.movementState = 'idle'
+        self.idleThreshold = 4
+        self.idleTimer = self.idleThreshold
+        self.walkSoundPlaying = False
+
+
+
+        self.maxHealth = self.game.startPlayerMaxHealth
+        self.targetHealth = self.game.priorPlayerHealth
+        self.currentHealth = self.targetHealth
+        #self.currentHealth = self.game.priorPlayerHealth
+        self.maxHealthBarLength = 320
+        self.healthBarHeight = 20
+        self.healthRatio = self.maxHealth / self.maxHealthBarLength
+        self.healthChangeSpeed = 12
+        self.transitionWidth = 0
+        self.transitionColor = (255, 0, 0)
+        self.health_bar_rect = pygame.Rect(10, 10, self.currentHealth / self.healthRatio - 3, self.healthBarHeight)
+        self.transition_bar_rect = pygame.Rect(self.health_bar_rect.right, 10, self.transitionWidth, self.healthBarHeight)
+        self.hitInvulnerable = False
+        self.hitInvulnerableTime = 0
+        self.invulnerableTimer = 50
+
         #Shows the file paths for each image, depending on which direction the player is facing
-        self.rightImgList = ['Sprites/protag/protagLattern(1).png', 'Sprites/protag/protagLatternAlt(2).png', 'Sprites/protag/protagblobRight3.png', 'Sprites/protag/protagLatternAlt(2).png']
-        self.leftImgList = ['Sprites/protag/protagBlobLeft.png', 'Sprites/protag/protagBlobLeftAlt.png', 'Sprites/protag/protagBlobLeft3.png', 'Sprites/protag/protagBlobLeftAlt.png']
-        self.upImgList = ['Sprites/protag/protagBlobUpAlt.png', 'Sprites/protag/protagBlobUpLeftAlt.png', 'Sprites/protag/protagBlobUpAlt.png', 'Sprites/protag/protagBlobUpRight.png']
-        self.downImgList = ['Sprites/protag/protagBlobDownNew.png', 'Sprites/protag/protagBlobDownLeftAlt.png', 'Sprites/protag/protagBlobDownNew.png', 'Sprites/protag/protagBlobDownRightAltNew.png',]
+        self.rightImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagLattern(1).png').convert_alpha(), (self.width, self.height)),
+                             pygame.transform.scale(pygame.image.load('Sprites/protag/protagLatternAlt(2).png').convert_alpha(), (self.width, self.height)),
+                             pygame.transform.scale(pygame.image.load('Sprites/protag/protagblobRight3.png').convert_alpha(), (self.width, self.height)),
+                             pygame.transform.scale(pygame.image.load('Sprites/protag/protagLatternAlt(2).png').convert_alpha(), (self.width, self.height))]
+        self.leftImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobLeft.png').convert_alpha(), (self.width, self.height)),
+                            pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobLeftAlt.png').convert_alpha(), (self.width, self.height)),
+                            pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobLeft3.png').convert_alpha(), (self.width, self.height)),
+                            pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobLeftAlt.png').convert_alpha(), (self.width, self.height))]
+        self.upImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobUpAlt.png').convert_alpha(), (self.width, self.height)),
+                          pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobUpLeftAlt.png').convert_alpha(), (self.width, self.height)),
+                          pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobUpAlt.png').convert_alpha(), (self.width, self.height)),
+                          pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobUpRight.png').convert_alpha(), (self.width, self.height))]
+        self.downImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobDownNew.png').convert_alpha(), (self.width, self.height)),
+                            pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobDownLeftAlt.png').convert_alpha(), (self.width, self.height)),
+                            pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobDownNew.png').convert_alpha(), (self.width, self.height)),
+                            pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobDownRightAltNew.png').convert_alpha(), (self.width, self.height))]
 
         #READ ME, ADD SPRITES FOR CUTTING WHILE FACING OTHER DIRECTIONS THAN RIGHT
-        self.cutRightImgList = ['Sprites/protag/protagCut.png', 'Sprites/protag/protagCutRed.png', 'Sprites/protag/protagCutBlue.png', 'Sprites/protag/protagCutPlat.png']
-        self.cutLeftImgList = ['Sprites/protag/protagCutLeft.png', 'Sprites/protag/protagCutRedLeft.png', 'Sprites/protag/protagCutBlueLeft.png', 'Sprites/protag/protagCutPlatLeft.png']
-        self.cutUpImgList = ['Sprites/protag/protagCutUp.png', 'Sprites/protag/protagCutRedUp.png', 'Sprites/protag/protagCutBlueUp.png', 'Sprites/protag/protagCutPlatUp.png']
-        self.cutDownImgList = ['Sprites/protag/protagCutDown.png', 'Sprites/protag/protagCutRedDown.png', 'Sprites/protag/protagCutBlueDown.png', 'Sprites/protag/protagCutPlatDown.png']
+        self.cutRightImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagCut.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                                pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutRed.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                                pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutBlue.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                                pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutPlat.png').convert_alpha(), (self.width * 1.06, self.height * 1.06))]
+        self.cutLeftImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutLeft.png').convert_alpha()   , (self.width * 1.06, self.height * 1.06)),
+                               pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutRedLeft.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                               pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutBlueLeft.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                               pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutPlatLeft.png').convert_alpha(), (self.width * 1.06, self.height * 1.06))]
+        self.cutUpImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutUp.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                             pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutRedUp.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                             pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutBlueUp.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                             pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutPlatUp.png').convert_alpha(), (self.width * 1.06, self.height * 1.06))]
+        self.cutDownImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutDown.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                               pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutRedDown.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                               pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutBlueDown.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                               pygame.transform.scale(pygame.image.load('Sprites/protag/protagCutPlatDown.png').convert_alpha(), (self.width * 1.06, self.height * 1.06))]
         self.cutUpgrade = 0
 
 
         #READ ME, ADD SPRITES FOR MINING WHILE FACING OTHER DIRECTIONS THAN RIGHT
-        self.mineRightImgList = ['Sprites/protag/protagMine.png', 'Sprites/protag/protagMineRed.png', 'Sprites/protag/protagMineBlue.png', 'Sprites/protag/protagMinePlat.png']
-        self.mineLeftImgList = ['Sprites/protag/protagMineLeft.png', 'Sprites/protag/protagMineRedLeft.png', 'Sprites/protag/protagMineBlueLeft.png', 'Sprites/protag/protagMinePlatLeft.png']
-        self.mineUpImgList = ['Sprites/protag/protagMineUp.png', 'Sprites/protag/protagMineRedUp.png','Sprites/protag/protagMineBlueUp.png', 'Sprites/protag/protagMinePlatUp.png']
-        self.mineDownImgList = ['Sprites/protag/protagMineDown.png', 'Sprites/protag/protagMineRedDown.png','Sprites/protag/protagMineBlueDown.png', 'Sprites/protag/protagMinePlatDown.png']
+        self.mineRightImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagMine.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                                 pygame.transform.scale(pygame.image.load('Sprites/protag/protagMineRed.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                                 pygame.transform.scale(pygame.image.load('Sprites/protag/protagMineBlue.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                                 pygame.transform.scale(pygame.image.load('Sprites/protag/protagMinePlat.png').convert_alpha(), (self.width * 1.06, self.height * 1.06))]
+        self.mineLeftImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagMineLeft.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                                pygame.transform.scale(pygame.image.load('Sprites/protag/protagMineRedLeft.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                                pygame.transform.scale(pygame.image.load('Sprites/protag/protagMineBlueLeft.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                                pygame.transform.scale(pygame.image.load('Sprites/protag/protagMinePlatLeft.png').convert_alpha(), (self.width * 1.06, self.height * 1.06))]
+        self.mineUpImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagMineUp.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                              pygame.transform.scale(pygame.image.load('Sprites/protag/protagMineRedUp.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                              pygame.transform.scale(pygame.image.load('Sprites/protag/protagMineBlueUp.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                              pygame.transform.scale(pygame.image.load('Sprites/protag/protagMinePlatUp.png').convert_alpha(), (self.width * 1.06, self.height * 1.06))]
+        self.mineDownImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagMineDown.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                                pygame.transform.scale(pygame.image.load('Sprites/protag/protagMineRedDown.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                                pygame.transform.scale(pygame.image.load('Sprites/protag/protagMineBlueDown.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
+                                pygame.transform.scale(pygame.image.load('Sprites/protag/protagMinePlatDown.png').convert_alpha(), (self.width * 1.06, self.height * 1.06))]
         self.mineUpgrade = 0
 
-        self.rangedWeaponList = [pygame.image.load('Sprites/protag/protagRangedRight.png'), pygame.image.load('Sprites/protag/protagRangedDown.png'), pygame.image.load('Sprites/protag/protagRangedUp.png')]
+        self.rangedWeaponList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagRangedRight.png').convert_alpha(), (self.width, self.height)),
+                                 pygame.transform.scale(pygame.image.load('Sprites/protag/protagRangedDown.png').convert_alpha(), (self.width, self.height)),
+                                 pygame.transform.scale(pygame.image.load('Sprites/protag/protagRangedUp.png').convert_alpha(), (self.width, self.height))]
         self.rangedWeaponList.append(pygame.transform.flip(self.rangedWeaponList[0], True, False))
+
+        self.swingUpList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingUp.png').convert_alpha(), (self.width, self.height)),
+                            pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingUp2.png').convert_alpha(), (self.width, self.height)),
+                            pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingUp3.png').convert_alpha(), (self.width, self.height))]
+        self.swingDownList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown.png').convert_alpha(), (self.width, self.height)),
+                              pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown2.png').convert_alpha(), (self.width, self.height)),
+                              pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown3.png').convert_alpha(), (self.width, self.height))]
+
+        self.swingLeftList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingLeft.png').convert_alpha(), (self.width, self.height)),
+                              pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingLeft2.png').convert_alpha(), (self.width, self.height)),
+                              pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingLeft3.png').convert_alpha(), (self.width, self.height))]
+        self.swingRightList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingRight.png').convert_alpha(), (self.width, self.height)),
+                               pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingRight2.png').convert_alpha(), (self.width, self.height)),
+                               pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingRight3.png').convert_alpha(), (self.width, self.height))]
+        self.pokeList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagThrowUp.png').convert_alpha(), (self.width, self.height)),
+                         pygame.transform.scale(pygame.image.load('Sprites/protag/protagThrowDown.png').convert_alpha(),(self.width, self.height)),
+                         pygame.transform.scale(pygame.transform.flip(pygame.image.load('Sprites/protag/protagThrowRight.png').convert_alpha(), True, False),(self.width, self.height)),
+                         pygame.transform.scale(pygame.image.load('Sprites/protag/protagThrowRight.png').convert_alpha(),(self.width, self.height))]
 
         self.clock = clock
         self.timepassed = 0
 
-        self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]).convert_alpha(), (self.width, self.height))
+        self.image = self.downImgList[self.imgindex]
         
 
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
+        #self.rect = self.image.get_rect()
         #Below line is to decrease the rectangle collision slightly
         #Was having trouble fitting in 1 tile gaps
-        #self.rect = pygame.Rect(self.x, self.y, 30, 30)
+        self.rect = pygame.Rect(self.x, self.y, 30, 30)
+        self.rect.x = self.x
+        self.rect.y = self.y
 
     def update(self):
         self.movement()
+        self.checkIdle()
         self.interact()
+        self.tutorial.draw()
+        if self.currentHealth <= 0:
+            self.game.state = 'game over'
 
         self.rect.x += self.xChange
         self.collideBlocks('x')
@@ -86,26 +177,37 @@ class Player(pygame.sprite.Sprite):
         self.x = self.rect.x
         self.y = self.rect.y
 
+
+        if self.hitInvulnerable:
+            self.hitInvulnerableTime += 1
+            if self.hitInvulnerableTime > self.invulnerableTimer:
+                self.hitInvulnerable = False
+                self.hitInvulnerableTime = 0
+
+
         self.timepassed += self.clock.get_time()/1000
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
         if self.game.state == 'explore' and not self.weapon.used:
             if self.facing == 'right':
-                self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1, self.height * 1))
+                self.image = self.rightImgList[self.imgindex]
             elif self.facing == 'left':
-                self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]), (self.width * 1, self.height * 1))
+                self.image = self.leftImgList[self.imgindex]
             elif self.facing == 'up':
-                self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]), (self.width * 1, self.height * 1))
+                self.image = self.upImgList[self.imgindex]
             else: # self.facing == 'down':
-                self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]), (self.width * 1, self.height * 1))
+                self.image = self.downImgList[self.imgindex]
         elif self.weapon.used and self.weapon.type == 'bubble'and self.weapon.ammo != 0:
             if self.facing == 'right':
-                self.image = pygame.transform.scale(self.rangedWeaponList[0], (self.width * 1, self.height * 1))
+                self.image = self.rangedWeaponList[0]
             elif self.facing == 'left':
-                self.image = pygame.transform.scale(self.rangedWeaponList[3], (self.width * 1, self.height * 1))
+                self.image = self.rangedWeaponList[3]
             elif self.facing == 'up':
-                self.image = pygame.transform.scale(self.rangedWeaponList[2], (self.width * 1, self.height * 1))
+                self.image = self.rangedWeaponList[2]
             else: # self.facing == 'down':
-                self.image = pygame.transform.scale(self.rangedWeaponList[1], (self.width * 1, self.height * 1))
+                self.image = self.rangedWeaponList[1]
+
+        self.flicker()
+
         self.xChange = 0
         self.yChange = 0
 
@@ -127,6 +229,69 @@ class Player(pygame.sprite.Sprite):
                 else:
                     npc.TextBox.selectedRect = highlighted
 
+    def setLocation(self, x, y):
+        pass
+
+    # inspiration for this function and the damage flickering effect was gotten from:
+    # https://www.youtube.com/watch?v=QU1pPzEGrqw
+    def flicker(self):
+        alpha = 0
+        value = math.sin(pygame.time.get_ticks())
+        if value >= 0:
+            alpha = 255
+        else:
+            alpha = 0
+        if self.hitInvulnerable:
+            self.image.set_alpha(alpha)
+            #print(self.image.get_alpha())
+        else:
+            self.image.set_alpha(255)
+        pass
+
+    def getDamage(self, amount):
+        # self.currentHealth = self.targetHealth
+        if self.hitInvulnerable:
+            return
+        else:
+            self.hitInvulnerable = True
+            if self.targetHealth > 0:
+                self.targetHealth = self.targetHealth - amount
+            if self.targetHealth <=0:
+                self.targetHealth = 0
+            pygame.mixer.Channel(1).set_volume(0.035 * self.game.soundVol)
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/77_flesh_02.wav'))
+
+    def getHealth(self, amount):
+        if self.targetHealth < self.maxHealth:
+            self.targetHealth = self.targetHealth + amount
+        if self.targetHealth > self.maxHealth:
+            self.targetHealth = self.maxHealth
+        pygame.mixer.Channel(1).set_volume(0.015 * self.game.soundVol)
+        pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/8_Buffs_Heals_SFX/02_Heal_02.wav'))
+
+    def healthBar(self): # Static health bar function
+        pygame.draw.rect(self.game.screen, (255, 0, 0), (10, 10, self.targetHealth/self.healthRatio, self.healthBarHeight))
+        pygame.draw.rect(self.game.screen, (255, 255, 255), (10, 10, self.maxHealthBarLength,self.healthBarHeight), 4)
+
+    def animateHealth(self): # Animated health bar function
+        if self.currentHealth < self.targetHealth:
+            self.currentHealth += self.healthChangeSpeed
+            self.transitionWidth = int((self.targetHealth - self.currentHealth)/self.healthRatio)
+            self.transitionColor = (0, 255, 0)
+            self.health_bar_rect = pygame.Rect(10, 10, self.currentHealth / self.healthRatio - 3, self.healthBarHeight)
+            self.transition_bar_rect = pygame.Rect(self.health_bar_rect.right, 10, self.transitionWidth, self.healthBarHeight)
+        elif self.currentHealth > self.targetHealth:
+            self.currentHealth -= self.healthChangeSpeed
+            self.transitionWidth = int((self.currentHealth - self.targetHealth)/self.healthRatio)
+            self.transitionColor = (255, 255, 0)
+            self.health_bar_rect = pygame.Rect(10, 10, self.targetHealth / self.healthRatio - 3, self.healthBarHeight)
+            self.transition_bar_rect = pygame.Rect(self.health_bar_rect.right, 10, self.transitionWidth, self.healthBarHeight)
+
+
+        pygame.draw.rect(self.game.screen, (255, 0, 0 ), self.health_bar_rect)
+        pygame.draw.rect(self.game.screen, self.transitionColor, self.transition_bar_rect)
+        pygame.draw.rect(self.game.screen, (255, 255, 255), (10, 10, self.maxHealthBarLength, self.healthBarHeight), 4)
+
 
     #Method for different Player interactions
     def interact(self):
@@ -136,13 +301,13 @@ class Player(pygame.sprite.Sprite):
 
         if self.itemUsed:
             if self.facing == 'right':
-                self.image = pygame.transform.scale(pygame.image.load(self.rightImgList[self.imgindex]), (self.width * 1, self.height * 1))
+                self.image = self.rightImgList[self.imgindex]
             elif self.facing == 'left':
-                self.image = pygame.transform.scale(pygame.image.load(self.leftImgList[self.imgindex]),(self.width * 1, self.height * 1))
+                self.image = self.leftImgList[self.imgindex]
             elif self.facing == 'up':
-                self.image = pygame.transform.scale(pygame.image.load(self.upImgList[self.imgindex]),(self.width * 1, self.height * 1))
+                self.image = self.upImgList[self.imgindex]
             else:  # self.facing == 'down':
-                self.image = pygame.transform.scale(pygame.image.load(self.downImgList[self.imgindex]),(self.width * 1, self.height * 1))
+                self.image = self.downImgList[self.imgindex]
 
 
 
@@ -166,13 +331,13 @@ class Player(pygame.sprite.Sprite):
                 self.game.flowers.get_sprite(flowerIndex).anim()
                 #READ ME, USE "self.facing" DIRECTIONS TO DETERMINE WHICH DIRECTION CUTTING SPRITE TO USE
                 if self.facing == 'right':
-                    self.image = pygame.transform.scale(pygame.image.load(self.cutRightImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
+                    self.image = self.cutRightImgList[self.cutUpgrade]
                 elif self.facing == 'left':
-                    self.image = pygame.transform.scale(pygame.image.load(self.cutLeftImgList[self.cutUpgrade]),   (self.width * 1.06, self.height * 1.06))
+                    self.image = self.cutLeftImgList[self.cutUpgrade]
                 elif self.facing == 'up':
-                    self.image = pygame.transform.scale(pygame.image.load(self.cutUpImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
+                    self.image = self.cutUpImgList[self.cutUpgrade]
                 else:
-                    self.image = pygame.transform.scale(pygame.image.load(self.cutDownImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
+                    self.image = self.cutDownImgList[self.cutUpgrade]
 
 
 
@@ -184,13 +349,13 @@ class Player(pygame.sprite.Sprite):
                 self.game.ores.get_sprite(oreIndex).state = 'mining'
                 self.game.ores.get_sprite(oreIndex).killAnim()
                 if self.facing == 'right':
-                    self.image = pygame.transform.scale(pygame.image.load(self.mineRightImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                    self.image = self.mineRightImgList[self.mineUpgrade]
                 elif self.facing == 'left':
-                    self.image = pygame.transform.scale(pygame.image.load(self.mineLeftImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                    self.image = self.mineLeftImgList[self.mineUpgrade]
                 elif self.facing == 'up':
-                    self.image = pygame.transform.scale(pygame.image.load(self.mineUpImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                    self.image = self.mineUpImgList[self.mineUpgrade]
                 else:
-                    self.image = pygame.transform.scale(pygame.image.load(self.mineDownImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                    self.image = self.mineDownImgList[self.mineUpgrade]
 
             #Gets the index of the npc that the player interacted with
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
@@ -205,8 +370,10 @@ class Player(pygame.sprite.Sprite):
             
 
         #EDIT AFTER INVENTORY MADE
-        elif keys[pygame.K_r]:
+        elif keys[pygame.K_r] and self.weapon.type == 'bubble':
             self.weapon.reload()
+            pygame.mixer.Channel(4).set_volume(0.025 * self.game.soundVol)
+            pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/mag-slide-in-80901.mp3'))
 
 
         elif self.game.state == 'dialogue' and (keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_UP] or keys[pygame.K_DOWN]):
@@ -262,13 +429,13 @@ class Player(pygame.sprite.Sprite):
                         self.game.ores.get_sprite(interactIndex).state = 'mining'
                         self.game.ores.get_sprite(interactIndex).killAnim()
                         if self.facing == 'right':
-                            self.image = pygame.transform.scale(pygame.image.load(self.mineRightImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                            self.image = self.mineRightImgList[self.mineUpgrade]
                         elif self.facing == 'left':
-                            self.image = pygame.transform.scale(pygame.image.load(self.mineLeftImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                            self.image = self.mineLeftImgList[self.mineUpgrade]
                         elif self.facing == 'up':
-                            self.image = pygame.transform.scale(pygame.image.load(self.mineUpImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))
+                            self.image = self.mineUpImgList[self.mineUpgrade]
                         else:
-                            self.image = pygame.transform.scale(pygame.image.load(self.mineDownImgList[self.mineUpgrade]),(self.width * 1.06, self.height * 1.06))\
+                            self.image = self.mineDownImgList[self.mineUpgrade]
 
                     
                     interactIndex = mouseRect.collidelist(list(flower.rect for flower in self.game.flowers))
@@ -279,13 +446,13 @@ class Player(pygame.sprite.Sprite):
 
                         #READ ME, USE "self.facing" DIRECTIONS TO DETERMINE WHICH DIRECTION CUTTING SPRITE TO USE
                         if self.facing == 'right':
-                            self.image = pygame.transform.scale(pygame.image.load(self.cutRightImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
+                            self.image = self.cutRightImgList[self.cutUpgrade]
                         elif self.facing == 'left':
-                            self.image = pygame.transform.scale(pygame.image.load(self.cutLeftImgList[self.cutUpgrade]),   (self.width * 1.06, self.height * 1.06))
+                            self.image = self.cutLeftImgList[self.cutUpgrade]
                         elif self.facing == 'up':
-                            self.image = pygame.transform.scale(pygame.image.load(self.cutUpImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
+                            self.image = self.cutUpImgList[self.cutUpgrade]
                         else:
-                            self.image = pygame.transform.scale(pygame.image.load(self.cutDownImgList[self.cutUpgrade]), (self.width * 1.06, self.height * 1.06))
+                            self.image = self.cutDownImgList[self.cutUpgrade]
 
 
                     interactIndex = mouseRect.collidelist(list(npc.rect for npc in self.game.npcs))
@@ -310,6 +477,19 @@ class Player(pygame.sprite.Sprite):
     def movement(self):
         if self.game.state != 'explore':
             return
+
+        if self.imgindex == 1:
+            self.playWalkSound()
+            #if self.walkSoundNum == 3:
+            #    self.walkSoundNum = 4
+            #elif self.walkSoundNum == 4:
+            #    self.walkSoundNum = 3
+            #self.walkSoundNum = random.randint(0, len(self.walkingList) - 1)
+            self.walkingSound = self.walkingList[self.walkSoundNum]
+        elif (self.imgindex != 1):
+            self.walkSoundPlaying = False
+
+
         #The key press segments came from viewing this tutorial
         #https://www.youtube.com/watch?v=GakNgbiAxzs&list=PLkkm3wcQHjT7gn81Wn-e78cAyhwBW3FIc&index=2
         keys = pygame.key.get_pressed()
@@ -321,7 +501,14 @@ class Player(pygame.sprite.Sprite):
                     #sprite.rect.x += PLAYER_SPEED
                 self.xChange -= PLAYER_SPEED
                 self.facing = 'left'
-                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
+                self.idleTimer = 0
+                if ((self.timepassed) // (0.20) % 4 == self.imgindex):
+                    self.imgindex = (self.imgindex + 1)%4
+                    #if self.imgindex == 1 or self.imgindex == 3:
+                    #    pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
+                    #    pygame.mixer.Channel(2).play(self.walkingSound)
+                else:
+                    self.imgindex
 
 
             if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
@@ -329,14 +516,28 @@ class Player(pygame.sprite.Sprite):
                     #sprite.rect.x -= PLAYER_SPEED
                 self.xChange += PLAYER_SPEED
                 self.facing = 'right'
-                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.20)%4 == self.imgindex) else self.imgindex
+                self.idleTimer = 0
+                if ((self.timepassed) // (0.20) % 4 == self.imgindex):
+                    self.imgindex = (self.imgindex + 1)%4
+                    #if self.imgindex == 1 or self.imgindex == 3:
+                    #    pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
+                    #    pygame.mixer.Channel(2).play(self.walkingSound)
+                else:
+                    self.imgindex
 
             if keys[pygame.K_w] or keys[pygame.K_UP]:
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.y += PLAYER_SPEED
                 self.yChange -= PLAYER_SPEED
                 self.facing = 'up'
-                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.18)%4 == self.imgindex) else self.imgindex
+                self.idleTimer = 0
+                if ((self.timepassed) // (0.18) % 4 == self.imgindex):
+                    self.imgindex = (self.imgindex + 1)%4
+                    #if self.imgindex == 1 or self.imgindex == 3:
+                    #    pygame.mixer.Channel(2).set_volume(0.08* self.game.soundVol)
+                    #    pygame.mixer.Channel(2).play(self.walkingSound)
+                else:
+                    self.imgindex
 
 
             if keys[pygame.K_s] or keys[pygame.K_DOWN]:
@@ -344,7 +545,41 @@ class Player(pygame.sprite.Sprite):
                     #sprite.rect.y -= PLAYER_SPEED
                 self.yChange += PLAYER_SPEED
                 self.facing = 'down'
-                self.imgindex = (self.imgindex + 1)%4 if ((self.timepassed)//(0.25)%4 == self.imgindex) else self.imgindex
+                self.idleTimer = 0
+                if ((self.timepassed) // (0.25) % 4 == self.imgindex):
+                    self.imgindex = (self.imgindex + 1)%4
+                    #if self.imgindex == 1 or self.imgindex == 3:
+                    #    pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
+                    #    pygame.mixer.Channel(2).play(self.walkingSound)
+                else:
+                    self.imgindex
+
+    # function that will check if the player is idle from moving. This will be done by using a timer that is decremented unless the player moves, or the movement state will be changed to idle from moving.
+    def checkIdle(self):
+        self.idleTimer += 1
+        if self.game.state != 'explore':
+            self.movementState = 'idle'
+        elif self.idleTimer >= self.idleThreshold:
+            self.movementState = 'idle'
+        else:
+            self.movementState = 'moving'
+        if self.movementState == 'idle' and self.game.state == 'explore':
+            self.imgindex = 0
+            if self.facing == 'right':
+                self.image = self.rightImgList[self.imgindex]
+            elif self.facing == 'left':
+                self.image = self.leftImgList[self.imgindex]
+            elif self.facing == 'up':
+                self.image = self.upImgList[self.imgindex]
+            else:  # self.facing == 'down':
+                self.image = self.downImgList[self.imgindex]
+
+
+    def playWalkSound(self):
+        if self.movementState != 'idle' and (not self.walkSoundPlaying):
+            pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
+            pygame.mixer.Channel(2).play(self.walkingSound)
+            self.walkSoundPlaying = True
 
     def collideBlocks(self, direction):
         if direction == 'x':
@@ -379,44 +614,44 @@ class Player(pygame.sprite.Sprite):
         if self.swordUsed:
             if self.facing == 'up':
                 if attackInstance.animationPhase == 1:
-                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingUp.png'), (self.width, self.height))
+                    self.image = self.swingUpList[0]
                 elif attackInstance.animationPhase == 2:
-                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingUp2.png'), (self.width, self.height))
+                    self.image = self.swingUpList[1]
                 elif attackInstance.animationPhase == 3:
-                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingUp3.png'), (self.width, self.height))
+                    self.image = self.swingUpList[2]
 
             elif self.facing == 'down':
                 if attackInstance.animationPhase == 1:
-                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown.png'), (self.width, self.height))
+                    self.image = self.swingDownList[0]
                 elif attackInstance.animationPhase == 2:
-                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown2.png'), (self.width, self.height))
+                    self.image = self.swingDownList[1]
                 elif attackInstance.animationPhase == 3:
-                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown3.png'), (self.width, self.height))
+                    self.image = self.swingDownList[2]
 
             elif self.facing == 'left':
                 if attackInstance.animationPhase == 1:
-                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingLeft.png'), (self.width, self.height))
+                    self.image = self.swingLeftList[0]
                 elif attackInstance.animationPhase == 2:
-                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingLeft2.png'), (self.width, self.height))
+                    self.image = self.swingLeftList[1]
                 elif attackInstance.animationPhase == 3:
-                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingLeft3.png'), (self.width, self.height))
+                    self.image = self.swingLeftList[2]
 
             elif self.facing == 'right':
                 if attackInstance.animationPhase == 1:
-                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingRight.png'), (self.width, self.height))
+                    self.image = self.swingRightList[0]
                 elif attackInstance.animationPhase == 2:
-                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingRight2.png'), (self.width, self.height))
+                    self.image = self.swingRightList[1]
                 elif attackInstance.animationPhase == 3:
-                    self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingRight3.png'), (self.width, self.height))
+                    self.image = self.swingRightList[2]
         elif self.spearUsed:
             if self.facing == 'up':
-                self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagThrowUp.png'), (self.width, self.height))
+                self.image = self.pokeList[0]
             elif self.facing == 'down':
-                self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagThrowDown.png'),(self.width, self.height))
+                self.image = self.pokeList[1]
             elif self.facing == 'left':
-                self.image = pygame.transform.scale(pygame.transform.flip(pygame.image.load('Sprites/protag/protagThrowRight.png'), True, False),(self.width, self.height))
+                self.image = self.pokeList[2]
             elif self.facing == 'right':
-                self.image = pygame.transform.scale(pygame.image.load('Sprites/protag/protagThrowRight.png'),(self.width, self.height))
+                self.image = self.pokeList[3]
 
         pygame.display.update()
 
@@ -427,11 +662,18 @@ class Player(pygame.sprite.Sprite):
             self.weaponNum += 1
             self.weaponNum %= len(self.weaponList)
             self.weapon.type = self.weaponList[self.weaponNum]
+            self.weapon.updateDamage()
+            if self.weapon.type == 'swordfish':
+                self.weaponAnimationSpeed = 15
+            elif self.weapon.type == 'trident':
+                self.weaponAnimationSpeed = 18
+            pygame.mixer.Channel(1).set_volume(0.04 * self.game.soundVol)
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/070_Equip_10.wav'))
         pass
 
 
 class Block(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, index):
 
         self.game = game
         self._layer = BLOCK_LAYER
@@ -443,7 +685,11 @@ class Block(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
 
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/tiles/brick1.png'), (self.width, self.height))
+        self.imagelist = ['Sprites/tiles/brick1.png',
+                          'Sprites/tiles/water1.png',
+                          'Sprites/tiles/sapling2.png',
+                          'Sprites/tiles/rock1.png']
+        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[index]), (self.width, self.height))
         #self.image.fill(RED)
 
         self.rect = self.image.get_rect()
@@ -468,7 +714,10 @@ class NPC(pygame.sprite.Sprite):
         self.xChange = 0
         self.yChange = 0
 
-        self.imagelist = ['Sprites/npcs/sampleNPC/hkprotagdown.jpg', 'Sprites/npcs/sampleNPC/hkprotagleft.jpg', 'Sprites/npcs/sampleNPC/hkprotagright.jpg', 'Sprites/npcs/sampleNPC/hkprotagdown.jpg']
+        self.imagelist = ['Sprites/npcs/sampleNPC/hkprotagdown.jpg',
+                          'Sprites/npcs/sampleNPC/hkprotagleft.jpg',
+                          'Sprites/npcs/sampleNPC/hkprotagright.jpg',
+                          'Sprites/npcs/sampleNPC/hkprotagdown.jpg']
         self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (self.width, self.height))
 
         self.dialogueStage = '01:First Meet'
@@ -516,6 +765,8 @@ class NPC(pygame.sprite.Sprite):
         #Going into dialogue from explore
         if self.game.state == 'explore':
             self.game.play_music('dialogue')
+            pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
             self.meetings += 1
             self.TextBox = TextBox(self.game)
             self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 28, 'Garamond', self.name)
@@ -526,6 +777,8 @@ class NPC(pygame.sprite.Sprite):
         elif self.dialogueStageIndex < len(self.dialogueList[self.dialogueStage]):
             nextDialogue = self.dialogueList[self.dialogueStage][self.dialogueStageIndex]
             #If there are choices displayed on the screen
+            pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
             if len(self.TextBox.choiceRectList) > 0:
                 self.choiceResponse(False)
                 self.dialogueStageIndex += 1
@@ -534,6 +787,7 @@ class NPC(pygame.sprite.Sprite):
                     self.updateDialogue()
                     self.game.state = 'explore'
                     self.game.play_music('stop')
+                    self.game.play_music('village')
                 else:
                     self.interaction()
             #If the next dialogue to display is a choice list
@@ -562,63 +816,248 @@ class NPC(pygame.sprite.Sprite):
 
 #Authored by Max Chiu 4/16/2024
 class Enemy(pygame.sprite.Sprite):
+
     def __init__(self, game, x, y):
         self.game = game
-        self._layer = PLAYER_LAYER
+        self.map = currentTileMap[mapList[self.game.map[0]][self.game.map[1]]]
+        self._layer = ENEMY_LAYER
         self.groups = self.game.all_sprites, self.game.enemies
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
+        self.type = 'pumpkinRobot'
 
         self.health = 100
+        self.damage = 120
+        self.speed = PLAYER_SPEED * 0.6
+
+        self.hitInvincible = False
+        self.hitInvulnerable = False
+        self.hitInvulnerableTime = 0
+        self.invulnerableTimer = 24
+        self.stunned = False
+        self.stunCount = 0
+        self.stunTimer = 8
 
         self.name = 'Udibudibudib'
 
         self.xChange = 0
         self.yChange = 0
         self.state = 'standing'
+        self.moving = False
+        self.facingDirection = 'down'
 
-        self.imagelist = ['Sprites/npcs/sampleEnemy/sampleEnemyLeft.png', 'Sprites/npcs/sampleEnemy/sampleEnemyRight.png']
+        self.pumpkinImgDown = [
+            pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99)),
+            pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99)),
+            pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99)),
+            pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99))]
+        # pumpkinImgDown = [pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99)),
+        #                  pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99))]
+
+        self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 120, 'health': 100, 'speed': PLAYER_SPEED * 0.6}
+
+        self.imagelist = self.pumpkinRobot['down']
+        #self.deathImgList = [pygame.transform.scale(pygame.image.load('').convert_alpha(), (self.width, self.height))]
         #self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (2*self.width, 2*self.height))
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/joker.jpeg'), (self.width, self.height))
+        self.imageIndex = 0
+        self.image = self.imagelist[self.imageIndex]
+        self.animationCount = 0
+        self.animationSpeed = 36
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+        self.setup()
+
+    def setup(self):
+        if self.type == 'pumpkinRobot':
+            self.health = self.pumpkinRobot['health']
+            self.speed = self.pumpkinRobot['speed']
+            self.damage = self.pumpkinRobot['damage']
+            self.imagelist = self.pumpkinRobot['down']
+
+    def deathAnimation(self):
+        pass
+
+    def flicker(self):
+        alpha = 0
+        value = math.sin(pygame.time.get_ticks())
+        if value >= 0:
+            alpha = 255
+        else:
+            alpha = 0
+        if self.hitInvulnerable:
+            self.image.set_alpha(alpha)
+            print(self.image.get_alpha())
+        else:
+            self.image.set_alpha(255)
+        pass
 
     #Authored: Max Chiu 4/18/2024
     def dealtDamage(self, damage, type):
-        if type == 'bubble':
-            self.health -= damage
-            self.state = 'standing'
-        elif type == 'swordfish' or type == 'trident':
-            self.health -= damage
-            self.state = 'knockback'
-        if self.health < 0:
-            self.kill()
+        # print(self.hitInvincible)
+        if not self.hitInvulnerable:
+            if type == 'bubble':
+                self.health -= damage
+                self.stunned = True
+                self.state = 'standing'
+                pygame.mixer.Channel(4).set_volume(0.06 * self.game.soundVol)
+                pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/15_Impact_flesh_02.wav'))
+            elif type == 'swordfish' or type == 'trident':
+                self.speed *= 0.7
+                self.hitInvulnerable = True
+                self.health -= damage
+                self.state = 'knockback'
+                pygame.mixer.Channel(4).set_volume(0.06 * self.game.soundVol)
+                pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/03_Claw_03.wav'))
+            if self.health <= 0:
+                self.kill()
+                pygame.mixer.Channel(4).set_volume(0.065 * self.game.soundVol)
+                pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/69_Enemy_death_01.wav'))
+            print(f"enemy (self) health is {self.health}")
+        else:
+            return
 
+    def animate(self):
+
+        if self.moving:
+            self.animationCount+= 1
+            if self.animationCount >= self.animationSpeed:
+                self.animationCount = 0
+           # for i in range(len(self.imagelist)):
+                #if self.animationCount < (self.animationSpeed // len(self.imagelist) * (i + 1)):
+                    #self.imageIndex = i
+                    #break
+            if self.animationCount < (self.animationSpeed // len(self.imagelist)):
+                self.imageIndex = 0
+            elif self.animationCount < (self.animationSpeed // len(self.imagelist) * 2):
+                self.imageIndex = 1
+            elif self.animationCount < (self.animationSpeed // len(self.imagelist) * 3):
+                self.imageIndex = 2
+            elif self.animationCount < (self.animationSpeed // len(self.imagelist) * 4):
+                self.imageIndex = 3
+            self.image = self.imagelist[self.imageIndex]
+        self.flicker()
 
     #Authored: Max Chiu 4/18/2024
     def update(self):
-        if self.state == 'standing':
-            self.state = 'moving'
-        elif self.state == 'knockback':
-            pass
-        else: #self.state == 'moving'
+        if self.game.state != 'dialogue' and self.game.state != 'scene' and self.game.state != 'pause' and self.game.state != 'game over':
+            self.searchPlayer()
+            self.animate()
+            self.attack()
 
-            self.x += self.xChange
-            self.y += self.yChange
 
-            self.rect.x = self.x
-            self.rect.y = self.y
-            
-        
+
+            if self.state == 'standing':
+                self.yChange = 0
+                self.xChange = 0
+                if self.stunned:
+                    self.stunCount += 1
+                    if self.stunCount > self.stunTimer:
+                        self.stunned = False
+                        self.stunCount = 0
+
+            elif self.state == 'knockback':
+                self.rect.x += self.xChange * -1
+                self.collideBlocks('x')
+                self.rect.y += self.yChange * -1
+                self.collideBlocks('y')
+
+                self.x = self.rect.x
+                self.y = self.rect.y
+                pass
+            else: #self.state == 'chasing'
+                self.rect.x += self.xChange
+                self.collideBlocks('x')
+                self.rect.y += self.yChange
+                self.collideBlocks('y')
+
+                self.x = self.rect.x
+                self.y = self.rect.y
+
+            if self.hitInvulnerable:
+                self.hitInvulnerableTime += 1
+                if self.hitInvulnerableTime > self.invulnerableTimer:
+                    self.hitInvulnerable = False
+                    self.hitInvulnerableTime = 0
+                    self.speed *= (1/0.7)
+
+    #Authored: Max Chiu 4/28/2024
+    def searchPlayer(self):
+        playerPos = [self.game.player.x, self.game.player.y]
+
+        lines=[]
+        px = playerPos[0]+self.game.player.width/2
+        py = playerPos[1]+self.game.player.height/2
+        ex = self.x+self.width/2
+        ey = self.y+self.height/2
+        n = 4
+        dx = (px - ex)/n
+        dy = (py - ey)/n
+
+        distance = math.sqrt((dx*n)**2+(dy*n)**2)
+
+        surface = pygame.Surface(self.game.screen.get_size(), pygame.SRCALPHA)
+        for i in range(n):
+            lines.append(pygame.draw.line(surface, (0, 255, 0, 0), (ex+dx*i, ey+dy*i), (ex+dx*(i+1), ey+dy*(i+1)), 1))
+        #line = pygame.draw.line(self.screen, RED, (self.enemy.x+self.enemy.width/2, self.enemy.y+self.enemy.height/2), (self.player.x+self.player.width/2, self.player.y+self.player.height/2), 2)
+        index = [line.collidelist(list(block.rect for block in self.game.blocks)) for line in lines]
+        move = True
+        for i in index:
+            if i != -1:
+                #print(i)
+                rect = self.game.blocks.get_sprite(i)
+                #rect.image.fill(BLUE)
+                move = False
+
+        if move:
+            self.moving = True
+            if not self.hitInvulnerable and not self.stunned:
+                self.state = 'chasing'
+            try:
+                dx *= n/distance
+                dy *= n/distance
+            except ZeroDivisionError:
+                dy = dy
+                dx = dx
+            self.xChange = dx * self.speed
+            self.yChange = dy * self.speed
+            # print(self.xChange, self.yChange)
+        elif not move:
+            self.xChange = 0
+            self.yChange = 0
+            self.state = 'standing'
+            self.moving = False
+            return
+
+    #Authored: Max Chiu 4/28/2024
+    def collideBlocks(self, direction):
+        if direction == 'x':
+            hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False) + pygame.sprite.spritecollide(self, self.game.enemies, False)
+            if hits and hits[0] != self:
+                if self.xChange > 0:
+                    self.rect.x = hits[0].rect.left - self.rect.width
+                if self.xChange < 0:
+                    self.rect.x = hits[0].rect.right
+        else:
+            hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False) + pygame.sprite.spritecollide(self, self.game.enemies, False)
+            if hits and hits[0] != self:
+                if self.yChange > 0:
+                    self.rect.y = hits[0].rect.top - self.rect.height
+                if self.yChange < 0:
+                    self.rect.y = hits[0].rect.bottom
+
+    def attack(self):
+        if pygame.sprite.collide_rect(self, self.game.player):
+            self.game.player.getDamage(self.damage)
+
 class Teleport(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
-        self._layer = BLOCK_LAYER
+        self._layer = GROUND_LAYER
         self.groups = self.game.all_sprites, self.game.teleport
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.width = TILESIZE
@@ -762,3 +1201,44 @@ class Inventory(pygame.sprite.Sprite):
 
     def add_item(self, item):
         self.slots[item] =  self.slots.get(item) + 1
+class Tutorial:
+    def __init__(self, game):
+        self.game = game
+        self.appear = True
+
+
+    def checkAppear(self):
+        if (self.game.state != 'dialogue') and self.game.tutorialsActive:
+            self.appear = True
+        else:
+            self.appear = False
+
+    def draw(self):
+        if self.appear:
+            tutorialText = ["Use WASD to move, Q to switch weapons",
+                            "E to attack using melee weapons",
+                            "SPACE to fire ranged weapon or interact",
+                            "R to reload ranged weapon",
+                            "Press P to pause, change settings, disable tutorials, or quit."]
+            #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[0].strip(), False, WHITE)
+            #textSurf.set_alpha(127)
+            #self.game.screen.blit(textSurf, (WIDTH * 0.72, HEIGHT * 0.78))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[0].strip(), False, WHITE),(WIDTH * 0.72, HEIGHT * 0.78))
+            #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[1].strip(), False, WHITE)
+            #textSurf.set_alpha(127)
+            #self.game.screen.blit(textSurf, (WIDTH * 0.78, HEIGHT * 0.81))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[1].strip(), False, WHITE),(WIDTH * 0.78, HEIGHT * 0.81))
+            #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[2].strip(), False, WHITE)
+            #textSurf.set_alpha(127)
+            #self.game.screen.blit(textSurf, (WIDTH * 0.73, HEIGHT * 0.84))
+            #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[3].strip(), False, WHITE)
+            #self.game.screen.blit(textSurf, (WIDTH * 0.81, HEIGHT * 0.87))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[2].strip(), False, WHITE),(WIDTH * 0.73, HEIGHT * 0.84))
+            #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[4].strip(), False, WHITE)
+            #textSurf.set_alpha(127)
+            #self.game.screen.blit(textSurf, (WIDTH * 0.64, HEIGHT * 0.9))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[3].strip(), False, WHITE),(WIDTH * 0.81, HEIGHT * 0.87))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[4].strip(), False, WHITE),(WIDTH * 0.64, HEIGHT * 0.9))
+            #pygame.display.update()
+        else:
+            return
