@@ -185,7 +185,7 @@ class Game():
             # if the room is unloaded and listed as -3, a randomly assigned green npc room will be loaded and added to the map list
             elif mapNumber == -3:
                 usedGreenRooms = [] # empty list that holds all green room indexes so that green rooms don't repeat throughout exploration
-                while True:
+                while True: ### CHARLENNE
                     greenRandomRoomIndex = random.randint(0, len(greenRandomRooms)-1) # pick random green room
                     if greenRandomRoomIndex not in usedGreenRooms:
                         usedGreenRooms.append(greenRandomRoomIndex)
