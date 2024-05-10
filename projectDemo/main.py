@@ -100,7 +100,11 @@ class Game():
                     elif (settings.currentTileMap[0][row])[col] == "S": # sapling
                         Block(self, col, row, 2)
                     elif (settings.currentTileMap[0][row])[col] == "R": # rock
-                        Block(self, col, row, 3)                                                                        
+                        Block(self, col, row, 3)
+                    elif (settings.currentTileMap[0][row])[col] == "C": # crossBridge
+                        WalkableBlock(self, col, row, 0)
+                    elif (settings.currentTileMap[0][row])[col] == "G": # growth
+                        WalkableBlock(self, col, row, 1)                                                                      
                     elif (settings.currentTileMap[0][row])[col] == "P": # player
                         self.player = Player(self, col, row, self.clock)
                     elif (settings.currentTileMap[0][row])[col] == "F": # flower
@@ -122,6 +126,7 @@ class Game():
             # kill all the current sprites in the current room
             self.all_sprites.empty()
             self.blocks.empty()
+            self.walk_blocks.empty()
             self.ground.empty()
             self.flowers.empty()
             self.ores.empty()
@@ -248,6 +253,10 @@ class Game():
                         Block(self, col, row, 2)
                     elif (settings.currentTileMap[mapNumber][row])[col] == "R": # rock
                         Block(self, col, row, 3)
+                    elif (settings.currentTileMap[mapNumber][row])[col] == "C": # crossBridge
+                        WalkableBlock(self, col, row, 0)
+                    elif (settings.currentTileMap[mapNumber][row])[col] == "G": # growth
+                        WalkableBlock(self, col, row, 1)
                     elif (settings.currentTileMap[mapNumber][row])[col] == "F": # flower
                         Flower(self, col, row, self.clock)
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'O': # ore
@@ -299,6 +308,7 @@ class Game():
         self.playing = True
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.blocks = pygame.sprite.LayeredUpdates()
+        self.walk_blocks = pygame.sprite.LayeredUpdates()
         self.ground = pygame.sprite.LayeredUpdates()
         self.flowers = pygame.sprite.LayeredUpdates()
         self.ores = pygame.sprite.LayeredUpdates()
