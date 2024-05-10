@@ -1501,6 +1501,7 @@ class Inventory(pygame.sprite.Sprite):
         self.numList.append(self.image.blit(self.font.render(str(self.slots.get('ore')),False,(WHITE)),(125,53)))
         self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(190,53)))
 
+    ### RACHEL
     def add_item(self, item):
         self.slots[item] =  self.slots.get(item) + 1
         for image in self.numList:
