@@ -49,6 +49,21 @@ class Game():
 
         self.cutsceneManage = cutscenes.CutsceneManager(self)
         self.map = [-1, -1]
+        # This list contains all the special tiles for the game, preloaded here when the game starts to save loading time
+        # When going from room to room.
+        # The first nested list is for walkable blocks, while the second list is for not walkable ones
+        self.tileList = None
+        self.hyacinImgL = None
+        self.sunFloImgL = None
+        self.silentFImgL = None
+        self.rubyImageL = None
+        self.emeraldImageL = None
+        self.ironImageL = None
+        self.amethImageL = None
+        self.copperImageL = None
+
+
+        self.setupImages()
 
         self.tutorialsActive = False
         
@@ -502,6 +517,42 @@ class Game():
             self.play_music('village')
         pass
 
+    def setupImages(self):
+        self.tileList = [[pygame.transform.scale(pygame.image.load('Sprites/tiles/crossBridge1.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/growth1.png').convert_alpha(),(TILESIZE, TILESIZE))],
+                         [pygame.transform.scale(pygame.image.load('Sprites/tiles/brick1.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/water1.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/sapling2.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/rock1.png').convert_alpha(),(TILESIZE, TILESIZE))]]
+        self.hyacinImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth3New.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth5.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        self.sunFloImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/sunflowernew.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/sunflower3New.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/sunflower5.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        self.silentFImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower3New.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower5.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        self.rubyImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby2.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby3.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby3.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        self.emeraldImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                         pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald2.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                         pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald3.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                         pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald3.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        self.copperImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                        pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper2.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                        pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper3.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                        pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper3.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        self.amethImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst2.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst3.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                       pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst3.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        self.ironImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreIron.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreIron2.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                      pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE))]
 
 
 

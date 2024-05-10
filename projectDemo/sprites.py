@@ -463,9 +463,9 @@ class Player(pygame.sprite.Sprite):
         if teleportIndex != -1:
             tpSprite = self.game.teleport.get_sprite(teleportIndex)
             self.kill()
-            pygame.time.wait(50)
+            #pygame.time.wait(50)
             self.game.createTilemap((tpSprite.x//TILESIZE, tpSprite.y//TILESIZE))
-            pygame.time.wait(50)
+            #pygame.time.wait(50)
 
 
     
@@ -679,14 +679,14 @@ class Block(pygame.sprite.Sprite):
 
         self.x = x*TILESIZE
         self.y = y*TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
+        #self.width = TILESIZE
+        #self.height = TILESIZE
 
-        self.imagelist = ['Sprites/tiles/brick1.png',
-                          'Sprites/tiles/water1.png',
-                          'Sprites/tiles/sapling2.png',
-                          'Sprites/tiles/rock1.png']
-        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[index]), (self.width, self.height))
+        #self.imagelist = ['Sprites/tiles/brick1.png',
+        #                  'Sprites/tiles/water1.png',
+        #                  'Sprites/tiles/sapling2.png',
+        #                  'Sprites/tiles/rock1.png']
+        self.image = self.game.tileList[1][index]
         #self.image.fill(RED)
 
         self.rect = self.image.get_rect()
@@ -706,9 +706,9 @@ class WalkableBlock(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
 
-        self.imagelist = ['Sprites/tiles/crossBridge1.png',
-                        'Sprites/tiles/growth1.png']
-        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[index]), (self.width, self.height))
+        #self.imagelist = [pygame.transform.scale(pygame.image.load('Sprites/tiles/crossBridge1.png').convert_alpha(), (self.width, self.height)),
+        #                pygame.transform.scale(pygame.image.load('Sprites/tiles/growth1.png').convert_alpha(), (self.width, self.height))]
+        self.image = self.game.tileList[0][index]
         #self.image.fill(RED)
 
         self.rect = self.image.get_rect()

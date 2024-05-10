@@ -629,17 +629,9 @@ class Flower(pygame.sprite.Sprite):
         #THIS WILL LIKELY IMPROVE ANIMATION FLUIDITY WHEN FLOWERS ARE INTERACTED WITH
         #WILL ALSO REMOVE DUPLICATE SHEARS WITH THE PLAYER CUTTING ANIMATION
 
-        hyacinImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth.png').convert_alpha(), (self.width, self.height)),
-                      pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth3New.png').convert_alpha(), (self.width, self.height)),
-                      pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth5.png').convert_alpha(), (self.width, self.height))]
-        sunFloImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/sunflowernew.png').convert_alpha(), (self.width, self.height)),
-                      pygame.transform.scale(pygame.image.load('Sprites/items/sunflower3New.png').convert_alpha(), (self.width, self.height)),
-                      pygame.transform.scale(pygame.image.load('Sprites/items/sunflower5.png').convert_alpha(), (self.width, self.height))]
-        silentFImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower.png').convert_alpha(), (self.width, self.height)),
-                       pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower3New.png').convert_alpha(), (self.width, self.height)),
-                       pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower5.png').convert_alpha(), (self.width, self.height))]
 
-        self.imageList = [[hyacinImgL[0], hyacinImgL], [sunFloImgL[0], sunFloImgL], [silentFImgL[0], silentFImgL]]
+
+        self.imageList = [[self.game.hyacinImgL[0], self.game.hyacinImgL], [self.game.sunFloImgL[0], self.game.sunFloImgL], [self.game.silentFImgL[0], self.game.silentFImgL]]
         #Randomly selects the flower to spawn as one of the flower options:
         #either a hyacinth, sunflower, or silent princess flower
         self.flowerSpriteNum = random.randint(0, len(self.imageList)-1)
@@ -693,30 +685,10 @@ class Ore(pygame.sprite.Sprite):
 
         self.state = 'alive'
 
-        rubyImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby.png').convert_alpha(), (self.width, self.height)),
-                      pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby2.png').convert_alpha(), (self.width, self.height)),
-                      pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby3.png').convert_alpha(), (self.width, self.height)),
-                      pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby3.png').convert_alpha(), (self.width, self.height))]
-        emeraldImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald.png').convert_alpha(), (self.width, self.height)),
-                         pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald2.png').convert_alpha(), (self.width, self.height)),
-                         pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald3.png').convert_alpha(), (self.width, self.height)),
-                         pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald3.png').convert_alpha(), (self.width, self.height))]
-        copperImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper.png').convert_alpha(), (self.width, self.height)),
-                        pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper2.png').convert_alpha(), (self.width, self.height)),
-                        pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper3.png').convert_alpha(), (self.width, self.height)),
-                        pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper3.png').convert_alpha(), (self.width, self.height))]
-        amethImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst.png').convert_alpha(), (self.width, self.height)),
-                       pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst2.png').convert_alpha(), (self.width, self.height)),
-                       pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst3.png').convert_alpha(), (self.width, self.height)),
-                       pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst3.png').convert_alpha(), (self.width, self.height))]
-        ironImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreIron.png').convert_alpha(), (self.width, self.height)),
-                      pygame.transform.scale(pygame.image.load('Sprites/items/oreIron2.png').convert_alpha(), (self.width, self.height)),
-                      pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(), (self.width, self.height)),
-                      pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(), (self.width, self.height))]
 
 
 
-        self.imageList = [[rubyImageL[0], rubyImageL], [emeraldImageL[0], emeraldImageL], [copperImageL[0], copperImageL], [amethImageL[0], amethImageL], [ironImageL[0], ironImageL]]
+        self.imageList = [[self.game.rubyImageL[0], self.game.rubyImageL], [self.game.emeraldImageL[0], self.game.emeraldImageL], [self.game.copperImageL[0], self.game.copperImageL], [self.game.amethImageL[0], self.game.amethImageL], [self.game.ironImageL[0], self.game.ironImageL]]
         self.oreSpriteNum = random.randint(0, len(self.imageList) - 1)
 
         self.image = self.imageList[self.oreSpriteNum][0]
