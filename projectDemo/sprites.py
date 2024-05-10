@@ -1062,7 +1062,7 @@ class Enemy(pygame.sprite.Sprite):
             change = self.path.checkCollisions()
             print(change)
             if change and change != (0, 0):
-                self.xChange, self.yChange = change[0]*self.speed, change[1]*self.speed
+                self.xChange, self.yChange = change[0]*self.speed*0.7, change[1]*self.speed*0.7
             else:  
                 self.state = 'standing'
                 self.moving = False
