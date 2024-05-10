@@ -624,6 +624,7 @@ class Flower(pygame.sprite.Sprite):
         self.imgindex = 1
 
         self.state = 'alive'
+        self.name = 'flower'
 
         #READ ME, EDIT ALL OF THE FLOWER SPRITES TO NOT INCLUDE THE CUTTING SHEARS
         #THIS WILL LIKELY IMPROVE ANIMATION FLUIDITY WHEN FLOWERS ARE INTERACTED WITH
@@ -664,6 +665,8 @@ class Flower(pygame.sprite.Sprite):
         else:
             if self.state == 'cutting':
                 self.kill()
+                self.game.inventory.add_item('flower')
+                print(self.game.inventory.slots)
                 pygame.mixer.Channel(3).set_volume(0.01 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
 
@@ -684,6 +687,7 @@ class Ore(pygame.sprite.Sprite):
         self.imgindex = 0
 
         self.state = 'alive'
+        self.name = 'ore'
 
 
 
@@ -723,6 +727,8 @@ class Ore(pygame.sprite.Sprite):
         else:
             if self.state == 'mining':
                 self.kill()
+                self.game.inventory.add_item('ore')
+                print(self.game.inventory.slots)
                 pygame.mixer.Channel(3).set_volume(0.01 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
         pass

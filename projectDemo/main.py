@@ -41,6 +41,7 @@ class Game():
         self.clock = pygame.time.Clock() 
 
         self.player = None
+        self.inventory = None
         self.state = 'opening'
         #Game states:
         #explore - Player can move around
@@ -105,6 +106,7 @@ class Game():
         #Only for initial map creation
         # -1, -1 is the convention to make known that the map doesnt currently exist
         if self.map == [-1, -1]:
+            self.inventory = Inventory(self)
             for row in range(len(settings.currentTileMap[0])):
                 #print(f"{row} ", end="")   
                 for col in range(len(settings.currentTileMap[0][row])):
@@ -255,7 +257,9 @@ class Game():
             print('Current Map:')
             for i in currentTileMap[mapNumber]:
                 print(i)
-                     
+
+
+            self.all_sprites.add(self.inventory)         
             for row in range(len(settings.currentTileMap[mapNumber])):
                 #print(f"{row} ", end="")
                 for col in range(len(settings.currentTileMap[mapNumber][row])):
@@ -516,6 +520,7 @@ class Game():
             self.state = 'explore'
             self.play_music('village')
         pass
+    
 
     def setupImages(self):
         self.tileList = [[pygame.transform.scale(pygame.image.load('Sprites/tiles/crossBridge1.png').convert_alpha(),(TILESIZE, TILESIZE)),

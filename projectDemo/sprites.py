@@ -367,6 +367,8 @@ class Player(pygame.sprite.Sprite):
             if not interacted:
                 self.weapon.attack()
 
+            
+
         #EDIT AFTER INVENTORY MADE
         elif keys[pygame.K_r] and self.weapon.type == 'bubble':
             self.weapon.reload()
@@ -441,6 +443,7 @@ class Player(pygame.sprite.Sprite):
                         self.game.state = 'flowerC'
                         self.game.flowers.get_sprite(interactIndex).state = 'cutting'
                         self.game.flowers.get_sprite(interactIndex).anim()
+
                         #READ ME, USE "self.facing" DIRECTIONS TO DETERMINE WHICH DIRECTION CUTTING SPRITE TO USE
                         if self.facing == 'right':
                             self.image = self.cutRightImgList[self.cutUpgrade]
@@ -1197,6 +1200,29 @@ class TextBox(pygame.sprite.Sprite):
                     pygame.draw.rect(self.image, GRAY, self.choiceRectList[rect], 2, 1)
 
 
+class Inventory(pygame.sprite.Sprite):
+    def __init__(self, game):
+        self.game = game
+        self._layer = TEXT_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        self.x = 1*TILESIZE
+        self.y = 10.5*TILESIZE
+        self.width = 6*TILESIZE
+        self.height = 13*TILESIZE
+
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/hudImages/pixil-frame-0 (1).png'), (self.width, self.height))
+        #self.image.fill(RED)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+        self.slots = {"flower":0, "ore":0, "potion": 0}
+
+    def add_item(self, item):
+        self.slots[item] =  self.slots.get(item) + 1
 class Tutorial:
     def __init__(self, game):
         self.game = game
