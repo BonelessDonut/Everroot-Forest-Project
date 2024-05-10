@@ -901,6 +901,7 @@ class Enemy(pygame.sprite.Sprite):
     def deathAnimation(self):
         pass
 
+    ### EDDIE
     def flicker(self):
         alpha = 0
         value = math.sin(pygame.time.get_ticks())
@@ -1207,7 +1208,7 @@ class Enemy(pygame.sprite.Sprite):
     def attack(self):
         if self.attackType == 'melee' and pygame.sprite.collide_rect(self, self.game.player):
             self.game.player.getDamage(self.damage)
-        elif self.attackType == 'ranged':
+        elif self.attackType == 'ranged': ### MAX !!!
             self.timepassed += self.clock.get_time()/1000
             if self.timepassed > self.attackTimer:
                 playerPos = self.game.player.rect.center
