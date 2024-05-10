@@ -959,7 +959,7 @@ class Enemy(pygame.sprite.Sprite):
             if type == 'bubble':
                 self.health -= damage
                 self.stunned = True
-                self.state = 'standing'
+                self.state = 'stunned'
                 pygame.mixer.Channel(4).set_volume(0.06 * self.game.soundVol)
                 pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/15_Impact_flesh_02.wav'))
             elif type == 'swordfish' or type == 'trident':
@@ -997,7 +997,15 @@ class Enemy(pygame.sprite.Sprite):
                     self.imageIndex = 3
                 self.image = self.imagelist[self.imageIndex]
         else:
-            pass
+            if self.facingDirection == 'right':
+                self.imageIndex = 2
+            elif self.facingDirection == 'down':
+                self.imageIndex = 0
+            elif self.facingDirection == 'left':
+                self.imageIndex = 1
+            elif self.facingDirection == 'up':
+                self.imageIndex = 3
+        self.image = self.imagelist[self.imageIndex]
         self.flicker()
 
     #Authored: Max Chiu 4/18/2024
@@ -1029,7 +1037,7 @@ class Enemy(pygame.sprite.Sprite):
             self.attack()
 
 
-            if self.state == 'standing':
+            if self.state == 'standing' or self.state == 'stunned':
                 self.yChange = 0
                 self.xChange = 0
                 if self.stunned:
@@ -1038,14 +1046,14 @@ class Enemy(pygame.sprite.Sprite):
                         self.stunned = False
                         self.stunCount = 0
 
-            # elif self.state == 'knockback':
-            #     self.rect.x += self.xChange * -1
-            #     self.collideBlocks('x')
-            #     self.rect.y += self.yChange * -1
-            #     self.collideBlocks('y')
+            elif self.state == 'knockback':
+                self.rect.x += self.xChange * -1
+                self.collideBlocks('x')
+                self.rect.y += self.yChange * -1
+                self.collideBlocks('y')
 
-            #     self.x = self.rect.x
-            #     self.y = self.rect.y
+                self.x = self.rect.x
+                self.y = self.rect.y
             #     pass
             else: #self.state == 'chasing'
                 self.searchPlayer()
@@ -1103,8 +1111,11 @@ class Enemy(pygame.sprite.Sprite):
     #Modified: Max Chiu 4/28/2024 - 5/10/2024
     def searchPlayer(self):
         #print(self.state)
-        if not self.hitInvulnerable and not self.stunned:
+        if not self.hitInvulnerable and not self.stunned and self.attackType == 'melee':
             self.state = 'chasing' if self.state not in ['chasing', 'searching', 'standing', 'returning'] else self.state
+            print(self.xChange, self.yChange)
+        if self.state == 'stunned' or self.state == 'knockback':
+            return
         if self.state == 'returning':
             #print(len(self.path.collision_rects))
             if self.path.collision_rects == []:
@@ -1128,6 +1139,7 @@ class Enemy(pygame.sprite.Sprite):
                 self.xChange, self.yChange = change[0]*self.speed, change[1]*self.speed
                 if self.xChange == 0 and self.yChange == 0:
                     self.state = 'chasing'
+
             else:
                 self.state = 'returning'
                 self.path.emptyPath()
@@ -1145,9 +1157,11 @@ class Enemy(pygame.sprite.Sprite):
         n = 10
         dx = (px - ex)/n
         dy = (py - ey)/n
+        print(dx, dy)
 
         #find the distance between player and enemy, check if this distance is outside the range of the enemy
         distance = math.sqrt((dx*n)**2+(dy*n)**2)
+        print(distance)
         if distance > 300: #implement pathfinding for the last 4-5 tiles of the player
             # self.xChange = 0
             # self.yChange = 0
@@ -1159,8 +1173,10 @@ class Enemy(pygame.sprite.Sprite):
                 # self.xChange, self.yChange = (coord*self.speed for coord in self.path.createPath((enemyPos[0]//TILESIZE, enemyPos[1]//TILESIZE), (playerPos[0]//TILESIZE, playerPos[1]//TILESIZE)))
                 self.path.createPath((enemyPos[0]//TILESIZE, enemyPos[1]//TILESIZE), (playerPos[0]//TILESIZE, playerPos[1]//TILESIZE))
                 change = self.path.checkCollisions()
+
                 if change != (0, 0):
                     self.xChange, self.yChange = change[0]*self.speed, change[1]*self.speed
+
                 else:
                     # self.state = 'chasing'
                     # self.path.emptyPath()
@@ -1193,6 +1209,7 @@ class Enemy(pygame.sprite.Sprite):
             dx, dy = Multiclass.normalize(dx*n, dy*n)
             self.xChange = dx * self.speed
             self.yChange = dy * self.speed
+            print(self.xChange, self.yChange)
             
         elif not isChasing and self.state != 'returning':
             
@@ -1216,12 +1233,13 @@ class Enemy(pygame.sprite.Sprite):
     def collideBlocks(self, direction):
         if direction == 'x':
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False) + pygame.sprite.spritecollide(self, self.game.enemies, False)
-            if pygame.sprite.collide_rect(self, self.game.player):
-                if self.xChange > 0:
-                    self.rect.x = self.game.player.rect.left - self.rect.width
-                if self.xChange < 0:
-                    self.rect.x = self.game.player.rect.right
-            elif hits and hits[0] != self:
+            #if pygame.sprite.collide_rect(self, self.game.player):
+            #    if self.xChange > 0:
+            #        self.rect.x = self.game.player.rect.left - self.rect.width
+            #    if self.xChange < 0:
+            #        self.rect.x = self.game.player.rect.right
+            #elif hits and hits[0] != self:
+            if hits and hits[0] != self:
                 if self.xChange > 0:
                     self.rect.x = hits[0].rect.left - self.rect.width
                 if self.xChange < 0:
@@ -1230,12 +1248,13 @@ class Enemy(pygame.sprite.Sprite):
                 return True
         else:
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False) + pygame.sprite.spritecollide(self, self.game.enemies, False)
-            if pygame.sprite.collide_rect(self, self.game.player):
-                if self.yChange > 0:
-                    self.rect.y = self.game.player.rect.top - self.rect.height
-                if self.yChange < 0:
-                    self.rect.y = self.game.player.rect.bottom
-            elif hits and hits[0] != self:
+            #if pygame.sprite.collide_rect(self, self.game.player):
+            #    if self.yChange > 0:
+            #        self.rect.y = self.game.player.rect.top - self.rect.height
+            #    if self.yChange < 0:
+            #        self.rect.y = self.game.player.rect.bottom
+            #elif hits and hits[0] != self:
+            if hits and hits[0] != self:
                 if self.yChange > 0:
                     self.rect.y = hits[0].rect.top - self.rect.height
                 if self.yChange < 0:
@@ -1262,6 +1281,14 @@ class Enemy(pygame.sprite.Sprite):
                     angle = math.pi - math.atan(dy/dx)
                 elif dx < 0 and dy > 0:
                     angle = math.pi + math.atan(-1*dy/dx)
+                if dx > 0 and (abs(dx) > abs(dy)):
+                    self.facingDirection = 'right'
+                elif dy < 0 and (abs(dy) > abs(dx)):
+                    self.facingDirection = 'up'
+                elif dx < 0 and (abs(dx) > abs(dy)):
+                    self.facingDirection = 'left'
+                elif dy < 0 and (abs(dy) > abs(dx)):
+                    self.facingDirection = 'down'
                 try:
                     print(angle)
                     items.Bullet(self.game, self.x, self.y, angle, 1000, self.damage, 'enemy')
