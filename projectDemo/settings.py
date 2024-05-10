@@ -1,6 +1,8 @@
+import pygame
 WIDTH = 1280
 HEIGHT = 720
 TILESIZE = 40
+
 
 GREEN = (20, 145, 54)
 BLACK = (0, 0, 0)

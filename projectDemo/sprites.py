@@ -747,11 +747,11 @@ class Inventory(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
 
         self.x = 1*TILESIZE
-        self.y = 17*TILESIZE
-        self.width = 13*TILESIZE
-        self.height = 1*TILESIZE
+        self.y = 10.5*TILESIZE
+        self.width = 6*TILESIZE
+        self.height = 13*TILESIZE
 
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/hotbar.png'), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/hudImages/pixil-frame-0 (1).png'), (self.width, self.height))
         #self.image.fill(RED)
 
         self.rect = self.image.get_rect()
@@ -762,5 +762,3 @@ class Inventory(pygame.sprite.Sprite):
 
     def add_item(self, item):
         self.slots[item] =  self.slots.get(item) + 1
-
-            

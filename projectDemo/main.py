@@ -188,7 +188,8 @@ class Game():
             for i in currentTileMap[mapNumber]:
                 print(i)
 
-                     
+
+            self.all_sprites.add(self.inventory)         
             for row in range(len(settings.currentTileMap[mapNumber])):
                 #print(f"{row} ", end="")
                 for col in range(len(settings.currentTileMap[mapNumber][row])):
