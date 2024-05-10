@@ -357,10 +357,12 @@ class Game():
                     self.player.spearUsed = True
                 MeleeAttack(self, self.player.weapon, self.player)
             # Q is used to switch weapons for the player
-            if event.type == pygame.KEYUP and event.key == pygame.K_q and not self.player.itemUsed:
+            if event.type == pygame.KEYUP and event.key == pygame.K_q and not self.player.itemUsed and self.state == 'explore':
                 self.player.switchWeapons()
             if event.type == pygame.KEYUP and event.key == pygame.K_p:
                 self.pause()
+            if event.type == pygame.KEYUP and event.key == pygame.K_g and not self.player.itemUsed and self.state == 'explore': # keybind to heal, will have added functionality with potions in the inventoryy later
+                self.player.getHealth(200)
             if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
                 pygame.font.quit()
                 pygame.quit()
