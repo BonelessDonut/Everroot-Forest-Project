@@ -203,12 +203,13 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
-        hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False)
-        if hits:
-            self.timepassed += self.clock.get_time()
-        if self.timepassed > 50:
-            self.kill()
-            self.timepassed = 0
+        if self.side == 'player':
+            hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False)
+            if hits:
+                self.timepassed += self.clock.get_time()
+            if self.timepassed > 50:
+                self.kill()
+                self.timepassed = 0
 
         if self.side == 'player':
             enemyIndex = self.rect.collidelist(list(enemy.rect for enemy in self.game.enemies))

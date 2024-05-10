@@ -936,7 +936,7 @@ class Enemy(pygame.sprite.Sprite):
             alpha = 0
         if self.hitInvulnerable:
             self.image.set_alpha(alpha)
-            print(self.image.get_alpha())
+            #print(self.image.get_alpha())
         else:
             self.image.set_alpha(255)
         pass
@@ -962,7 +962,7 @@ class Enemy(pygame.sprite.Sprite):
                 self.kill()
                 pygame.mixer.Channel(4).set_volume(0.065 * self.game.soundVol)
                 pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/69_Enemy_death_01.wav'))
-            print(f"enemy (self) health is {self.health}")
+            # print(f"enemy (self) health is {self.health}")
         else:
             return
 
@@ -1039,16 +1039,16 @@ class Enemy(pygame.sprite.Sprite):
                 collideX = self.collideBlocks('x')
                 self.rect.y += self.yChange
                 collideY = self.collideBlocks('y')
-                print('before', self.path.collision_rects)
-                print('before state check:', self.state)
+                #print('before', self.path.collision_rects)
+                #print('before state check:', self.state)
                 if (self.state == 'searching' or self.state == 'returning') and (collideX or collideY):
                     if collideX:
-                        print('collided x')
+                        #print('collided x')
                         if self.yChange < 0: #need to move up
-                            print('x up')
+                            #print('x up')
                             self.path.collision_rects.insert(0, pygame.Rect(enemyPos[0]-1, enemyPos[1]-TILESIZE-1, 2, 2))
                         elif self.yChange > 0: #need to move down
-                            print('x down')
+                            #print('x down')
                             self.path.collision_rects.insert(0, pygame.Rect(enemyPos[0]-1, enemyPos[1]+TILESIZE-1, 2, 2))
                         # elif self.xChange > 0 and self.yChange == 0: #need to move left
                         #     print('x left')
@@ -1057,12 +1057,12 @@ class Enemy(pygame.sprite.Sprite):
                         #     print('x right')
                         #     self.path.collision_rects.insert(0, pygame.Rect(enemyPos[0]+TILESIZE-1, enemyPos[1]-1, 2, 2))
                     elif collideY:
-                        print('collided y')
+                        #print('collided y')
                         if self.xChange < 0: #need to move left
-                            print('y left')
+                            #print('y left')
                             self.path.collision_rects.insert(0, pygame.Rect(enemyPos[0]-TILESIZE-1, enemyPos[1]-1, 2, 2))
                         elif self.xChange > 0: #need to move right
-                            print('y right')
+                            #print('y right')
                             self.path.collision_rects.insert(0, pygame.Rect(enemyPos[0]+TILESIZE+1, enemyPos[1]-1, 2, 2))
                         # elif self.yChange < 0 and self.xChange == 0: #need to move down
                         #     print('y down')
@@ -1070,7 +1070,7 @@ class Enemy(pygame.sprite.Sprite):
                         # elif self.yChange > 0 and self.xChange == 0: #need to move up
                         #     print('y up')
                         #     self.path.collision_rects.insert(0, pygame.Rect(enemyPos[0]-1, enemyPos[1]-TILESIZE-1, 2, 2))
-                print('after ', self.path.collision_rects)
+                #print('after ', self.path.collision_rects)
                 #print('dx', self.xChange, 'dy', self.yChange)
                 self.x = self.rect.x
                 self.y = self.rect.y
@@ -1088,17 +1088,17 @@ class Enemy(pygame.sprite.Sprite):
     #Authored: Max Chiu 4/28/2024
     #Modified: Max Chiu 4/28/2024 - 5/10/2024
     def searchPlayer(self):
-        print(self.state)
+        #print(self.state)
         if not self.hitInvulnerable and not self.stunned:
             self.state = 'chasing' if self.state not in ['chasing', 'searching', 'standing', 'returning'] else self.state
         if self.state == 'returning':
-            print(len(self.path.collision_rects))
+            #print(len(self.path.collision_rects))
             if self.path.collision_rects == []:
                 self.path = Pathfinder(self.map, self)
                 enemyPos = self.rect.center
                 self.path.createPath((enemyPos[0]//TILESIZE, enemyPos[1]//TILESIZE), (self.defaultPos[0], self.defaultPos[1]))
             change = self.path.checkCollisions()
-            print(change)
+            #print(change)
             if change and change != (0, 0):
                 self.xChange, self.yChange = change[0]*self.speed*0.7, change[1]*self.speed*0.7
             else:  
@@ -1240,8 +1240,8 @@ class Enemy(pygame.sprite.Sprite):
                 enemyPos = self.rect.center
                 dy = (playerPos[1] - enemyPos[1])
                 dx = (playerPos[0] - enemyPos[0])
-                print(dx)
-                print(dy)
+                #print(dx)
+                #print(dy)
                 if dx > 0:
                     angle = math.atan(-1*dy/dx)
                 elif dx < 0 and dy < 0:
