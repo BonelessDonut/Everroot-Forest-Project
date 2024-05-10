@@ -351,7 +351,7 @@ class Game():
             # pygame.draw.rect(self.screen, (0,255,0), (960, 520, 10, 10))
             # pygame.draw.rect(self.screen, (0,0,255), (950, 540, 10, 10))
 
-            
+
             # draws the tutorial text on screen if needed
             if self.tutorialsActive:
                 self.player.tutorial.draw()
@@ -468,7 +468,7 @@ class Game():
                 self.screen.blit(pauseRect, (0,0))
                 #pygame.draw.rect(self.screen, (128, 128, 128, 128), [0, 0, WIDTH, HEIGHT])
                 # putting the pause text on the screen while the game is paused
-                self.screen.blit(pygame.font.SysFont('Garamond', 55).render(pauseText[0].strip(), False, WHITE),  (WIDTH * 0.4225, HEIGHT * 0.1))
+                self.screen.blit(pygame.font.SysFont('Garamond', 55).render(pauseText[0].strip(), False, WHITE),(WIDTH * 0.4225, HEIGHT * 0.1))
                 self.screen.blit(pygame.font.SysFont('Garamond', 55).render(pauseText[1].strip(), False, WHITE),(WIDTH * 0.3271875, HEIGHT * 0.2277))
                 self.screen.blit(pygame.font.SysFont('Garamond', 45).render(pauseText[2].strip(), False, ORANGE),(WIDTH * 0.3446875, HEIGHT * 0.34166))
                 # handling events while the game is paused
