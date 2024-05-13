@@ -311,8 +311,8 @@ class MeleeAttack(pygame.sprite.Sprite):
             self.x = self.player.x + self.width // 7
             self.rect.x = self.player.rect.x + self.width // 7
             if self.animationPhase == 1:
-                self.y = self.player.y - (self.height * 1.5)
-                self.rect.y = self.player.rect.y - (self.height * 1.5)
+                self.y = self.player.y - (self.height)
+                self.rect.y = self.player.rect.y - (self.height)
                 # self.hitbox = (self.rect.x, self.rect.y + TILESIZE // 2,(self.width, self.height))
             elif self.animationPhase == 2:
                 self.y = self.player.y - (self.height * 2)
@@ -354,16 +354,16 @@ class MeleeAttack(pygame.sprite.Sprite):
             self.x = self.player.x + self.width // 7
             self.rect.x = self.player.rect.x + self.width // 7
             if self.animationPhase == 1:
-                self.y = self.player.y + (self.height * 1.5)
-                self.rect.y = self.player.rect.y + (self.height * 1.5)
+                self.y = self.player.y + self.height // 2
+                self.rect.y = self.player.rect.y + self.height // 2
                 # self.hitbox = (self.rect.x, self.rect.y + self.height, self.width, self.height)
             elif self.animationPhase == 2:
-                self.y = self.player.y + (self.height * 2)
-                self.rect.y = self.player.rect.y + (self.height * 2)
+                self.y = self.player.y + (self.height)
+                self.rect.y = self.player.rect.y + (self.height)
                 # self.hitbox = (self.rect.x, self.rect.y + self.height, self.width, self.height)
             elif self.animationPhase == 3:
-                self.y = self.player.y + (self.height * 2.5)
-                self.rect.y = self.player.rect.y + (self.height * 2.5)
+                self.y = self.player.y + (self.height * 2)
+                self.rect.y = self.player.rect.y + (self.height * 2)
                 # self.hitbox = (self.rect.x, self.rect.y + self.height, self.width, self.height)
             if self.checkWalls():
                 print("wall blocking")
@@ -395,8 +395,8 @@ class MeleeAttack(pygame.sprite.Sprite):
             self.y = self.player.y + self.height // 7
             self.rect.y = self.player.rect.y + self.height // 7
             if self.animationPhase == 1:
-                self.x = self.player.x - (self.width * 1.5)
-                self.rect.x = self.player.rect.x - (self.width * 1.5)
+                self.x = self.player.x - (self.width)
+                self.rect.x = self.player.rect.x - (self.width)
                 self.hitbox = (self.rect.x, self.rect.y, self.width, self.height)
             elif self.animationPhase == 2:
                 self.x = self.player.x - (self.width * 2)
@@ -436,8 +436,8 @@ class MeleeAttack(pygame.sprite.Sprite):
             self.y = self.player.y + self.height // 7
             self.rect.y = self.player.rect.y + self.height // 7
             if self.animationPhase == 1:
-                self.x = self.player.x + (self.width)
-                self.rect.x = self.player.rect.x + (self.width)
+                self.x = self.player.x + (self.width) // 2
+                self.rect.x = self.player.rect.x + (self.width) // 2
                 self.hitbox = (self.rect.x + self.width, self.rect.y, self.width, self.height)
             elif self.animationPhase == 2:
                 self.x = self.player.x + (self.width * 1.5)
@@ -609,11 +609,11 @@ class MeleeAttack(pygame.sprite.Sprite):
         self.collide()
 
         # Uncomment the lines below to see the attack's hitbox as a transparent blue rectangle
-        # hitbox = pygame.surface.Surface([self.width, self.height])
-        # hitbox.set_alpha(128)
-        # hitbox.fill(GREEN)
-        # self.game.screen.blit(hitbox, (self.rect.x, self.rect.y))
-        # pygame.display.update()
+        #hitbox = pygame.surface.Surface([self.width, self.height])
+        #hitbox.set_alpha(128)
+        #hitbox.fill(GREEN)
+        #self.game.screen.blit(hitbox, (self.rect.x, self.rect.y))
+        #pygame.display.update()
 
         # Could add sounds effects for using a melee attack in this method, or within the Player class attack() method
         # So that the proper sound would play whenever the attack is used

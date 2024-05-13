@@ -1113,7 +1113,7 @@ class Enemy(pygame.sprite.Sprite):
         #print(self.state)
         if not self.hitInvulnerable and not self.stunned and self.attackType == 'melee':
             self.state = 'chasing' if self.state not in ['chasing', 'searching', 'standing', 'returning'] else self.state
-            print(self.xChange, self.yChange)
+            #print(self.xChange, self.yChange)
         if self.state == 'stunned' or self.state == 'knockback':
             return
         if self.state == 'returning':
@@ -1157,11 +1157,11 @@ class Enemy(pygame.sprite.Sprite):
         n = 10
         dx = (px - ex)/n
         dy = (py - ey)/n
-        print(dx, dy)
+        #print(dx, dy)
 
         #find the distance between player and enemy, check if this distance is outside the range of the enemy
         distance = math.sqrt((dx*n)**2+(dy*n)**2)
-        print(distance)
+        #print(distance)
         if distance > 300: #implement pathfinding for the last 4-5 tiles of the player
             # self.xChange = 0
             # self.yChange = 0
@@ -1209,7 +1209,7 @@ class Enemy(pygame.sprite.Sprite):
             dx, dy = Multiclass.normalize(dx*n, dy*n)
             self.xChange = dx * self.speed
             self.yChange = dy * self.speed
-            print(self.xChange, self.yChange)
+            #print(self.xChange, self.yChange)
             
         elif not isChasing and self.state != 'returning':
             
@@ -1290,7 +1290,7 @@ class Enemy(pygame.sprite.Sprite):
                 elif dy < 0 and (abs(dy) > abs(dx)):
                     self.facingDirection = 'down'
                 try:
-                    print(angle)
+                    #print(angle)
                     items.Bullet(self.game, self.x, self.y, angle, 1000, self.damage, 'enemy')
                 except UnboundLocalError:
                     pass
