@@ -367,8 +367,8 @@ class Player(pygame.sprite.Sprite):
                 self.game.npcs.get_sprite(npcIndex).interaction()
                 pygame.time.wait(250)
 
-            if not interacted:
-                self.weapon.attack()
+            #if not interacted:
+            #    self.weapon.attack()
 
             
 
@@ -1624,6 +1624,7 @@ class WeaponDisplay(pygame.sprite.Sprite):
 
     def checkActiveWep(self):
         currWeapon = self.game.player.weapon.type
+        self.changeCount = 0
         self.hasSwitched = True
         if currWeapon == 'swordfish':
             self.swordfishWep.update({'active': True})
