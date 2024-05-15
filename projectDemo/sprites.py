@@ -1655,24 +1655,24 @@ class Tutorial:
     def draw(self):
         if self.appear:
             tutorialText = ["Use WASD to move, Q to switch weapons",
-                            "E to attack using melee weapons",
-                            "SPACE to fire ranged weapon or interact",
+                            "E to attack using melee & ranged weapons",
+                            "SPACE to interact",
                             "R to reload ranged weapon",
                             "Press P to pause, change settings, disable tutorials, or quit."]
             #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[0].strip(), False, WHITE)
             #textSurf.set_alpha(127)
             #self.game.screen.blit(textSurf, (WIDTH * 0.72, HEIGHT * 0.78))
-            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[0].strip(), False, WHITE),(WIDTH * 0.72, HEIGHT * 0.78))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[0].strip(), False, WHITE),(WIDTH * 0.7225, HEIGHT * 0.78))
             #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[1].strip(), False, WHITE)
             #textSurf.set_alpha(127)
             #self.game.screen.blit(textSurf, (WIDTH * 0.78, HEIGHT * 0.81))
-            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[1].strip(), False, WHITE),(WIDTH * 0.78, HEIGHT * 0.81))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[1].strip(), False, WHITE),(WIDTH * 0.725, HEIGHT * 0.81))
             #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[2].strip(), False, WHITE)
             #textSurf.set_alpha(127)
             #self.game.screen.blit(textSurf, (WIDTH * 0.73, HEIGHT * 0.84))
             #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[3].strip(), False, WHITE)
             #self.game.screen.blit(textSurf, (WIDTH * 0.81, HEIGHT * 0.87))
-            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[2].strip(), False, WHITE),(WIDTH * 0.73, HEIGHT * 0.84))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[2].strip(), False, WHITE),(WIDTH * 0.859, HEIGHT * 0.84))
             #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[4].strip(), False, WHITE)
             #textSurf.set_alpha(127)
             #self.game.screen.blit(textSurf, (WIDTH * 0.64, HEIGHT * 0.9))
