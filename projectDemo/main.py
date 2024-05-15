@@ -42,6 +42,7 @@ class Game():
 
         self.player = None
         self.inventory = None
+        self.weaponsHud = None
         self.state = 'opening'
         #Game states:
         #explore - Player can move around
@@ -140,6 +141,7 @@ class Game():
                         Teleport(self, col, row)
                     #print(f"{col}", end="")
                 #print()
+            self.weaponsHud = WeaponDisplay(self)
         #For moving between rooms
         else:
             # kill all the current sprites in the current room
@@ -261,7 +263,8 @@ class Game():
                 print(i)
 
 
-            self.all_sprites.add(self.inventory)         
+            self.all_sprites.add(self.inventory)
+            self.all_sprites.add(self.weaponsHud)
             for row in range(len(settings.currentTileMap[mapNumber])):
                 #print(f"{row} ", end="")
                 for col in range(len(settings.currentTileMap[mapNumber][row])):
@@ -396,6 +399,7 @@ class Game():
                 self.player.tutorial.draw()
             if (self.state == 'explore' or self.state == 'oreMine' or self.state == 'flowerC'):
                 self.player.animateHealth()
+            self.weaponsHud.draw()
             self.clock.tick(FPS)
             pygame.display.update()
 

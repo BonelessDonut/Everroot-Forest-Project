@@ -672,7 +672,7 @@ class Player(pygame.sprite.Sprite):
                 self.weaponAnimationSpeed = 18
             pygame.mixer.Channel(1).set_volume(0.04 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/070_Equip_10.wav'))
-        pass
+            self.game.weaponsHud.checkActiveWep()
 
 
 class Block(pygame.sprite.Sprite):
@@ -900,7 +900,7 @@ class Enemy(pygame.sprite.Sprite):
                            pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinRangedUp.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99))]
 
         self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 120, 'health': 100, 'speed': PLAYER_SPEED * 0.5}
-        self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 100, 'health': 80}
+        self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 100, 'health': 70}
 
         self.imagelist = self.pumpkinRobot['down']
         #self.deathImgList = [pygame.transform.scale(pygame.image.load('').convert_alpha(), (self.width, self.height))]
@@ -1528,7 +1528,7 @@ class Inventory(pygame.sprite.Sprite):
         self.width = 5.5*TILESIZE
         self.height = 2.5*TILESIZE
 
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/hudImages/pixil-frame-0_cropped.png'), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/hudImages/pixil-frame-0_cropped.png').convert_alpha(), (self.width, self.height))
         #self.image.fill(RED)
 
         self.rect = self.image.get_rect()
@@ -1569,6 +1569,76 @@ class Inventory(pygame.sprite.Sprite):
             self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(potionX,53)))
         else:
             self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(potionX,53)))
+
+class WeaponDisplay(pygame.sprite.Sprite):
+    def __init__(self, game):
+        self.game = game
+        self._layer = TEXT_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.swordfishWep = {'image': pygame.image.load('Sprites/items/swordfish3.png').convert_alpha(), 'active' : False}
+        self.tridentWep = {'image' : pygame.image.load('Sprites/items/trident3.png').convert_alpha(), 'active' : False}
+        self.bubblegunWep = {'image' : self.game.player.weapon.imagelist[0], 'active' : True}
+        self.weaponList = [self.bubblegunWep,
+                           self.swordfishWep,
+                           self.tridentWep]
+        self.x = WIDTH * 0.83
+        self.y = HEIGHT * 0.018
+        self.width = 4.5 * TILESIZE
+        self.height = 2 * TILESIZE
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/hudImages/pixil-frame-0_cropped.png').convert_alpha(), (self.width, self.height))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.changeTimer = 20
+        self.changeCount = 0
+        self.hasSwitched = False
+        self.highlightColorList = [(176, 176, 46), (156, 90, 60)]
+        self.highlightNumber = 0
+
+    def update(self):
+        if self.hasSwitched:
+            self.changeCount += 1
+            value = math.sin(self.changeCount)
+            if value > 0:
+                self.highlightNumber = 1
+            else:
+                self.highlightNumber = 0
+            if self.changeCount >= self.changeTimer:
+                self.changeCount = 0
+                self.highlightNumber = 0
+                self.hasSwitched = False
+
+    def draw(self):
+        if self.game.state == 'explore' or self.game.state == 'oreMine' or self.game.state == 'flowerC':
+            if self not in self.game.all_sprites:
+                self.groups = self.game.all_sprites
+                self.add(self.game.all_sprites)
+            for i in range(len(self.weaponList)):
+                currentImage = pygame.transform.scale(self.weaponList[i]['image'].convert_alpha(), (TILESIZE * 0.8, TILESIZE * 0.8))
+                self.image.blit(currentImage, pygame.Rect((self.width*0.1) + self.width * 0.3*(i),self.height * 0.25,0,0))
+                if self.weaponList[i]['active']:
+                    pygame.draw.rect(self.game.screen, self.highlightColorList[self.highlightNumber],(self.x + 10 + self.width * 0.3 * i, self.y + 18, TILESIZE * 1.3, TILESIZE * 1.1), 3)
+        else:
+            self.remove(self.game.all_sprites)
+
+    def checkActiveWep(self):
+        currWeapon = self.game.player.weapon.type
+        self.hasSwitched = True
+        if currWeapon == 'swordfish':
+            self.swordfishWep.update({'active': True})
+            self.tridentWep.update({'active': False})
+            self.bubblegunWep.update({'active': False})
+        elif currWeapon == 'trident':
+            self.swordfishWep.update({'active': False})
+            self.tridentWep.update({'active': True})
+            self.bubblegunWep.update({'active': False})
+        elif currWeapon == 'bubble':
+            self.swordfishWep.update({'active': False})
+            self.tridentWep.update({'active': False})
+            self.bubblegunWep.update({'active': True})
+
+
 class Tutorial:
     def __init__(self, game):
         self.game = game
