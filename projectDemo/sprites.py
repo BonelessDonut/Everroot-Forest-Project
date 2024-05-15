@@ -367,8 +367,8 @@ class Player(pygame.sprite.Sprite):
                 self.game.npcs.get_sprite(npcIndex).interaction()
                 pygame.time.wait(250)
 
-            if not interacted:
-                self.weapon.attack()
+            #if not interacted:
+            #    self.weapon.attack()
 
             
 
@@ -672,7 +672,7 @@ class Player(pygame.sprite.Sprite):
                 self.weaponAnimationSpeed = 18
             pygame.mixer.Channel(1).set_volume(0.04 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/070_Equip_10.wav'))
-        pass
+            self.game.weaponsHud.checkActiveWep()
 
 
 class Block(pygame.sprite.Sprite):
@@ -900,7 +900,7 @@ class Enemy(pygame.sprite.Sprite):
                            pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinRangedUp.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99))]
 
         self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 120, 'health': 100, 'speed': PLAYER_SPEED * 0.5}
-        self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 100, 'health': 80}
+        self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 100, 'health': 70}
 
         self.imagelist = self.pumpkinRobot['down']
         #self.deathImgList = [pygame.transform.scale(pygame.image.load('').convert_alpha(), (self.width, self.height))]
@@ -959,7 +959,7 @@ class Enemy(pygame.sprite.Sprite):
             if type == 'bubble':
                 self.health -= damage
                 self.stunned = True
-                self.state = 'standing'
+                self.state = 'stunned'
                 pygame.mixer.Channel(4).set_volume(0.06 * self.game.soundVol)
                 pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/15_Impact_flesh_02.wav'))
             elif type == 'swordfish' or type == 'trident':
@@ -997,7 +997,15 @@ class Enemy(pygame.sprite.Sprite):
                     self.imageIndex = 3
                 self.image = self.imagelist[self.imageIndex]
         else:
-            pass
+            if self.facingDirection == 'right':
+                self.imageIndex = 2
+            elif self.facingDirection == 'down':
+                self.imageIndex = 0
+            elif self.facingDirection == 'left':
+                self.imageIndex = 1
+            elif self.facingDirection == 'up':
+                self.imageIndex = 3
+        self.image = self.imagelist[self.imageIndex]
         self.flicker()
 
     #Authored: Max Chiu 4/18/2024
@@ -1029,7 +1037,7 @@ class Enemy(pygame.sprite.Sprite):
             self.attack()
 
 
-            if self.state == 'standing':
+            if self.state == 'standing' or self.state == 'stunned':
                 self.yChange = 0
                 self.xChange = 0
                 if self.stunned:
@@ -1038,14 +1046,14 @@ class Enemy(pygame.sprite.Sprite):
                         self.stunned = False
                         self.stunCount = 0
 
-            # elif self.state == 'knockback':
-            #     self.rect.x += self.xChange * -1
-            #     self.collideBlocks('x')
-            #     self.rect.y += self.yChange * -1
-            #     self.collideBlocks('y')
+            elif self.state == 'knockback':
+                self.rect.x += self.xChange * -1
+                self.collideBlocks('x')
+                self.rect.y += self.yChange * -1
+                self.collideBlocks('y')
 
-            #     self.x = self.rect.x
-            #     self.y = self.rect.y
+                self.x = self.rect.x
+                self.y = self.rect.y
             #     pass
             else: #self.state == 'chasing'
                 self.searchPlayer()
@@ -1103,8 +1111,11 @@ class Enemy(pygame.sprite.Sprite):
     #Modified: Max Chiu 4/28/2024 - 5/10/2024
     def searchPlayer(self):
         #print(self.state)
-        if not self.hitInvulnerable and not self.stunned:
+        if not self.hitInvulnerable and not self.stunned and self.attackType == 'melee':
             self.state = 'chasing' if self.state not in ['chasing', 'searching', 'standing', 'returning'] else self.state
+            #print(self.xChange, self.yChange)
+        if self.state == 'stunned' or self.state == 'knockback':
+            return
         if self.state == 'returning':
             #print(len(self.path.collision_rects))
             if self.path.collision_rects == []:
@@ -1128,6 +1139,7 @@ class Enemy(pygame.sprite.Sprite):
                 self.xChange, self.yChange = change[0]*self.speed, change[1]*self.speed
                 if self.xChange == 0 and self.yChange == 0:
                     self.state = 'chasing'
+
             else:
                 self.state = 'returning'
                 self.path.emptyPath()
@@ -1145,9 +1157,11 @@ class Enemy(pygame.sprite.Sprite):
         n = 10
         dx = (px - ex)/n
         dy = (py - ey)/n
+        #print(dx, dy)
 
         #find the distance between player and enemy, check if this distance is outside the range of the enemy
         distance = math.sqrt((dx*n)**2+(dy*n)**2)
+        #print(distance)
         if distance > 300: #implement pathfinding for the last 4-5 tiles of the player
             # self.xChange = 0
             # self.yChange = 0
@@ -1159,8 +1173,10 @@ class Enemy(pygame.sprite.Sprite):
                 # self.xChange, self.yChange = (coord*self.speed for coord in self.path.createPath((enemyPos[0]//TILESIZE, enemyPos[1]//TILESIZE), (playerPos[0]//TILESIZE, playerPos[1]//TILESIZE)))
                 self.path.createPath((enemyPos[0]//TILESIZE, enemyPos[1]//TILESIZE), (playerPos[0]//TILESIZE, playerPos[1]//TILESIZE))
                 change = self.path.checkCollisions()
+
                 if change != (0, 0):
                     self.xChange, self.yChange = change[0]*self.speed, change[1]*self.speed
+
                 else:
                     # self.state = 'chasing'
                     # self.path.emptyPath()
@@ -1193,6 +1209,7 @@ class Enemy(pygame.sprite.Sprite):
             dx, dy = Multiclass.normalize(dx*n, dy*n)
             self.xChange = dx * self.speed
             self.yChange = dy * self.speed
+            #print(self.xChange, self.yChange)
             
         elif not isChasing and self.state != 'returning':
             
@@ -1216,12 +1233,13 @@ class Enemy(pygame.sprite.Sprite):
     def collideBlocks(self, direction):
         if direction == 'x':
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False) + pygame.sprite.spritecollide(self, self.game.enemies, False)
-            if pygame.sprite.collide_rect(self, self.game.player):
-                if self.xChange > 0:
-                    self.rect.x = self.game.player.rect.left - self.rect.width
-                if self.xChange < 0:
-                    self.rect.x = self.game.player.rect.right
-            elif hits and hits[0] != self:
+            #if pygame.sprite.collide_rect(self, self.game.player):
+            #    if self.xChange > 0:
+            #        self.rect.x = self.game.player.rect.left - self.rect.width
+            #    if self.xChange < 0:
+            #        self.rect.x = self.game.player.rect.right
+            #elif hits and hits[0] != self:
+            if hits and hits[0] != self:
                 if self.xChange > 0:
                     self.rect.x = hits[0].rect.left - self.rect.width
                 if self.xChange < 0:
@@ -1230,12 +1248,13 @@ class Enemy(pygame.sprite.Sprite):
                 return True
         else:
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False) + pygame.sprite.spritecollide(self, self.game.enemies, False)
-            if pygame.sprite.collide_rect(self, self.game.player):
-                if self.yChange > 0:
-                    self.rect.y = self.game.player.rect.top - self.rect.height
-                if self.yChange < 0:
-                    self.rect.y = self.game.player.rect.bottom
-            elif hits and hits[0] != self:
+            #if pygame.sprite.collide_rect(self, self.game.player):
+            #    if self.yChange > 0:
+            #        self.rect.y = self.game.player.rect.top - self.rect.height
+            #    if self.yChange < 0:
+            #        self.rect.y = self.game.player.rect.bottom
+            #elif hits and hits[0] != self:
+            if hits and hits[0] != self:
                 if self.yChange > 0:
                     self.rect.y = hits[0].rect.top - self.rect.height
                 if self.yChange < 0:
@@ -1262,8 +1281,16 @@ class Enemy(pygame.sprite.Sprite):
                     angle = math.pi - math.atan(dy/dx)
                 elif dx < 0 and dy > 0:
                     angle = math.pi + math.atan(-1*dy/dx)
+                if dx > 0 and (abs(dx) > abs(dy)):
+                    self.facingDirection = 'right'
+                elif dy < 0 and (abs(dy) > abs(dx)):
+                    self.facingDirection = 'up'
+                elif dx < 0 and (abs(dx) > abs(dy)):
+                    self.facingDirection = 'left'
+                elif dy < 0 and (abs(dy) > abs(dx)):
+                    self.facingDirection = 'down'
                 try:
-                    print(angle)
+                    #print(angle)
                     items.Bullet(self.game, self.x, self.y, angle, 1000, self.damage, 'enemy')
                 except UnboundLocalError:
                     pass
@@ -1501,7 +1528,7 @@ class Inventory(pygame.sprite.Sprite):
         self.width = 5.5*TILESIZE
         self.height = 2.5*TILESIZE
 
-        self.image = pygame.transform.scale(pygame.image.load('Sprites/hudImages/pixil-frame-0_cropped.png'), (self.width, self.height))
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/hudImages/pixil-frame-0_cropped.png').convert_alpha(), (self.width, self.height))
         #self.image.fill(RED)
 
         self.rect = self.image.get_rect()
@@ -1542,6 +1569,77 @@ class Inventory(pygame.sprite.Sprite):
             self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(potionX,53)))
         else:
             self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(potionX,53)))
+
+class WeaponDisplay(pygame.sprite.Sprite):
+    def __init__(self, game):
+        self.game = game
+        self._layer = TEXT_LAYER
+        self.groups = self.game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.swordfishWep = {'image': pygame.image.load('Sprites/items/swordfish3.png').convert_alpha(), 'active' : False}
+        self.tridentWep = {'image' : pygame.image.load('Sprites/items/trident3.png').convert_alpha(), 'active' : False}
+        self.bubblegunWep = {'image' : self.game.player.weapon.imagelist[0], 'active' : True}
+        self.weaponList = [self.bubblegunWep,
+                           self.swordfishWep,
+                           self.tridentWep]
+        self.x = WIDTH * 0.83
+        self.y = HEIGHT * 0.018
+        self.width = 4.5 * TILESIZE
+        self.height = 2 * TILESIZE
+        self.image = pygame.transform.scale(pygame.image.load('Sprites/hudImages/pixil-frame-0_cropped.png').convert_alpha(), (self.width, self.height))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.changeTimer = 20
+        self.changeCount = 0
+        self.hasSwitched = False
+        self.highlightColorList = [(176, 176, 46), (156, 90, 60)]
+        self.highlightNumber = 0
+
+    def update(self):
+        if self.hasSwitched:
+            self.changeCount += 1
+            value = math.sin(self.changeCount)
+            if value > 0:
+                self.highlightNumber = 1
+            else:
+                self.highlightNumber = 0
+            if self.changeCount >= self.changeTimer:
+                self.changeCount = 0
+                self.highlightNumber = 0
+                self.hasSwitched = False
+
+    def draw(self):
+        if self.game.state == 'explore' or self.game.state == 'oreMine' or self.game.state == 'flowerC':
+            if self not in self.game.all_sprites:
+                self.groups = self.game.all_sprites
+                self.add(self.game.all_sprites)
+            for i in range(len(self.weaponList)):
+                currentImage = pygame.transform.scale(self.weaponList[i]['image'].convert_alpha(), (TILESIZE * 0.8, TILESIZE * 0.8))
+                self.image.blit(currentImage, pygame.Rect((self.width*0.1) + self.width * 0.3*(i),self.height * 0.25,0,0))
+                if self.weaponList[i]['active']:
+                    pygame.draw.rect(self.game.screen, self.highlightColorList[self.highlightNumber],(self.x + 10 + self.width * 0.3 * i, self.y + 18, TILESIZE * 1.3, TILESIZE * 1.1), 3)
+        else:
+            self.remove(self.game.all_sprites)
+
+    def checkActiveWep(self):
+        currWeapon = self.game.player.weapon.type
+        self.changeCount = 0
+        self.hasSwitched = True
+        if currWeapon == 'swordfish':
+            self.swordfishWep.update({'active': True})
+            self.tridentWep.update({'active': False})
+            self.bubblegunWep.update({'active': False})
+        elif currWeapon == 'trident':
+            self.swordfishWep.update({'active': False})
+            self.tridentWep.update({'active': True})
+            self.bubblegunWep.update({'active': False})
+        elif currWeapon == 'bubble':
+            self.swordfishWep.update({'active': False})
+            self.tridentWep.update({'active': False})
+            self.bubblegunWep.update({'active': True})
+
+
 class Tutorial:
     def __init__(self, game):
         self.game = game
@@ -1557,24 +1655,24 @@ class Tutorial:
     def draw(self):
         if self.appear:
             tutorialText = ["Use WASD to move, Q to switch weapons",
-                            "E to attack using melee weapons",
-                            "SPACE to fire ranged weapon or interact",
+                            "E to attack using melee & ranged weapons",
+                            "SPACE to interact",
                             "R to reload ranged weapon",
                             "Press P to pause, change settings, disable tutorials, or quit."]
             #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[0].strip(), False, WHITE)
             #textSurf.set_alpha(127)
             #self.game.screen.blit(textSurf, (WIDTH * 0.72, HEIGHT * 0.78))
-            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[0].strip(), False, WHITE),(WIDTH * 0.72, HEIGHT * 0.78))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[0].strip(), False, WHITE),(WIDTH * 0.7225, HEIGHT * 0.78))
             #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[1].strip(), False, WHITE)
             #textSurf.set_alpha(127)
             #self.game.screen.blit(textSurf, (WIDTH * 0.78, HEIGHT * 0.81))
-            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[1].strip(), False, WHITE),(WIDTH * 0.78, HEIGHT * 0.81))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[1].strip(), False, WHITE),(WIDTH * 0.725, HEIGHT * 0.81))
             #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[2].strip(), False, WHITE)
             #textSurf.set_alpha(127)
             #self.game.screen.blit(textSurf, (WIDTH * 0.73, HEIGHT * 0.84))
             #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[3].strip(), False, WHITE)
             #self.game.screen.blit(textSurf, (WIDTH * 0.81, HEIGHT * 0.87))
-            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[2].strip(), False, WHITE),(WIDTH * 0.73, HEIGHT * 0.84))
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(tutorialText[2].strip(), False, WHITE),(WIDTH * 0.859, HEIGHT * 0.84))
             #textSurf = pygame.font.SysFont('Garamond', 18).render(tutorialText[4].strip(), False, WHITE)
             #textSurf.set_alpha(127)
             #self.game.screen.blit(textSurf, (WIDTH * 0.64, HEIGHT * 0.9))

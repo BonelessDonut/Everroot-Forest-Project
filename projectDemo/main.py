@@ -42,6 +42,7 @@ class Game():
 
         self.player = None
         self.inventory = None
+        self.weaponsHud = None
         self.state = 'opening'
         #Game states:
         #explore - Player can move around
@@ -140,6 +141,7 @@ class Game():
                         Teleport(self, col, row)
                     #print(f"{col}", end="")
                 #print()
+            self.weaponsHud = WeaponDisplay(self)
         #For moving between rooms
         else:
             # kill all the current sprites in the current room
@@ -261,7 +263,8 @@ class Game():
                 print(i)
 
 
-            self.all_sprites.add(self.inventory)         
+            self.all_sprites.add(self.inventory)
+            self.all_sprites.add(self.weaponsHud)
             for row in range(len(settings.currentTileMap[mapNumber])):
                 #print(f"{row} ", end="")
                 for col in range(len(settings.currentTileMap[mapNumber][row])):
@@ -351,7 +354,7 @@ class Game():
                 pygame.quit()
                 sys.exit()
             # Use E to attack using a melee weapon
-            if event.type == pygame.KEYUP and (event.key == pygame.K_e and not self.player.itemUsed) and ((self.player.weapon.type == 'swordfish' or self.player.weapon.type == 'trident') and self.state == 'explore'):
+            if event.type == pygame.KEYDOWN and (event.key == pygame.K_e and not self.player.itemUsed) and ((self.player.weapon.type == 'swordfish' or self.player.weapon.type == 'trident') and self.state == 'explore'):
                 self.player.itemUsed = True
                 if False: # This line is a placeholder for a conditional that will check if the melee weapon type is the spear weapon or swordfish
                     pass
@@ -361,6 +364,8 @@ class Game():
                     self.player.spearUsed = True
                 MeleeAttack(self, self.player.weapon, self.player)
             # Q is used to switch weapons for the player
+            if event.type == pygame.KEYDOWN and ((event.key == pygame.K_e) and not self.player.itemUsed) and (self.player.weapon.type == 'bubble' and self.state == 'explore'):
+                self.player.weapon.attack()
             if event.type == pygame.KEYUP and event.key == pygame.K_q and not self.player.itemUsed and self.state == 'explore':
                 self.player.switchWeapons()
             if event.type == pygame.KEYUP and event.key == pygame.K_p:
@@ -396,6 +401,7 @@ class Game():
                 self.player.tutorial.draw()
             if (self.state == 'explore' or self.state == 'oreMine' or self.state == 'flowerC'):
                 self.player.animateHealth()
+            self.weaponsHud.draw()
             self.clock.tick(FPS)
             pygame.display.update()
 
