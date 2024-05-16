@@ -182,7 +182,6 @@ class Game():
             if mapNumber == -2:
                 purpleRandomRoomIndex = random.randint(0, len(purpleRandomRooms)-1)
                 randomPurpleMap = purpleRandomRooms[purpleRandomRoomIndex]
-        
                 # RANDOMLY SPAWNING THE FLOWERS AND ORES
                 # double flower: FF
                 i = 5
@@ -192,8 +191,8 @@ class Game():
                     if randomPurpleMap[row][column] == '.':
                         if randomPurpleMap[row][column+1] == '.':
                             string1 = self.replaceString(randomPurpleMap[row], column, 'F')
-                            string2 = self.replaceString(string1, column+1, 'F')
-                            randomPurpleMap[row] = string2
+                            string1 = self.replaceString(string1, column+1, 'F')
+                            randomPurpleMap[row] = string1
                             i -= 1
                         else:
                             i -= 1
@@ -201,21 +200,62 @@ class Game():
                     else:
                         i -= 1
                         pass
-                # tripe flower: F
-                #               FF
-                i = 2
+                # triple flower: F    1
+                #                FF   23
+                i = 3
+                while i > 0:
+                    row = random.randint(1,17)
+                    column = random.randint(1,31)
+                    if randomPurpleMap[row][column] == '.': # checks for period at 2
+                        if randomPurpleMap[row][column+1] == '.': #checks for period at 3
+                            if randomPurpleMap[row-1][column] == '.': # checks for period at 1
+                                string1 = self.replaceString(randomPurpleMap[row], column, 'F') 
+                                string1 = self.replaceString(string1, column+1, 'F')
+                                string2 = self.replaceString(randomPurpleMap[row-1], column, 'F')
+                                randomPurpleMap[row-1] = string1
+                                randomPurpleMap[row] = string2
+                                i -= 1
+                            else:
+                                i -= 1
+                                pass
+                        else:
+                            i -= 1
+                            pass
+                    else:
+                        i -= 1
+                        pass
+                # single ore: O
+                i = 5
                 while i > 0:
                     row = random.randint(1,17)
                     column = random.randint(1,31)
                     if randomPurpleMap[row][column] == '.':
-                        if randomPurpleMap[row][column+1] == '.':
-                            if randomPurpleMap[row-1][column] == '.':
-                                string1 = self.replaceString(randomPurpleMap[row], column, 'F')
-                                string2 = self.replaceString(string1, column+1, 'F')
-                                string3 = self.replaceString(randomPurpleMap[row-1], column, 'F')
-                                randomPurpleMap[row-1] = string3
-                                randomPurpleMap[row] = string2
-                                i -= 1
+                        string1 = self.replaceString(randomPurpleMap[row], column, 'O')
+                        randomPurpleMap[row] = string1
+                        i -= 1
+                    else:
+                        i -= 1
+                        pass
+                # ore box: OO  12
+                #          OO  34
+                i = 2
+                while i > 0:
+                    row = random.randint(1,17)
+                    column = random.randint(1,31)
+                    if randomPurpleMap[row][column] == '.': # ore 3
+                        if randomPurpleMap[row][column+1] == '.': # ore 4
+                            if randomPurpleMap[row-1][column] == '.': # ore 1
+                                if randomPurpleMap[row-1][column+1] == '.': # ore 2
+                                    string1 = self.replaceString(randomPurpleMap[row], column, 'O')
+                                    string1 = self.replaceString(string1, column+1, 'O')
+                                    string2 = self.replaceString(randomPurpleMap[row-1], column, 'O')
+                                    string2 = self.replaceString(string2, column+1, 'O')
+                                    randomPurpleMap[row] = string1
+                                    randomPurpleMap[row-1] = string2
+                                    i -= 1
+                                else:
+                                    i -= 1
+                                    pass
                             else:
                                 i -= 1
                                 pass
