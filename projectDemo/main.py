@@ -181,6 +181,50 @@ class Game():
             if mapNumber == -2:
                 purpleRandomRoomIndex = random.randint(0, len(purpleRandomRooms)-1)
                 randomPurpleMap = purpleRandomRooms[purpleRandomRoomIndex]
+        
+                # RANDOMLY SPAWNING THE FLOWERS AND ORES
+                # double flower: FF
+                i = 5
+                while i > 0:
+                    row = random.randint(1,17)
+                    column = random.randint(1,31)
+                    if randomPurpleMap[row][column] == '.':
+                        if randomPurpleMap[row][column+1] == '.':
+                            string1 = self.replaceString(randomPurpleMap[row], column, 'F')
+                            string2 = self.replaceString(string1, column+1, 'F')
+                            randomPurpleMap[row] = string2
+                            i -= 1
+                        else:
+                            i -= 1
+                            pass
+                    else:
+                        i -= 1
+                        pass
+                # tripe flower: F
+                #               FF
+                i = 2
+                while i > 0:
+                    row = random.randint(1,17)
+                    column = random.randint(1,31)
+                    if randomPurpleMap[row][column] == '.':
+                        if randomPurpleMap[row][column+1] == '.':
+                            if randomPurpleMap[row-1][column] == '.':
+                                string1 = self.replaceString(randomPurpleMap[row], column, 'F')
+                                string2 = self.replaceString(string1, column+1, 'F')
+                                string3 = self.replaceString(randomPurpleMap[row-1], column, 'F')
+                                randomPurpleMap[row-1] = string3
+                                randomPurpleMap[row] = string2
+                                i -= 1
+                            else:
+                                i -= 1
+                                pass
+                        else:
+                            i -= 1
+                            pass
+                    else:
+                        i -= 1
+                        pass
+
                 currentTileMap.append(randomPurpleMap)
                 mapNumber = len(currentTileMap)-1
                 mapList[self.map[0]][self.map[1]] = mapNumber
@@ -221,7 +265,7 @@ class Game():
             # print(self.map[1]-1)
             # print(mapList[self.map[0]][self.map[1]-1])
 
-            # create doors in a new room if it is meant to exist
+            # CREATES DOORS in a new room if it is meant to exist
             # going up
             if self.map[0]-1 >= 0 and mapList[self.map[0]-1][self.map[1]] != -1:
                 # the top row of a map
@@ -306,9 +350,19 @@ class Game():
                         self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
                         self.player.weapon.updateDamage()
 
+
+
         # print("mapList:", mapList)
         # print("currentTileMap:", currentTileMap)
     
+    # Charlenne: to replace the string of a map row where an item needs to be added
+    def replaceString(self, string, column, replacement):
+        beginning = string[:column]
+        end = string[column+1:]
+        newString = beginning + replacement + end
+        return newString
+        
+
     def addRoom(self, prevPosition):
         emptyRoom = []
         for row in range(18):
