@@ -783,6 +783,7 @@ class NPC(pygame.sprite.Sprite):
         self.dialogueStageIndex = 1
         #Always leave a space/punctuation at the end of the quote!
         #Would you rather cum in the sink or sink in the cum? That is indeed the question for which we must all ponder and arrive at our own answers.
+        self.potionList = ['healthPotion', 'damagePotion', 'speedPotion']
         self.dialogueList = {'01:First Meet':[{'Meetings': 1},
                                                 "Testing dialogue ",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
@@ -1278,8 +1279,7 @@ class Enemy(pygame.sprite.Sprite):
     #Authored: Max Chiu 4/28/2024
     def collideBlocks(self, direction):
         if direction == 'x':
-            hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False) + pygame.sprite.spritecollide(self, self.game.enemies, False)
-            #if pygame.sprite.collide_rect(self, self.game.player):
+            hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False)
             #    if self.xChange > 0:
             #        self.rect.x = self.game.player.rect.left - self.rect.width
             #    if self.xChange < 0:
@@ -1293,7 +1293,7 @@ class Enemy(pygame.sprite.Sprite):
                 #print('collided method x')
                 return True
         else:
-            hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False) + pygame.sprite.spritecollide(self, self.game.enemies, False)
+            hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False)
             #if pygame.sprite.collide_rect(self, self.game.player):
             #    if self.yChange > 0:
             #        self.rect.y = self.game.player.rect.top - self.rect.height
@@ -1308,6 +1308,7 @@ class Enemy(pygame.sprite.Sprite):
                 #print('collided method y')
                 return True
         return False
+
     
     def attack(self):
         if pygame.sprite.collide_rect(self, self.game.player):
