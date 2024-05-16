@@ -212,8 +212,8 @@ class Game():
                                 string1 = self.replaceString(randomPurpleMap[row], column, 'F') 
                                 string1 = self.replaceString(string1, column+1, 'F')
                                 string2 = self.replaceString(randomPurpleMap[row-1], column, 'F')
-                                randomPurpleMap[row-1] = string1
-                                randomPurpleMap[row] = string2
+                                randomPurpleMap[row] = string1
+                                randomPurpleMap[row-1] = string2
                                 i -= 1
                             else:
                                 i -= 1
