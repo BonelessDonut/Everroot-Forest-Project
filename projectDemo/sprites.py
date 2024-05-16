@@ -55,6 +55,7 @@ class Player(pygame.sprite.Sprite):
         self.walkSoundPlaying = False
 
 
+        # Variables for the player's health, healthbar, and taking damage / invulnerability
 
         self.maxHealth = self.game.startPlayerMaxHealth
         self.targetHealth = self.game.priorPlayerHealth
@@ -71,6 +72,7 @@ class Player(pygame.sprite.Sprite):
         self.hitInvulnerable = False
         self.hitInvulnerableTime = 0
         self.invulnerableTimer = 50
+
 
         #Shows the file paths for each image, depending on which direction the player is facing
         self.rightImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagLattern(1).png').convert_alpha(), (self.width, self.height)),
@@ -166,13 +168,19 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = self.y
 
     def update(self):
+        # checks for any movement from the player
         self.movement()
+        # checks to see if the player has gone idle
         self.checkIdle()
+        # calls the function to check for any interactions
         self.interact()
+        # calls the function to draw the tutorials on screen
         self.tutorial.draw()
-        if self.currentHealth <= 0:
+        # if the player's health is reduced to zero, they get a game over and lose the game
+        if self.currentHealth <= 0 or self.targetHealth <= 0:
             self.game.state = 'game over'
 
+        # updates the player's position based on any movement and checks for collisions with any blocks or friendly npcs
         self.rect.x += self.xChange
         self.collideBlocks('x')
         self.rect.y += self.yChange
@@ -180,16 +188,21 @@ class Player(pygame.sprite.Sprite):
         self.x = self.rect.x
         self.y = self.rect.y
 
-
+        # if the player has been hit an is invulnerable, this code executes
         if self.hitInvulnerable:
+            # counts down the time they can continue being invulnerable for
             self.hitInvulnerableTime += 1
+            # when it reaches the limit
             if self.hitInvulnerableTime > self.invulnerableTimer:
+                # the player is no longer invulnerable
                 self.hitInvulnerable = False
                 self.hitInvulnerableTime = 0
 
-
+        # updates the variable that counts how much time is passing
         self.timepassed += self.clock.get_time()/1000
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
+
+        # updates the player's image sprite based on the direction they are facing and if they have used the ranged weapon
         if self.game.state == 'explore' and not self.weapon.used:
             if self.facing == 'right':
                 self.image = self.rightImgList[self.imgindex]
@@ -199,6 +212,7 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.upImgList[self.imgindex]
             else: # self.facing == 'down':
                 self.image = self.downImgList[self.imgindex]
+        # if they have used the ranged attack, sets their sprites accordingly
         elif self.weapon.used and self.weapon.type == 'bubble'and self.weapon.ammo != 0:
             if self.facing == 'right':
                 self.image = self.rangedWeaponList[0]
@@ -209,11 +223,14 @@ class Player(pygame.sprite.Sprite):
             else: # self.facing == 'down':
                 self.image = self.rangedWeaponList[1]
 
+        # makes the player's current sprite flicker if they are invulnerable after taking damage
         self.flicker()
 
+        # resets x and y direction change to 0 for the next game loop
         self.xChange = 0
         self.yChange = 0
 
+        # allows the mouse to used for selection during dialogue
         if self.game.state == 'dialogue':
             self.mouseRect.center = pygame.mouse.get_pos()
             interactRect = pygame.Rect(self.rect.left-TILESIZE*0.1, self.rect.top-TILESIZE*0.1, TILESIZE*1.2, TILESIZE*1.2)
@@ -237,6 +254,7 @@ class Player(pygame.sprite.Sprite):
 
     # inspiration for this function and the damage flickering effect was gotten from:
     # https://www.youtube.com/watch?v=QU1pPzEGrqw
+    # Makes the player's sprite flicker by changing the alpha values rapidly
     def flicker(self):
         alpha = 0
         value = math.sin(pygame.time.get_ticks())
@@ -251,6 +269,7 @@ class Player(pygame.sprite.Sprite):
             self.image.set_alpha(255)
         pass
 
+    # lwoers the player's health
     def getDamage(self, amount):
         # self.currentHealth = self.targetHealth
         if self.hitInvulnerable:
@@ -258,41 +277,49 @@ class Player(pygame.sprite.Sprite):
         else:
             self.hitInvulnerable = True
             if self.targetHealth > 0:
-                self.targetHealth = self.targetHealth - amount
+                self.targetHealth = self.targetHealth - amount # decreases the target health for the animated healthbar
             if self.targetHealth <=0:
-                self.targetHealth = 0
+                self.targetHealth = 0 # target health cannot go below zero
             pygame.mixer.Channel(1).set_volume(0.035 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/77_flesh_02.wav'))
 
     def getHealth(self, amount):
         if self.targetHealth < self.maxHealth:
-            self.targetHealth = self.targetHealth + amount
+            self.targetHealth = self.targetHealth + amount # increases the target health for the animated healthbar
         if self.targetHealth > self.maxHealth:
-            self.targetHealth = self.maxHealth
+            self.targetHealth = self.maxHealth # target health cannot increase past the max health
         pygame.mixer.Channel(1).set_volume(0.015 * self.game.soundVol)
         pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/8_Buffs_Heals_SFX/02_Heal_02.wav'))
 
-    def healthBar(self): # Static health bar function
+    def healthBar(self): # Static health bar function, not currently in use
         pygame.draw.rect(self.game.screen, (255, 0, 0), (10, 10, self.targetHealth/self.healthRatio, self.healthBarHeight))
         pygame.draw.rect(self.game.screen, (255, 255, 255), (10, 10, self.maxHealthBarLength,self.healthBarHeight), 4)
 
     def animateHealth(self): # Animated health bar function
-        if self.currentHealth < self.targetHealth:
-            self.currentHealth += self.healthChangeSpeed
+        if self.currentHealth < self.targetHealth: # if health should increase
+            self.currentHealth += self.healthChangeSpeed # increases the current health (red bar) by the health bar's speed
+            # updates the width of the transition health bar to be the distance between the current health and target health points
             self.transitionWidth = int((self.targetHealth - self.currentHealth)/self.healthRatio)
-            self.transitionColor = (0, 255, 0)
+            self.transitionColor = (0, 255, 0) # transition bar color is set to Green if increasing
+            # creates the rectangle for the current health bar (red bar)
             self.health_bar_rect = pygame.Rect(10, 10, self.currentHealth / self.healthRatio - 3, self.healthBarHeight)
+            # creates the rectangle for the transition bar
             self.transition_bar_rect = pygame.Rect(self.health_bar_rect.right, 10, self.transitionWidth, self.healthBarHeight)
-        elif self.currentHealth > self.targetHealth:
-            self.currentHealth -= self.healthChangeSpeed
+        elif self.currentHealth > self.targetHealth: # if health should decrease
+            self.currentHealth -= self.healthChangeSpeed # decreases the current health (red bar) by the health bar's speed
+            # updates the width of the transition health bar to be the distance between the current health and target health points
             self.transitionWidth = int((self.currentHealth - self.targetHealth)/self.healthRatio)
-            self.transitionColor = (255, 255, 0)
+            self.transitionColor = (255, 255, 0) # transition bar color is set to Yellow if decreasing
+            # creates the rectangle for the current health bar (red bar)
             self.health_bar_rect = pygame.Rect(10, 10, self.targetHealth / self.healthRatio - 3, self.healthBarHeight)
+            # creates the rectangle for the transition bar
             self.transition_bar_rect = pygame.Rect(self.health_bar_rect.right, 10, self.transitionWidth, self.healthBarHeight)
 
-
+        # draws the health bar onto the screen (red bar)
         pygame.draw.rect(self.game.screen, (255, 0, 0 ), self.health_bar_rect)
+        # draws the transition bar onto the screen (yellow / green bar)
         pygame.draw.rect(self.game.screen, self.transitionColor, self.transition_bar_rect)
+        # draws the outline border for the health bar
         pygame.draw.rect(self.game.screen, (255, 255, 255), (10, 10, self.maxHealthBarLength, self.healthBarHeight), 4)
 
 
@@ -478,9 +505,10 @@ class Player(pygame.sprite.Sprite):
 
 
     def movement(self):
+        # movement is only allowed if the game state is 'explore'
         if self.game.state != 'explore':
             return
-
+        # plays the walk sound effect if it's on the right frame of the walk animation
         if self.imgindex == 1:
             self.playWalkSound()
             #if self.walkSoundNum == 3:
@@ -488,15 +516,15 @@ class Player(pygame.sprite.Sprite):
             #elif self.walkSoundNum == 4:
             #    self.walkSoundNum = 3
             #self.walkSoundNum = random.randint(0, len(self.walkingList) - 1)
-            self.walkingSound = self.walkingList[self.walkSoundNum]
+            self.walkingSound = self.walkingList[self.walkSoundNum] # walking sound is selected from a list of sound effects (might be changed)
         elif (self.imgindex != 1):
-            self.walkSoundPlaying = False
+            self.walkSoundPlaying = False # allows the walk sound effect to be played again
 
 
         #The key press segments came from viewing this tutorial
         #https://www.youtube.com/watch?v=GakNgbiAxzs&list=PLkkm3wcQHjT7gn81Wn-e78cAyhwBW3FIc&index=2
         keys = pygame.key.get_pressed()
-        if not self.itemUsed:
+        if not self.itemUsed: # if there is not an item being used
             if keys[pygame.K_a] or keys[pygame.K_LEFT]:
                 # Two lines below change camera to move around player character, moving all other sprites
                 # comment them out to create a static camera
@@ -505,6 +533,7 @@ class Player(pygame.sprite.Sprite):
                 self.xChange -= PLAYER_SPEED
                 self.facing = 'left'
                 self.idleTimer = 0
+                # updates the player's walking sprite if enough time has passed
                 if ((self.timepassed) // (0.20) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
                     #if self.imgindex == 1 or self.imgindex == 3:
@@ -520,6 +549,7 @@ class Player(pygame.sprite.Sprite):
                 self.xChange += PLAYER_SPEED
                 self.facing = 'right'
                 self.idleTimer = 0
+                # updates the player's walking sprite if enough time has passed
                 if ((self.timepassed) // (0.20) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
                     #if self.imgindex == 1 or self.imgindex == 3:
@@ -534,6 +564,7 @@ class Player(pygame.sprite.Sprite):
                 self.yChange -= PLAYER_SPEED
                 self.facing = 'up'
                 self.idleTimer = 0
+                # updates the player's walking sprite if enough time has passed
                 if ((self.timepassed) // (0.18) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
                     #if self.imgindex == 1 or self.imgindex == 3:
@@ -549,6 +580,7 @@ class Player(pygame.sprite.Sprite):
                 self.yChange += PLAYER_SPEED
                 self.facing = 'down'
                 self.idleTimer = 0
+                # updates the player's walking sprite if enough time has passed
                 if ((self.timepassed) // (0.25) % 4 == self.imgindex):
                     self.imgindex = (self.imgindex + 1)%4
                     #if self.imgindex == 1 or self.imgindex == 3:
@@ -559,7 +591,7 @@ class Player(pygame.sprite.Sprite):
 
     # function that will check if the player is idle from moving. This will be done by using a timer that is decremented unless the player moves, or the movement state will be changed to idle from moving.
     def checkIdle(self):
-        self.idleTimer += 1
+        self.idleTimer += 1 # increments the idle timer
         if self.game.state != 'explore':
             self.movementState = 'idle'
         elif self.idleTimer >= self.idleThreshold:
@@ -582,7 +614,7 @@ class Player(pygame.sprite.Sprite):
         if self.movementState != 'idle' and (not self.walkSoundPlaying):
             pygame.mixer.Channel(2).set_volume(0.08 * self.game.soundVol)
             pygame.mixer.Channel(2).play(self.walkingSound)
-            self.walkSoundPlaying = True
+            self.walkSoundPlaying = True # makes it so the walking sound cannot play multiple times for the same frame
 
     def collideBlocks(self, direction):
         if direction == 'x':
@@ -615,6 +647,7 @@ class Player(pygame.sprite.Sprite):
         # Depending on which melee weapon is in use
         # This method should only be getting called if the player's weapon type is one of the melee weapons
         if self.swordUsed:
+            # updates the player's sprite to match the current frame of the attack animation and the weapon's location, taking facing direction into account
             if self.facing == 'up':
                 if attackInstance.animationPhase == 1:
                     self.image = self.swingUpList[0]
@@ -647,6 +680,7 @@ class Player(pygame.sprite.Sprite):
                 elif attackInstance.animationPhase == 3:
                     self.image = self.swingRightList[2]
         elif self.spearUsed:
+            # updates the player's image based on the direction they are facing
             if self.facing == 'up':
                 self.image = self.pokeList[0]
             elif self.facing == 'down':
@@ -655,7 +689,7 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.pokeList[2]
             elif self.facing == 'right':
                 self.image = self.pokeList[3]
-
+        # updates the game's display (might be unnecessary)
         pygame.display.update()
 
     def switchWeapons(self):
@@ -854,13 +888,17 @@ class Enemy(pygame.sprite.Sprite):
         self.defaultPos = (x, y)
         self.width = TILESIZE
         self.height = TILESIZE
+        # determines the type of the enemy (if multiple enemy types are added)
         self.type = 'pumpkinRobot'
+        # checks for melee or ranged attack
         self.attackType = attackType
         self.timepassed = 0
 
         self.health = 100
         self.damage = 120
         self.speed = PLAYER_SPEED * 0.6
+
+        # Variables to handle enemy - player attack interaction
 
         self.hitInvincible = False
         self.hitInvulnerable = False
@@ -879,6 +917,8 @@ class Enemy(pygame.sprite.Sprite):
         self.moving = False
         self.facingDirection = 'down'
 
+        # sets up the enemy's images based on the attack type (if statement may be unnecessary since it seems it is doing the same thing either way)
+
         if self.attackType == 'melee':
             self.pumpkinImgDown = [
                 pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeIdle.png').convert_alpha(),(TILESIZE * 0.99, TILESIZE * 0.99)),
@@ -894,10 +934,14 @@ class Enemy(pygame.sprite.Sprite):
         # pumpkinImgDown = [pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownRight (1).png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99)),
         #                  pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinMeleeDownLeft.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99))]
 
+        # list containing the images for the ranged enemy variant
+
         self.rangedImgL = [pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinRangedIdle.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99)),
                            pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinRangedLeft.png').convert_alpha(), (TILESIZE *0.99, TILESIZE * 0.99)),
                            pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinRangedRight.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99)),
                            pygame.transform.scale(pygame.image.load('Sprites/npcs/sampleEnemy/pumpkinRangedUp.png').convert_alpha(), (TILESIZE * 0.99, TILESIZE * 0.99))]
+
+        # holds the data for the enemy types
 
         self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 120, 'health': 100, 'speed': PLAYER_SPEED * 0.5}
         self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 100, 'health': 70}
@@ -921,7 +965,7 @@ class Enemy(pygame.sprite.Sprite):
         enemyPos = self.rect.center
         self.xChange, self.yChange = (coord*self.speed for coord in self.path.createPath((enemyPos[0]//TILESIZE, enemyPos[1]//TILESIZE), (playerPos[0]//TILESIZE, playerPos[1]//TILESIZE)))
 
-
+    # sets up the enemy instance depending on enemy type
     def setup(self):
         if self.type == 'pumpkinRobot':
             self.health = self.pumpkinRobot['health']
@@ -938,6 +982,7 @@ class Enemy(pygame.sprite.Sprite):
         pass
 
     ### EDDIE
+    # Makes the player's sprite flicker by changing the alpha values rapidly
     def flicker(self):
         alpha = 0
         value = math.sin(pygame.time.get_ticks())
@@ -953,6 +998,7 @@ class Enemy(pygame.sprite.Sprite):
         pass
 
     #Authored: Max Chiu 4/18/2024
+    # Does damage to the enemy based on type of the attack it is hit with
     def dealtDamage(self, damage, type):
         # print(self.hitInvincible)
         if not self.hitInvulnerable:
@@ -1609,6 +1655,7 @@ class WeaponDisplay(pygame.sprite.Sprite):
                 self.highlightNumber = 0
                 self.hasSwitched = False
 
+    # draws the weapons display onto the screen if needed
     def draw(self):
         if self.game.state == 'explore' or self.game.state == 'oreMine' or self.game.state == 'flowerC':
             if self not in self.game.all_sprites:
@@ -1620,8 +1667,10 @@ class WeaponDisplay(pygame.sprite.Sprite):
                 if self.weaponList[i]['active']:
                     pygame.draw.rect(self.game.screen, self.highlightColorList[self.highlightNumber],(self.x + 10 + self.width * 0.3 * i, self.y + 18, TILESIZE * 1.3, TILESIZE * 1.1), 3)
         else:
+            # removes the weapon hud from the list of sprites to be drawn if it should not be shown
             self.remove(self.game.all_sprites)
 
+    # checks the weapon that is actively equipped and updates the info within the hud to reflect that
     def checkActiveWep(self):
         currWeapon = self.game.player.weapon.type
         self.changeCount = 0

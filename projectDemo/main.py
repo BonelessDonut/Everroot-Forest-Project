@@ -64,7 +64,6 @@ class Game():
         self.amethImageL = None
         self.copperImageL = None
 
-
         self.setupImages()
 
         self.tutorialsActive = False
@@ -141,10 +140,12 @@ class Game():
                         Teleport(self, col, row)
                     #print(f"{col}", end="")
                 #print()
+            # initializes the visual element that displays the player's weapons
             self.weaponsHud = WeaponDisplay(self)
         #For moving between rooms
         else:
             # kill all the current sprites in the current room
+            # empties all the sprites lists
             self.all_sprites.empty()
             self.blocks.empty()
             self.walk_blocks.empty()
@@ -184,6 +185,7 @@ class Game():
                 currentTileMap.append(randomPurpleMap)
                 mapNumber = len(currentTileMap)-1
                 mapList[self.map[0]][self.map[1]] = mapNumber
+                # play enemy fighting music in this room
             # if the room is unloaded and listed as -3, a randomly assigned green npc room will be loaded and added to the map list
             elif mapNumber == -3:
                 usedGreenRooms = [] # empty list that holds all green room indexes so that green rooms don't repeat throughout exploration
@@ -302,6 +304,7 @@ class Game():
                             self.player = Player(self, col, row-1, self.clock)
                         elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
                             self.player = Player(self, col, row+1, self.clock)
+                        # maintains the previously equipped weapon from the previous screen
                         self.player.weaponNum = priorWeaponNum
                         self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
                         self.player.weapon.updateDamage()
@@ -349,7 +352,7 @@ class Game():
     def events(self):
         #game loop events
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT: # if the exit button in the top corner of the window is pressed, then the game closes
                 pygame.font.quit()
                 pygame.quit()
                 sys.exit()
@@ -358,35 +361,36 @@ class Game():
                 self.player.itemUsed = True
                 if False: # This line is a placeholder for a conditional that will check if the melee weapon type is the spear weapon or swordfish
                     pass
-                elif self.player.weapon.type == 'swordfish':
+                elif self.player.weapon.type == 'swordfish': # if the weapon equipped is the swordfish
                     self.player.swordUsed = True
-                elif self.player.weapon.type == 'trident':
+                elif self.player.weapon.type == 'trident': # if the weapon equipped is the trident
                     self.player.spearUsed = True
                 MeleeAttack(self, self.player.weapon, self.player)
-            # Q is used to switch weapons for the player
+            # Uses the bubblegun to attack with E if that is the weapon currently equipped is the bubblegun
             if event.type == pygame.KEYDOWN and ((event.key == pygame.K_e) and not self.player.itemUsed) and (self.player.weapon.type == 'bubble' and self.state == 'explore'):
                 self.player.weapon.attack()
+            # switches weapon equipped using q
             if event.type == pygame.KEYUP and event.key == pygame.K_q and not self.player.itemUsed and self.state == 'explore':
                 self.player.switchWeapons()
-            if event.type == pygame.KEYUP and event.key == pygame.K_p:
+            if event.type == pygame.KEYUP and event.key == pygame.K_p: # pauses the game with P
                 self.pause()
-            if event.type == pygame.KEYUP and event.key == pygame.K_g and not self.player.itemUsed and self.state == 'explore': # keybind to heal, will have added functionality with potions in the inventoryy later
+            if event.type == pygame.KEYUP and event.key == pygame.K_g and not self.player.itemUsed and self.state == 'explore': # keybind to heal, will have added functionality with potions in the inventory later
                 self.player.getHealth(200)
-            if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+            if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE: # closes the game if escape is pressed
                 pygame.font.quit()
                 pygame.quit()
                 sys.exit()
 
     def update(self):
-        #game loop updates
-        self.all_sprites.update()
+        # game loop updates
+        self.all_sprites.update()  # calls update() function for all sprites within the all_sprites group
         # checks if the tutorial should appear based on the settings and state of the game
-        self.player.tutorial.checkAppear()
+        self.player.tutorial.checkAppear() # checks if the tutorial should be drawn on the screen, if it is enabled
 
     def draw(self):
         if self.state != 'game over':
             self.screen.fill(BLACK)
-            self.all_sprites.draw(self.screen)
+            self.all_sprites.draw(self.screen) # draws all sprites that are in the all_sprites group on the screen
             # self.pathfinder = Pathfinder(currentTileMap[mapList[self.map[0]][self.map[1]]], self.enemy)
             # #self.pathfinder.createPath(((self.enemy.x+TILESIZE//2)//TILESIZE, (self.enemy.y+TILESIZE//2)//TILESIZE), ((self.player.x+TILESIZE//2)//TILESIZE, (self.player.y+TILESIZE//2)//TILESIZE))
             # self.pathfinder.createPath((self.enemy.rect.center[0]//TILESIZE, self.enemy.rect.center[1]//TILESIZE), (self.player.rect.center[0]//TILESIZE, self.player.rect.center[1]//TILESIZE))
@@ -399,40 +403,43 @@ class Game():
             # draws the tutorial text on screen if needed
             if self.tutorialsActive:
                 self.player.tutorial.draw()
+            # draws the player's health bar on the screen if needed
             if (self.state == 'explore' or self.state == 'oreMine' or self.state == 'flowerC'):
                 self.player.animateHealth()
-            self.weaponsHud.draw()
+            self.weaponsHud.draw() # calls the function to draw the weapon display hud on the screen
             self.clock.tick(FPS)
-            pygame.display.update()
+            pygame.display.update() # updates the screen with any changes
 
     def main(self):
-        #game loop
-        while self.playing:
+        # main game loop
+        while self.playing: # while the game is being played
             self.events()
-            if self.state == 'opening':
+            if self.state == 'opening': # if the opening should be happening
                 self.intro_screen()
-            if self.state == 'game over':
+            if self.state == 'game over': # if the player has died or triggered a game over
                 self.game_over()
             self.update()
             self.draw()
-        self.running = False
+        self.running = False # after the game is done being played, the game should not be running
 
+    #
     def game_over(self):
-        #Play the game over screen
-        #To be created later
+        # Play the game over screen
+        # To be created later
         self.screen.fill(BLACK)
         cutscenes.playGameOver(self.cutsceneManage)
         pass
 
+    # handles events happening while the game is in the pause state
     def pauseEvents(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT: # allows the game to be closed with the x in the top right corner of the window
                 pygame.font.quit()
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYUP and event.key == pygame.K_p:
+            if event.type == pygame.KEYUP and event.key == pygame.K_p: # if p is pressed, the pause() function is called to unpause the game
                 self.pause()
-            if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+            if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE: # escape closes the game
                 pygame.font.quit()
                 pygame.quit()
                 sys.exit()
@@ -477,6 +484,7 @@ class Game():
                 else:
                     self.tutorialsActive = True
 
+    # function to display the settings and options within the pause menu
     def pauseMenuDisplay(self):
         self.screen.blit(pygame.font.SysFont('Garamond', 38).render(f"Adjust Music with Up/Down Arrows | Music Volume: {(self.musicVol / 20 * 100):.1f}%", False, WHITE), (WIDTH * 0.135 ,HEIGHT * 0.45))
         self.screen.blit(pygame.font.SysFont('Garamond', 38).render(f"Adjust SoundFX with Left/Right Arrows | Sound FX Volume: {(self.soundVol / 20 * 100):.1f}%", False,WHITE), (WIDTH * 0.105, HEIGHT * 0.55))
@@ -492,8 +500,9 @@ class Game():
         self.screen.blit(pygame.font.SysFont('Garamond', 38).render(f"Tutorials: {tutorialStatus}", False, WHITE),(WIDTH * 0.42, HEIGHT * 0.75))
         pass
 
+    # function to handle the process of pausing the game when P is pressed
     def pause(self):
-        if self.state == 'explore':
+        if self.state == 'explore': # pauses the game if it is not paused already
             self.state = 'pause'
             # lowers the volume of music when the game is paused
             pygame.mixer.Channel(1).set_volume(0.025 * self.soundVol)
@@ -526,7 +535,7 @@ class Game():
                 # EITHER REPRESENT THE VOLUME STATUS USING SLIDERS OR JUST DISPLAY THE NUMBER AS A FRACTION OF THE MAX VOLUME
                 
         else:
-            self.state = 'explore'
+            self.state = 'explore' # unpauses the game
             # returns the music to the former volume
             pygame.mixer.Channel(1).set_volume(0.025 * self.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/098_Unpause_04.wav'))
@@ -536,45 +545,56 @@ class Game():
     def intro_screen(self):
         #Play the intro screen
         #To be created later
-        cutscenes.playIntroScene(self.cutsceneManage)
-        if self.finishedScene:
+        cutscenes.playIntroScene(self.cutsceneManage) # starts the intro scene using the cutscene manager
+        if self.finishedScene: # after the introduction finishes
             self.state = 'explore'
             self.play_music('village')
         pass
     
 
+    # This function sets up many of the images to be used in the game, then stores them in lists
     def setupImages(self):
+        # sets up all the tile images to be placed in the game, then stores them in a list
+        # the walkable tiles and unwalkable blocks are stored in two different sub lists that are within the larger list
         self.tileList = [[pygame.transform.scale(pygame.image.load('Sprites/tiles/crossBridge1.png').convert_alpha(),(TILESIZE, TILESIZE)),
                           pygame.transform.scale(pygame.image.load('Sprites/tiles/growth1.png').convert_alpha(),(TILESIZE, TILESIZE))],
                          [pygame.transform.scale(pygame.image.load('Sprites/tiles/brick1.png').convert_alpha(),(TILESIZE, TILESIZE)),
                           pygame.transform.scale(pygame.image.load('Sprites/tiles/water1.png').convert_alpha(),(TILESIZE, TILESIZE)),
                           pygame.transform.scale(pygame.image.load('Sprites/tiles/sapling2.png').convert_alpha(),(TILESIZE, TILESIZE)),
                           pygame.transform.scale(pygame.image.load('Sprites/tiles/rock1.png').convert_alpha(),(TILESIZE, TILESIZE))]]
+        # sets up all the images for the hyacinth type flower
         self.hyacinImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth3New.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth5.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        # sets up all the images for the sunflower type flower
         self.sunFloImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/sunflowernew.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/sunflower3New.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/sunflower5.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        # sets up all the images for the silent flower type flower
         self.silentFImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower.png').convert_alpha(),(TILESIZE, TILESIZE)),
                        pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower3New.png').convert_alpha(),(TILESIZE, TILESIZE)),
                        pygame.transform.scale(pygame.image.load('Sprites/items/silentFlower5.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        # sets up all the images for the ruby type ore
         self.rubyImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby2.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby3.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreRuby3.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        # sets up all the images for the emerald type ore
         self.emeraldImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald.png').convert_alpha(),(TILESIZE, TILESIZE)),
                          pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald2.png').convert_alpha(),(TILESIZE, TILESIZE)),
                          pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald3.png').convert_alpha(),(TILESIZE, TILESIZE)),
                          pygame.transform.scale(pygame.image.load('Sprites/items/oreEmerald3.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        # sets up all the images for the copper type ore
         self.copperImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper.png').convert_alpha(),(TILESIZE, TILESIZE)),
                         pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper2.png').convert_alpha(),(TILESIZE, TILESIZE)),
                         pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper3.png').convert_alpha(),(TILESIZE, TILESIZE)),
                         pygame.transform.scale(pygame.image.load('Sprites/items/oreCopper3.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        # sets up all the images for the amethyst type ore
         self.amethImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst.png').convert_alpha(),(TILESIZE, TILESIZE)),
                        pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst2.png').convert_alpha(),(TILESIZE, TILESIZE)),
                        pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst3.png').convert_alpha(),(TILESIZE, TILESIZE)),
                        pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst3.png').convert_alpha(),(TILESIZE, TILESIZE))]
+        # sets up all the images for the iron type ore
         self.ironImageL = [pygame.transform.scale(pygame.image.load('Sprites/items/oreIron.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron2.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE)),
