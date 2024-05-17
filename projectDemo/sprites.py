@@ -1678,6 +1678,7 @@ class WeaponDisplay(pygame.sprite.Sprite):
                     if self.weaponList[i]['active']:
                         pygame.draw.rect(self.game.screen, self.highlightColorList[self.highlightNumber],(self.x + 10 + self.width * 0.3 * i, self.y + 18, TILESIZE * 1.3, TILESIZE * 1.1), 3)
                 else:
+                    # if the weapons are not in the active list, they will be grayed out on the display
                     currentImage = pygame.transform.scale(self.weaponList[i]['inactiveImg'].convert_alpha(), (TILESIZE * 0.8, TILESIZE * 0.8))
                     self.image.blit(currentImage, pygame.Rect((self.width * 0.1) + self.width * 0.3 * (i), self.height * 0.25, 0, 0))
 
