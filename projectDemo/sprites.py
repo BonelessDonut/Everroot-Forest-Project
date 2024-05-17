@@ -30,8 +30,8 @@ class Player(pygame.sprite.Sprite):
         # This list below holds the weapons that the player can switch to and use
         # It should start with only the swordfish weapon available
         # the rest would be appended to this list when unlocked
-        # self.activeWeaponList = ['swordfish', 'bubble', 'trident']
-        self.activeWeaponList = ['swordfish', 'bubble']
+        self.activeWeaponList = ['swordfish', 'bubble', 'trident']
+        # self.activeWeaponList = ['swordfish', 'bubble']
         self.weaponNum = 0
         self.weapon = items.Weapon(self.game, self.weaponList[self.weaponNum], self)
         self.weaponAnimationCount = 0
