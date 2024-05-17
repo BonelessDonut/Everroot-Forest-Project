@@ -57,24 +57,16 @@ class Weapon(pygame.sprite.Sprite):
 
 
         #bubble is a burst of 3 bullets with 15 bullet ammo
-        if type == 'bubble':
-            #7 degrees spread of bubble bullets
-            self.spread = 5
-            self.damage = 10
-            self.ammo = 60
-            #how long to pause between each bullet
-            self.pause = 0.3
-            self.range = 5*TILESIZE
-            #how long to reload ammo
-            self.reloadTime = 2
-            #how long each between each bullet during a burst (3 bullets should be separated by self.burstTime)
-            self.burstTime = self.pause/10
-        #melee
-        else:
-            #75 degrees spread of melee swing
-            self.spread = 75
-            self.damage = 20
-            self.pause = 0.4
+        self.spread = 5
+        self.damage = 10
+        self.ammo = 60
+        #how long to pause between each bullet
+        self.pause = 0.3
+        self.range = 5*TILESIZE
+        #how long to reload ammo
+        self.reloadTime = 2
+        #how long each between each bullet during a burst (3 bullets should be separated by self.burstTime)
+        self.burstTime = self.pause/10
 
     def reload(self):
         if self.type == 'bubble':
@@ -105,21 +97,22 @@ class Weapon(pygame.sprite.Sprite):
         
     #Author: Max Chiu 4/12/2024
     def update(self):
-        self.timepassed = self.clock.get_time() / 1000
-        
-        #To space out the bubble shots by burstTime
-        if self.ammo % 3 == 2 and -1*self.burstTime < self.timer - self.pause < 0 or self.ammo % 3 == 1 and -2*self.burstTime < self.timer - self.pause < -1*self.burstTime:
-            Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage, 'player')
-            self.ammo -= 1
-            pygame.mixer.Channel(1).set_volume(0.09 * self.game.soundVol)
-            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/shooting-sound-fx-159024.mp3'))
+        if self.type == 'bubble':
+            self.timepassed = self.clock.get_time() / 1000
 
-        #editing the timer between shots
-        self.timer -= self.timepassed
-        if self.timer <= 0:
-            self.timer = 0
-            #self.player.itemUsed = False
-            self.used = False
+            #To space out the bubble shots by burstTime
+            if self.ammo % 3 == 2 and -1*self.burstTime < self.timer - self.pause < 0 or self.ammo % 3 == 1 and -2*self.burstTime < self.timer - self.pause < -1*self.burstTime:
+                Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage, 'player')
+                self.ammo -= 1
+                pygame.mixer.Channel(1).set_volume(0.09 * self.game.soundVol)
+                pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/shooting-sound-fx-159024.mp3'))
+
+            #editing the timer between shots
+            self.timer -= self.timepassed
+            if self.timer <= 0:
+                self.timer = 0
+                #self.player.itemUsed = False
+                self.used = False
 
         #moves the Weapon sprite with the player and updates weapon image
         if self.player.itemUsed and self.used:
