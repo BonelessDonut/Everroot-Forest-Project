@@ -852,8 +852,8 @@ class NPC(pygame.sprite.Sprite):
                                                 "Testing dialogue ",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
                                                 "Boom Boom Boom Boom ",
-                                                "%Choices; What do you want to do?; Shop; Leave; Meow",
-                                                "Drink it now, drink it now, drink it now"],
+                                                "%Choices; What do you want to do?; Shop; Leave; Meow ",
+                                                "Drink it now, drink it now, drink it now "],
                              '02:Second Meet': [{'Meetings':2},
                                                 "Hi again... "]
                             }
