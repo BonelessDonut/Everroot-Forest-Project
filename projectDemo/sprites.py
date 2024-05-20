@@ -30,8 +30,8 @@ class Player(pygame.sprite.Sprite):
         # This list below holds the weapons that the player can switch to and use
         # It should start with only the swordfish weapon available
         # the rest would be appended to this list when unlocked
-        self.activeWeaponList = ['swordfish', 'bubble', 'trident']
-        # self.activeWeaponList = ['swordfish', 'bubble']
+        # self.activeWeaponList = ['swordfish', 'bubble', 'trident']
+        self.activeWeaponList = ['swordfish']
         self.weaponNum = 0
         self.weapon = items.Weapon(self.game, self.weaponList[self.weaponNum], self)
         self.weaponAnimationCount = 0
@@ -173,6 +173,14 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+    #Authored: Max Chiu 5/20/2024
+    #Sets the player's position using a tile position (where xTile goes up to 32 and yTile goes up to 18)
+    def setPosition(self, xTile, yTile):
+        self.x = xTile*TILESIZE
+        self.y = yTile*TILESIZE
+        self.rect.x = self.x
+        self.rect.y = self.y
+
     def update(self):
         # checks for any movement from the player
         self.movement()
@@ -242,21 +250,31 @@ class Player(pygame.sprite.Sprite):
             interactRect = pygame.Rect(self.rect.left-TILESIZE*0.1, self.rect.top-TILESIZE*0.1, TILESIZE*1.2, TILESIZE*1.2)
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
             npc = self.game.npcs.get_sprite(npcIndex)
+            self.game.activeNPC = npc
             collisionList = []
             for rect in npc.TextBox.choiceRectList:
-                collisionList.append(pygame.Rect(rect.left, rect.top, rect.width, rect.height))
+                collisionList.append(pygame.Rect(rect.left, rect.top, rect.width-30, rect.height))
             for rect in range(len(collisionList)):
-                collisionList[rect].x = npc.TextBox.x + 13
-                collisionList[rect].y = npc.TextBox.y + 25 + 30*rect
+                collisionList[rect].x = npc.TextBox.x + 60
+                collisionList[rect].y = npc.TextBox.y + 30 + 45*rect
             if len(collisionList) > 0:
                 highlighted = self.mouseRect.collidelist(collisionList) 
                 if highlighted == -1:
                     return
                 else:
                     npc.TextBox.selectedRect = highlighted
+                    self.game.activeNPC.selectedItem = highlighted
 
-    def setLocation(self, x, y):
-        pass
+        elif self.game.state == 'shopping':
+            self.mouseRect.center = pygame.mouse.get_pos()
+            interactRect = pygame.Rect(self.rect.left-TILESIZE*0.1, self.rect.top-TILESIZE*0.1, TILESIZE*1.2, TILESIZE*1.2)
+            collisionList = self.game.activeNPC.itemRects
+            if len(collisionList) > 0:
+                highlighted = self.mouseRect.collidelist(collisionList) 
+                if highlighted == -1:
+                    return
+                else:
+                    self.game.activeNPC.selectedItem = highlighted
 
     # inspiration for this function and the damage flickering effect was gotten from:
     # https://www.youtube.com/watch?v=QU1pPzEGrqw
@@ -361,7 +379,7 @@ class Player(pygame.sprite.Sprite):
             #Gets the index of the flower that the player interacted with
             flowerIndex = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
             if flowerIndex != -1:
-                interacted = True
+                # interacted = True
                 self.game.state = 'flowerC'
                 self.game.flowers.get_sprite(flowerIndex).state = 'cutting'
                 self.game.flowers.get_sprite(flowerIndex).anim()
@@ -380,7 +398,7 @@ class Player(pygame.sprite.Sprite):
             #Gets the index of the ore that the player interacted with
             oreIndex = interactRect.collidelist(list(ore.rect for ore in self.game.ores))
             if oreIndex != -1:
-                interacted = True
+                # interacted = True
                 self.game.state = 'oreMine'
                 self.game.ores.get_sprite(oreIndex).state = 'mining'
                 self.game.ores.get_sprite(oreIndex).killAnim()
@@ -395,8 +413,15 @@ class Player(pygame.sprite.Sprite):
 
             #Gets the index of the npc that the player interacted with
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
-            if npcIndex != -1:
-                interacted = True
+            if self.game.state == 'shopping':
+                item = self.game.activeNPC.interaction()
+                if item == 'trident':
+                    self.activeWeaponList.append('trident')
+                elif item == 'bubble':
+                    self.activeWeaponList.append('bubble')
+                #pygame.time.wait(250)
+            elif npcIndex != -1:
+                # interacted = True
                 self.game.npcs.get_sprite(npcIndex).interaction()
                 pygame.time.wait(250)
 
@@ -428,12 +453,23 @@ class Player(pygame.sprite.Sprite):
             if npcIndex != -1:
                 interacted = True
                 npc = self.game.npcs.get_sprite(npcIndex)
+                self.game.activeNPC = npc
                 if keys[pygame.K_w] or keys[pygame.K_UP]:
                     npc.TextBox.selectedRect = npc.TextBox.selectedRect - 1 if npc.TextBox.selectedRect > 0 else npc.TextBox.selectedRect
                     pygame.time.wait(150)
                 else:
                     npc.TextBox.selectedRect = npc.TextBox.selectedRect + 1 if npc.TextBox.selectedRect < len(npc.TextBox.choiceRectList)-1 else npc.TextBox.selectedRect
                     pygame.time.wait(150)
+
+        #Modified: Max Chiu 5/18/2024
+        elif self.game.state == 'shopping' and (keys[pygame.K_a] or keys[pygame.K_d] or keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
+            npc = self.game.activeNPC
+            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+                npc.selectedItem = npc.selectedItem - 1 if npc.selectedItem > 0 else npc.selectedItem
+                pygame.time.wait(150)
+            else:
+                npc.selectedItem = npc.selectedItem + 1 if npc.selectedItem < len(npc.itemList)-1 else npc.selectedItem
+                pygame.time.wait(150)
 
 
         #Allows mouse click functionality for interactions
@@ -445,6 +481,7 @@ class Player(pygame.sprite.Sprite):
                 interactRect = pygame.Rect(self.rect.left-TILESIZE*0.1, self.rect.top-TILESIZE*0.1, TILESIZE*1.2, TILESIZE*1.2)
                 npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
                 npc = self.game.npcs.get_sprite(npcIndex)
+                self.game.activeNPC = npc
                 rectCollisionList = npc.TextBox.choiceRectList[:]
 
                 for rect in range(len(rectCollisionList)):
@@ -454,7 +491,16 @@ class Player(pygame.sprite.Sprite):
                     npc.selectedRect = mouseRect.collidelist(rectCollisionList)
                     npc.interaction()
                     pygame.time.wait(200)
-
+            elif self.game.state == 'shopping':
+                interactIndex = mouseRect.collidelist(self.game.activeNPC.itemRects)
+                if interactIndex != -1:
+                    item = self.game.activeNPC.interaction()
+                    if item == 'trident':
+                        self.activeWeaponList.append('trident')
+                    elif item == 'bubble':
+                        self.activeWeaponList.append('bubble')
+                    self.game.activeNPC.interaction()
+                    #pygame.time.wait(250)
             else:
                 #Checks if the player is within a square's range of side length 60 pixels of the mouse
                 if ((mouseRect.x-self.rect.x)**2+(mouseRect.y-self.rect.y)**2)**(1/2) <= 60:
@@ -790,14 +836,54 @@ class NPC(pygame.sprite.Sprite):
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
+        self.totalItemCost = [{'flower': 20}, {'ore': 10}, {'flower': 10}]
+        self.totalItemList = ['healthPotion', 'damagePotion', 'speedPotion']
+        self.totalItemDesc = ['Restores health (Consumable) ', 'Increases damage ', 'Increases movement speed ']
+        self.totalItemImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
+                                pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
+                                pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200))]
+        
+        self.itemCost = []
+        self.itemList = []
+        self.itemDesc = []
+        self.itemImgs = []
+
+        if 'trident' not in self.game.player.activeWeaponList:
+            self.itemCost.append({'flower': 8})
+            self.itemList.append('trident')
+            self.itemDesc.append('Throwing weapon ')
+            self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/trident2.png'), (200, 200)))
+        if 'bubble' not in self.game.player.activeWeaponList:
+            self.itemCost.append({'flower': 16})
+            self.itemList.append('bubble')
+            self.itemDesc.append('Burst gun ')
+            self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/bubblegun.png'), (200, 200)))
+        while len(self.itemList) < 3:
+            randomInd = random.randint(0, len(self.totalItemList)-1)
+            if self.totalItemList[randomInd] not in self.itemList:
+                self.itemCost.append(self.totalItemCost[randomInd])
+                self.itemList.append(self.totalItemList[randomInd])
+                self.itemDesc.append(self.totalItemDesc[randomInd])
+                self.itemImgs.append(self.totalItemImgs[randomInd])
+        self.itemList.append('leave')
+        self.itemRects = []
+        self.selectedItem = 0
+        #self.descFont = pygame.font.SysFont('Garamond', 20)
+        self.descFont = pygame.font.Font('Fonts/minecraft-font/MinecraftRegular-Bmg3.otf', 16)
+        #self.descFont = pygame.font.Font('Fonts/pixel-font/Pixel-y14Y.ttf', 20)
+        #self.descFont = pygame.font.Font('Fonts/roboto-remix-font/Minecraftchmc-dBlX.ttf', 20)
+        #self.descFont = pygame.font.Font('Fonts/scarlet-devil-pixel-script-font/ScarletDevilPixelScript-0Vjr.ttf', 20)
+
+
         #Always leave a space/punctuation at the end of the quote!
         #Would you rather cum in the sink or sink in the cum? That is indeed the question for which we must all ponder and arrive at our own answers.
-        self.potionList = ['healthPotion', 'damagePotion', 'speedPotion']
+        #change this later
         self.dialogueList = {'01:First Meet':[{'Meetings': 1},
                                                 "Testing dialogue ",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
                                                 "Boom Boom Boom Boom ",
-                                                "%Choices; Shop; Leave; Meow"],
+                                                "%Choices; What do you want to do?; Shop; Leave; Meow ",
+                                                "Drink it now, drink it now, drink it now "],
                              '02:Second Meet': [{'Meetings':2},
                                                 "Hi again... "]
                             }
@@ -841,24 +927,42 @@ class NPC(pygame.sprite.Sprite):
             self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 28, 'Garamond', self.name)
             self.dialogueStageIndex += 1
             self.game.state = 'dialogue'
-
-        #While not finished with dialogue section
-        elif self.dialogueStageIndex < len(self.dialogueList[self.dialogueStage]):
-            nextDialogue = self.dialogueList[self.dialogueStage][self.dialogueStageIndex]
-            #If there are choices displayed on the screen
+        elif self.game.state == 'shopping':
             pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
+            purchase = True
+            if self.selectedItem == 3:
+                self.itemRects = []
+                self.game.state = 'dialogue'
+                return -1
+            for req in self.itemCost[self.selectedItem]:
+                if self.game.inventory.get(req) < self.itemCost[self.selectedItem].get(req):
+                    purchase = False
+            if purchase:
+                for req in self.itemCost[self.selectedItem]:
+                    self.game.inventory.add_item(req, -1*self.itemCost[self.selectedItem].get(req))
+                self.game.state = 'dialogue'
+                self.itemRects = []
+                return self.itemList[self.selectedItem]
+            return -1
+        #While not finished with dialogue section
+        elif self.game.state == 'dialogue' and self.dialogueStageIndex < len(self.dialogueList[self.dialogueStage]):
+            nextDialogue = self.dialogueList[self.dialogueStage][self.dialogueStageIndex]
+            pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
+            #If there are choices displayed on the screen
             if len(self.TextBox.choiceRectList) > 0:
-                self.choiceResponse(False)
+                self.choiceResponse()
                 self.dialogueStageIndex += 1
-                if self.dialogueStageIndex == len(self.dialogueList[self.dialogueStage]):
+                if self.dialogueStageIndex == len(self.dialogueList[self.dialogueStage]) and self.game.state != 'shopping':
                     self.TextBox.kill()
                     self.updateDialogue()
                     self.game.state = 'explore'
                     self.game.play_music('stop')
                     self.game.play_music('village')
                 else:
-                    self.interaction()
+                    #self.interaction()
+                    return -1
             #If the next dialogue to display is a choice list
             elif nextDialogue.find('%Choices') != -1:
                 self.TextBox.kill()
@@ -872,16 +976,107 @@ class NPC(pygame.sprite.Sprite):
                 self.TextBox.newText(nextDialogue, 28, 'Garamond', self.name)
                 self.dialogueStageIndex += 1
         #When finished with dialogue
-        else:
+        elif self.game.state == 'dialogue':
             self.TextBox.kill()
             self.updateDialogue()
             self.game.state = 'explore'
             self.game.play_music('stop')
+        self.itemRects = []
+        return -1
 
     #READ ME, FINISH WHEN CHOICES ARE DEFINED
-    def choiceResponse(self, isFlavor):
+    #Modified Max Chiu 5/17-5/20/2024
+    def choiceResponse(self):
         self.TextBox.choiceRectList = []
-        pass
+        #variable for each letter width of the font
+        textWidth = 9
+        if self.TextBox.selectedRect == 0:
+            self.game.state = 'shopping'
+            
+            #Displaying each of the potions
+            for item in range(len(self.itemList)-1):
+
+                #Draws the potion on the screen with background BROWN
+                itemRect = pygame.Rect(190+item*350, 140, 200, 300)
+                pygame.draw.rect(self.game.screen, BROWN, itemRect)
+                self.game.screen.blit(self.itemImgs[item], itemRect)
+                
+                #Displays the text for each item: name, cost, and description
+                if self.itemList[item] == 'healthPotion':
+                    nameText = 'Health Potion'
+                elif self.itemList[item] == 'damagePotion':
+                    nameText = 'Increased Damage'
+                elif self.itemList[item] == 'speedPotion':
+                    nameText = 'Increased Speed'
+                elif self.itemList[item] == 'trident':
+                    nameText = 'Trident'
+                elif self.itemList[item] == 'bubble':
+                    nameText = 'Bubble Gun'
+                self.game.screen.blit(self.descFont.render(nameText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(nameText)/2), itemRect.y+200))
+
+                #Item cost
+                #ShiftedDown checks if there was an extra line of text added right after name for if the user has enough resources
+                shiftedDown = False
+                for req in self.itemCost[item].keys():
+                    if self.game.inventory.get(req) < self.itemCost[item][req]:
+                        shiftedDown = True
+                        self.game.screen.blit(self.descFont.render('Need More Resources', False, RED), (itemRect.x+100-textWidth*(19/2), itemRect.y+220))
+                        break
+
+                numRows = 0
+                #Checks through every requirement for 1 item
+                for req in self.itemCost[item].keys():
+                    if req == 'flower':
+                        costText = f'Cost: {self.itemCost[item][req]} Flowers'
+                    elif req == 'ore':
+                        costText = f'Cost: {self.itemCost[item][req]} Ores'
+                    if not shiftedDown:
+                        self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(costText)/2), itemRect.y+220+numRows*20))
+                    else:
+                        self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(costText)/2), itemRect.y+240+numRows*20))
+                    numRows += 1
+
+                text = self.itemDesc[item]
+                maxLength = 20
+                while len(text) > 0:
+                    try:
+                        cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9()]', text[maxLength-1::-1]).end()+1
+                    except AttributeError:
+                        cutoffIndex = maxLength
+                    if shiftedDown:
+                        self.game.screen.blit(self.descFont.render(text[:cutoffIndex], False, OFFWHITE), (itemRect.x+100-textWidth*(len(text[:cutoffIndex])/2), itemRect.y+240+numRows*20))
+                    else:
+                        self.game.screen.blit(self.descFont.render(text[:cutoffIndex], False, OFFWHITE), (itemRect.x+100-textWidth*(len(text[:cutoffIndex])/2), itemRect.y+220+numRows*20))
+                    text = text[cutoffIndex:]
+                    numRows += 1
+
+
+                #Displays all the borders
+                if item == self.selectedItem:
+                    pygame.draw.rect(self.game.screen, BLUE, itemRect, 2, 2)
+                else:
+                    pygame.draw.rect(self.game.screen, WHITE, itemRect, 2, 2)
+                itemRect.x += 2
+                itemRect.y += 2
+                itemRect.width -= 4
+                itemRect.height -=104
+                pygame.draw.rect(self.game.screen, BLACK, itemRect, 1, 1)
+                if len(self.itemRects) < 3:
+                    self.itemRects.append(itemRect)
+
+            #For the leave button
+            itemRect = pygame.Rect(600, 460, 80, 25)
+            if len(self.itemRects) < 4:
+                self.itemRects.append(itemRect)
+            pygame.draw.rect(self.game.screen, BROWN, itemRect)
+            self.game.screen.blit(self.descFont.render('Leave', False, OFFWHITE), (itemRect.x+itemRect.width/2-textWidth*(len('Leave')/2), itemRect.y+5))
+            if self.selectedItem == 3:
+                pygame.draw.rect(self.game.screen, BLUE, itemRect, 2, 2)
+            else:
+                pygame.draw.rect(self.game.screen, WHITE, itemRect, 2, 2)
+        
+
+
 
 #Authored by Max Chiu 4/16/2024
 class Enemy(pygame.sprite.Sprite):
@@ -1086,7 +1281,7 @@ class Enemy(pygame.sprite.Sprite):
         # change = self.path.checkCollisions()
         # if change:
         #     self.xChange, self.yChange = change[0]*self.speed, change[1]*self.speed
-        if self.game.state != 'dialogue' and self.game.state != 'scene' and self.game.state != 'pause' and self.game.state != 'game over':
+        if self.game.state not in ['dialogue', 'scene', 'pause', 'game over', 'shopping']:
             if self.attackType == 'melee':
                 self.searchPlayer()
             self.animate()
@@ -1195,13 +1390,13 @@ class Enemy(pygame.sprite.Sprite):
                 self.xChange, self.yChange = change[0]*self.speed, change[1]*self.speed
                 if self.xChange == 0 and self.yChange == 0:
                     self.state = 'chasing'
-
             else:
                 self.state = 'returning'
                 self.path.emptyPath()
             return
         playerPos = [self.game.player.x, self.game.player.y]
 
+        ### MAX FINAL PRESENTATION
         #px and py are the coordinates for the center of the player
         lines=[]
         px = playerPos[0]+self.game.player.width/2
@@ -1210,7 +1405,7 @@ class Enemy(pygame.sprite.Sprite):
         ex = self.x+self.width/2
         ey = self.y+self.height/2
         #split up the line of sight into n line segments and calculate the dx and dy for 1 line segment
-        n = 10
+        n = 5
         dx = (px - ex)/n
         dy = (py - ey)/n
         #print(dx, dy)
@@ -1244,16 +1439,15 @@ class Enemy(pygame.sprite.Sprite):
         surface = pygame.Surface(self.game.screen.get_size(), pygame.SRCALPHA)
         for i in range(n):
             lines.append(pygame.draw.line(surface, (0, 0, 0, 0), (ex+dx*i, ey+dy*i), (ex+dx*(i+1), ey+dy*(i+1)), 1))
-        #line = pygame.draw.line(self.screen, RED, (self.enemy.x+self.enemy.width/2, self.enemy.y+self.enemy.height/2), (self.player.x+self.player.width/2, self.player.y+self.player.height/2), 2)
         index = [line.collidelist(list(block.rect for block in self.game.blocks)) for line in lines]
         isChasing = True
 
         #if any of these indices are not -1, there is no line of sight between the player and the enemy
         for i in index:
             if i != -1:
-                #print(i)
-                #rect = self.game.blocks.get_sprite(i)
-                #rect.image.fill(BLUE)
+                # print(i)
+                # rect = self.game.blocks.get_sprite(i)
+                # rect.image.fill(BLUE)
                 isChasing = False
 
         #if move and not self.path.collision_rects:
@@ -1267,7 +1461,7 @@ class Enemy(pygame.sprite.Sprite):
             self.yChange = dy * self.speed
             #print(self.xChange, self.yChange)
             
-        elif not isChasing and self.state != 'returning':
+        elif not isChasing and self.state not in ['returning', 'standing']:
             
             # self.xChange = 0
             # self.yChange = 0
@@ -1424,6 +1618,8 @@ class Pathfinder:
             self.emptyPath()
             return 0, 0
 
+    #Authored: Max Chiu 5/3/2024
+    #Followed sample code: https://github.com/clear-code-projects/Python-Pathfinder/blob/main/roomba%20project/pathfinding_roomba.py
     def checkCollisions(self):
         if self.collision_rects:
             for rect in self.collision_rects:
@@ -1431,6 +1627,8 @@ class Pathfinder:
                     del self.collision_rects[0]        
             return self.getDirection()
                 
+    #Authored: Max Chiu 5/3/2024
+    #Followed sample code: https://github.com/clear-code-projects/Python-Pathfinder/blob/main/roomba%20project/pathfinding_roomba.py
     def emptyPath(self):
         self.collision_rects = []
         self.path = []
@@ -1603,8 +1801,8 @@ class Inventory(pygame.sprite.Sprite):
         self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(190,53)))
 
     ### RACHEL
-    def add_item(self, item):
-        self.slots[item] =  self.slots.get(item) + 1
+    def add_item(self, item, number):
+        self.slots[item] =  self.slots.get(item) + number
         for image in self.numList:
             pygame.draw.rect(self.image, BLACK, image)
         flowerX = 60
@@ -1625,6 +1823,10 @@ class Inventory(pygame.sprite.Sprite):
             self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(potionX,53)))
         else:
             self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(potionX,53)))
+
+    def get(self, item):
+        return self.slots.get(item)
+
 
 class WeaponDisplay(pygame.sprite.Sprite):
     def __init__(self, game):
