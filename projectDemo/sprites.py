@@ -30,8 +30,8 @@ class Player(pygame.sprite.Sprite):
         # This list below holds the weapons that the player can switch to and use
         # It should start with only the swordfish weapon available
         # the rest would be appended to this list when unlocked
-        self.activeWeaponList = ['swordfish', 'bubble', 'trident']
-        # self.activeWeaponList = ['swordfish', 'bubble']
+        # self.activeWeaponList = ['swordfish', 'bubble', 'trident']
+        self.activeWeaponList = ['swordfish']
         self.weaponNum = 0
         self.weapon = items.Weapon(self.game, self.weaponList[self.weaponNum], self)
         self.weaponAnimationCount = 0
@@ -173,6 +173,12 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+    def setPosition(self, xTile, yTile):
+        self.x = xTile*TILESIZE
+        self.y = yTile*TILESIZE
+        self.rect.x = self.x
+        self.rect.y = self.y
+
     def update(self):
         # checks for any movement from the player
         self.movement()
@@ -255,21 +261,18 @@ class Player(pygame.sprite.Sprite):
                     return
                 else:
                     npc.TextBox.selectedRect = highlighted
-                    self.game.activeNPC.selectedPotion = highlighted
+                    self.game.activeNPC.selectedItem = highlighted
 
         elif self.game.state == 'shopping':
             self.mouseRect.center = pygame.mouse.get_pos()
             interactRect = pygame.Rect(self.rect.left-TILESIZE*0.1, self.rect.top-TILESIZE*0.1, TILESIZE*1.2, TILESIZE*1.2)
-            collisionList = self.game.activeNPC.potionRects
+            collisionList = self.game.activeNPC.itemRects
             if len(collisionList) > 0:
                 highlighted = self.mouseRect.collidelist(collisionList) 
                 if highlighted == -1:
                     return
                 else:
-                    self.game.activeNPC.selectedPotion = highlighted
-
-    def setLocation(self, x, y):
-        pass
+                    self.game.activeNPC.selectedItem = highlighted
 
     # inspiration for this function and the damage flickering effect was gotten from:
     # https://www.youtube.com/watch?v=QU1pPzEGrqw
@@ -409,7 +412,11 @@ class Player(pygame.sprite.Sprite):
             #Gets the index of the npc that the player interacted with
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
             if self.game.state == 'shopping':
-                self.game.activeNPC.interaction()
+                item = self.game.activeNPC.interaction()
+                if item == 'trident':
+                    self.activeWeaponList.append('trident')
+                elif item == 'bubble':
+                    self.activeWeaponList.append('bubble')
                 #pygame.time.wait(250)
             elif npcIndex != -1:
                 # interacted = True
@@ -456,10 +463,10 @@ class Player(pygame.sprite.Sprite):
         elif self.game.state == 'shopping' and (keys[pygame.K_a] or keys[pygame.K_d] or keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
             npc = self.game.activeNPC
             if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-                npc.selectedPotion = npc.selectedPotion - 1 if npc.selectedPotion > 0 else npc.selectedPotion
+                npc.selectedItem = npc.selectedItem - 1 if npc.selectedItem > 0 else npc.selectedItem
                 pygame.time.wait(150)
             else:
-                npc.selectedPotion = npc.selectedPotion + 1 if npc.selectedPotion < len(npc.potionList)-1 else npc.selectedPotion
+                npc.selectedItem = npc.selectedItem + 1 if npc.selectedItem < len(npc.itemList)-1 else npc.selectedItem
                 pygame.time.wait(150)
 
 
@@ -483,9 +490,13 @@ class Player(pygame.sprite.Sprite):
                     npc.interaction()
                     pygame.time.wait(200)
             elif self.game.state == 'shopping':
-                interactIndex = mouseRect.collidelist(self.game.activeNPC.potionRects)
+                interactIndex = mouseRect.collidelist(self.game.activeNPC.itemRects)
                 if interactIndex != -1:
-                    self.game.activeNPC.interaction()
+                    item = self.game.activeNPC.interaction()
+                    if item == 'trident':
+                        self.activeWeaponList.append('trident')
+                    elif item == 'bubble':
+                        self.activeWeaponList.append('bubble')
                     self.game.activeNPC.interaction()
                     #pygame.time.wait(250)
             else:
@@ -823,25 +834,38 @@ class NPC(pygame.sprite.Sprite):
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
-        self.totalPotionCost = [{'Flower': 20}, {'Ore': 10}, {'Flower': 10}]
-        self.totalPotionList = ['healthPotion', 'damagePotion', 'speedPotion']
-        self.totalPotionDesc = ['Restores health (Consumable) ', 'Permanently increases damage ', 'Permanently increases movement speed ']
-        self.totalPotionImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/trident2.png'), (200, 200)),
-                                pygame.transform.scale(pygame.image.load('Sprites/items/swordfish.png'), (200, 200)),
+        self.totalItemCost = [{'flower': 20}, {'ore': 10}, {'flower': 10}]
+        self.totalItemList = ['healthPotion', 'damagePotion', 'speedPotion']
+        self.totalItemDesc = ['Restores health (Consumable) ', 'Increases damage ', 'Increases movement speed ']
+        self.totalItemImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
+                                pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200))]
-        self.potionCost = []
-        self.potionList = []
-        self.potionDesc = []
-        self.potionImgs = []
-        while len(self.potionList) < 3:
-            randomInd = random.randint(0, len(self.totalPotionList)-1)
-            if self.totalPotionList[randomInd] not in self.potionList:
-                self.potionCost.append(self.totalPotionCost[randomInd])
-                self.potionList.append(self.totalPotionList[randomInd])
-                self.potionDesc.append(self.totalPotionDesc[randomInd])
-                self.potionImgs.append(self.totalPotionImgs[randomInd])
-        self.potionRects = []
-        self.selectedPotion = 0
+        
+        self.itemCost = []
+        self.itemList = []
+        self.itemDesc = []
+        self.itemImgs = []
+
+        if 'trident' not in self.game.player.activeWeaponList:
+            self.itemCost.append({'flower': 8})
+            self.itemList.append('trident')
+            self.itemDesc.append('Throwing weapon ')
+            self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/trident2.png'), (200, 200)))
+        if 'bubble' not in self.game.player.activeWeaponList:
+            self.itemCost.append({'flower': 16})
+            self.itemList.append('bubble')
+            self.itemDesc.append('Burst gun ')
+            self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/bubblegun.png'), (200, 200)))
+        while len(self.itemList) < 3:
+            randomInd = random.randint(0, len(self.totalItemList)-1)
+            if self.totalItemList[randomInd] not in self.itemList:
+                self.itemCost.append(self.totalItemCost[randomInd])
+                self.itemList.append(self.totalItemList[randomInd])
+                self.itemDesc.append(self.totalItemDesc[randomInd])
+                self.itemImgs.append(self.totalItemImgs[randomInd])
+        self.itemList.append('leave')
+        self.itemRects = []
+        self.selectedItem = 0
         #self.descFont = pygame.font.SysFont('Garamond', 20)
         self.descFont = pygame.font.Font('Fonts/minecraft-font/MinecraftRegular-Bmg3.otf', 16)
         #self.descFont = pygame.font.Font('Fonts/pixel-font/Pixel-y14Y.ttf', 20)
@@ -904,11 +928,23 @@ class NPC(pygame.sprite.Sprite):
         elif self.game.state == 'shopping':
             pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
-            self.game.state = 'dialogue'
-            self.potionRects = []
-            return self.selectedPotion
+            purchase = True
+            if self.selectedItem == 3:
+                self.itemRects = []
+                self.game.state = 'dialogue'
+                return -1
+            for req in self.itemCost[self.selectedItem]:
+                if self.game.inventory.get(req) < self.itemCost[self.selectedItem].get(req):
+                    purchase = False
+            if purchase:
+                for req in self.itemCost[self.selectedItem]:
+                    self.game.inventory.add_item(req, -1*self.itemCost[self.selectedItem].get(req))
+                self.game.state = 'dialogue'
+                self.itemRects = []
+                return self.itemList[self.selectedItem]
+            return -1
         #While not finished with dialogue section
-        elif self.dialogueStageIndex < len(self.dialogueList[self.dialogueStage]):
+        elif self.game.state == 'dialogue' and self.dialogueStageIndex < len(self.dialogueList[self.dialogueStage]):
             nextDialogue = self.dialogueList[self.dialogueStage][self.dialogueStageIndex]
             pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
@@ -938,12 +974,12 @@ class NPC(pygame.sprite.Sprite):
                 self.TextBox.newText(nextDialogue, 28, 'Garamond', self.name)
                 self.dialogueStageIndex += 1
         #When finished with dialogue
-        else:
+        elif self.game.state == 'dialogue':
             self.TextBox.kill()
             self.updateDialogue()
             self.game.state = 'explore'
             self.game.play_music('stop')
-        self.potionRects = []
+        self.itemRects = []
         return -1
 
     #READ ME, FINISH WHEN CHOICES ARE DEFINED
@@ -956,30 +992,47 @@ class NPC(pygame.sprite.Sprite):
             self.game.state = 'shopping'
             
             #Displaying each of the potions
-            for potion in range(len(self.potionList)):
+            for item in range(len(self.itemList)-1):
                 #Draws the potion on the screen with background Gray
-                potionRect = pygame.Rect(190+potion*350, 190, 200, 300)
-                pygame.draw.rect(self.game.screen, BROWN, potionRect)
-                self.game.screen.blit(self.potionImgs[potion], potionRect)
+                itemRect = pygame.Rect(190+item*350, 140, 200, 300)
+                pygame.draw.rect(self.game.screen, BROWN, itemRect)
+                self.game.screen.blit(self.itemImgs[item], itemRect)
                 
                 #Displays the text for each potion: name, cost, and description
-                if self.potionList[potion] == 'healthPotion':
+                if self.itemList[item] == 'healthPotion':
                     nameText = 'Health Potion'
-                elif self.potionList[potion] == 'damagePotion':
+                elif self.itemList[item] == 'damagePotion':
                     nameText = 'Increased Damage'
-                elif self.potionList[potion] == 'speedPotion':
+                elif self.itemList[item] == 'speedPotion':
                     nameText = 'Increased Speed'
-                self.game.screen.blit(self.descFont.render(nameText, False, OFFWHITE), (potionRect.x+100-textWidth*(len(nameText)/2), potionRect.y+200))
+                elif self.itemList[item] == 'trident':
+                    nameText = 'Trident'
+                elif self.itemList[item] == 'bubble':
+                    nameText = 'Bubble Gun'
+                self.game.screen.blit(self.descFont.render(nameText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(nameText)/2), itemRect.y+200))
 
-                for req in self.potionCost[potion].keys():
-                    if req == 'Flower':
-                        costText = f'Cost: {self.potionCost[potion][req]} Flowers'
-                        self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (potionRect.x+100-textWidth*(len(costText)/2), potionRect.y+220))
-                    elif req == 'Ore':
-                        costText = f'Cost: {self.potionCost[potion][req]} Ores'
-                        self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (potionRect.x+100-textWidth*(len(costText)/2), potionRect.y+220))
+                shiftedDown = False
+                for req in self.itemCost[item].keys():
+                    if req == 'flower':
+                        if self.game.inventory.get(req) >= self.itemCost[item][req]:
+                            costText = f'Cost: {self.itemCost[item][req]} Flowers'
+                            self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(costText)/2), itemRect.y+220))
+                        else:
+                            shiftedDown = True
+                            costText = f'Cost: {self.itemCost[item][req]} Flowers'
+                            self.game.screen.blit(self.descFont.render('Need More Resources', False, RED), (itemRect.x+100-textWidth*(19/2), itemRect.y+220))
+                            self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(costText)/2), itemRect.y+240))
+                    elif req == 'ore':
+                        if self.game.inventory.get(req) >= self.itemCost[item][req]:
+                            costText = f'Cost: {self.itemCost[item][req]} Ores'
+                            self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(costText)/2), itemRect.y+220))
+                        else:
+                            shiftedDown = True
+                            costText = f'Cost: {self.itemCost[item][req]} Ores'
+                            self.game.screen.blit(self.descFont.render('Need More Resources', False, RED), (itemRect.x+100-textWidth*(19/2), itemRect.y+220))
+                            self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(costText)/2), itemRect.y+240))
 
-                text = self.potionDesc[potion]
+                text = self.itemDesc[item]
                 maxLength = 20
                 numRows = 0
                 while len(text) > 0:
@@ -987,23 +1040,37 @@ class NPC(pygame.sprite.Sprite):
                         cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9()]', text[maxLength-1::-1]).end()+1
                     except AttributeError:
                         cutoffIndex = maxLength
-                    self.game.screen.blit(self.descFont.render(text[:cutoffIndex], False, OFFWHITE), (potionRect.x+100-textWidth*(len(text[:cutoffIndex])/2), potionRect.y+240+numRows*20))
+                    if shiftedDown:
+                        self.game.screen.blit(self.descFont.render(text[:cutoffIndex], False, OFFWHITE), (itemRect.x+100-textWidth*(len(text[:cutoffIndex])/2), itemRect.y+260+numRows*20))
+                    else:
+                        self.game.screen.blit(self.descFont.render(text[:cutoffIndex], False, OFFWHITE), (itemRect.x+100-textWidth*(len(text[:cutoffIndex])/2), itemRect.y+240+numRows*20))
                     text = text[cutoffIndex:]
                     numRows += 1
 
 
                 #Displays all the borders
-                if potion == self.selectedPotion:
-                    pygame.draw.rect(self.game.screen, BLUE, potionRect, 2, 2)
+                if item == self.selectedItem:
+                    pygame.draw.rect(self.game.screen, BLUE, itemRect, 2, 2)
                 else:
-                    pygame.draw.rect(self.game.screen, WHITE, potionRect, 2, 2)
-                potionRect.x += 2
-                potionRect.y += 2
-                potionRect.width -= 4
-                potionRect.height -=104
-                pygame.draw.rect(self.game.screen, BLACK, potionRect, 1, 1)
-                if len(self.potionRects) < 3:
-                    self.potionRects.append(potionRect)
+                    pygame.draw.rect(self.game.screen, WHITE, itemRect, 2, 2)
+                itemRect.x += 2
+                itemRect.y += 2
+                itemRect.width -= 4
+                itemRect.height -=104
+                pygame.draw.rect(self.game.screen, BLACK, itemRect, 1, 1)
+                if len(self.itemRects) < 3:
+                    self.itemRects.append(itemRect)
+
+            #For the leave button
+            itemRect = pygame.Rect(600, 460, 80, 25)
+            if len(self.itemRects) < 4:
+                self.itemRects.append(itemRect)
+            pygame.draw.rect(self.game.screen, BROWN, itemRect)
+            self.game.screen.blit(self.descFont.render('Leave', False, OFFWHITE), (itemRect.x+itemRect.width/2-textWidth*(len('Leave')/2), itemRect.y+5))
+            if self.selectedItem == 3:
+                pygame.draw.rect(self.game.screen, BLUE, itemRect, 2, 2)
+            else:
+                pygame.draw.rect(self.game.screen, WHITE, itemRect, 2, 2)
         
 
 
@@ -1731,8 +1798,8 @@ class Inventory(pygame.sprite.Sprite):
         self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(190,53)))
 
     ### RACHEL
-    def add_item(self, item):
-        self.slots[item] =  self.slots.get(item) + 1
+    def add_item(self, item, number):
+        self.slots[item] =  self.slots.get(item) + number
         for image in self.numList:
             pygame.draw.rect(self.image, BLACK, image)
         flowerX = 60
@@ -1753,6 +1820,10 @@ class Inventory(pygame.sprite.Sprite):
             self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(potionX,53)))
         else:
             self.numList.append(self.image.blit(self.font.render(str(self.slots.get('potion')),False,(WHITE)),(potionX,53)))
+
+    def get(self, item):
+        return self.slots.get(item)
+
 
 class WeaponDisplay(pygame.sprite.Sprite):
     def __init__(self, game):

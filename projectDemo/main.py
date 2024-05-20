@@ -284,6 +284,9 @@ class Game():
                         currentTileMap.append(randomGreenMap) # add the green map 
                         mapNumber = len(currentTileMap)-1
                         mapList[self.map[0]][self.map[1]] = mapNumber
+
+                        
+
                         break
                 # self.play_music('village') The village bgm would play whenever you enter a peaceful npc room
             # if the room is unloaded and listed as -4, the red boss room will be loaded and added to the map list
@@ -352,6 +355,7 @@ class Game():
 
             self.all_sprites.add(self.inventory)
             self.all_sprites.add(self.weaponsHud)
+            self.all_sprites.add(self.player)
             for row in range(len(settings.currentTileMap[mapNumber])):
                 #print(f"{row} ", end="")
                 for col in range(len(settings.currentTileMap[mapNumber][row])):
@@ -382,13 +386,17 @@ class Game():
                         # teleports the player's position on the screen when they move rooms
                         Teleport(self, col, row)
                         if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
-                            self.player = Player(self, col-1, row, self.clock)
+                            #self.player = Player(self, col-1, row, self.clock)
+                            self.player.setPosition(col-1, row)
                         elif prevPosition[0] == 31 and col == 0 and prevPosition[1] == row:
-                            self.player = Player(self, col+1, row, self.clock)
+                            #self.player = Player(self, col+1, row, self.clock)
+                            self.player.setPosition(col+1, row)
                         elif prevPosition[1] == 0 and row == 17 and prevPosition[0] == col:
-                            self.player = Player(self, col, row-1, self.clock)
+                            #self.player = Player(self, col, row-1, self.clock)
+                            self.player.setPosition(col, row-1)
                         elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
-                            self.player = Player(self, col, row+1, self.clock)
+                            #self.player = Player(self, col, row+1, self.clock)
+                            self.player.setPosition(col, row+1)
                         # maintains the previously equipped weapon from the previous screen
                         self.player.weaponNum = priorWeaponNum
                         self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
