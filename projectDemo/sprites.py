@@ -842,7 +842,11 @@ class NPC(pygame.sprite.Sprite):
                 self.potionImgs.append(self.totalPotionImgs[randomInd])
         self.potionRects = []
         self.selectedPotion = 0
-        self.descFont = pygame.font.SysFont('Garamond', 20)
+        #self.descFont = pygame.font.SysFont('Garamond', 20)
+        self.descFont = pygame.font.Font('Fonts/minecraft-font/MinecraftRegular-Bmg3.otf', 16)
+        #self.descFont = pygame.font.Font('Fonts/pixel-font/Pixel-y14Y.ttf', 20)
+        #self.descFont = pygame.font.Font('Fonts/roboto-remix-font/Minecraftchmc-dBlX.ttf', 20)
+        #self.descFont = pygame.font.Font('Fonts/scarlet-devil-pixel-script-font/ScarletDevilPixelScript-0Vjr.ttf', 20)
 
 
         #Always leave a space/punctuation at the end of the quote!
@@ -946,6 +950,8 @@ class NPC(pygame.sprite.Sprite):
     #Modified Max Chiu 5/17-5/18/2024
     def choiceResponse(self):
         self.TextBox.choiceRectList = []
+        #variable for each letter width of the font
+        textWidth = 9
         if self.TextBox.selectedRect == 0:
             self.game.state = 'shopping'
             
@@ -963,25 +969,25 @@ class NPC(pygame.sprite.Sprite):
                     nameText = 'Increased Damage'
                 elif self.potionList[potion] == 'speedPotion':
                     nameText = 'Increased Speed'
-                self.game.screen.blit(self.descFont.render(nameText, False, OFFWHITE), (potionRect.x+100-8*(len(nameText)/2), potionRect.y+200))
+                self.game.screen.blit(self.descFont.render(nameText, False, OFFWHITE), (potionRect.x+100-textWidth*(len(nameText)/2), potionRect.y+200))
 
                 for req in self.potionCost[potion].keys():
                     if req == 'Flower':
                         costText = f'Cost: {self.potionCost[potion][req]} Flowers'
-                        self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (potionRect.x+100-8*(len(costText)/2), potionRect.y+220))
+                        self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (potionRect.x+100-textWidth*(len(costText)/2), potionRect.y+220))
                     elif req == 'Ore':
                         costText = f'Cost: {self.potionCost[potion][req]} Ores'
-                        self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (potionRect.x+100-8*(len(costText)/2), potionRect.y+220))
+                        self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (potionRect.x+100-textWidth*(len(costText)/2), potionRect.y+220))
 
                 text = self.potionDesc[potion]
-                maxLength = 22
+                maxLength = 20
                 numRows = 0
                 while len(text) > 0:
                     try:
                         cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9()]', text[maxLength-1::-1]).end()+1
                     except AttributeError:
                         cutoffIndex = maxLength
-                    self.game.screen.blit(self.descFont.render(text[:cutoffIndex], False, OFFWHITE), (potionRect.x+100-8*(len(text[:cutoffIndex])/2), potionRect.y+240+numRows*20))
+                    self.game.screen.blit(self.descFont.render(text[:cutoffIndex], False, OFFWHITE), (potionRect.x+100-textWidth*(len(text[:cutoffIndex])/2), potionRect.y+240+numRows*20))
                     text = text[cutoffIndex:]
                     numRows += 1
 
