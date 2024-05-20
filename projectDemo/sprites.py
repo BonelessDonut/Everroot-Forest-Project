@@ -23,9 +23,15 @@ class Player(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = 30
         self.height = 30
+
         # The weapons available to the player are stored in a list
 
-        self.weaponList = ['bubble', 'swordfish', 'trident']
+        self.weaponList = ['swordfish', 'bubble', 'trident']
+        # This list below holds the weapons that the player can switch to and use
+        # It should start with only the swordfish weapon available
+        # the rest would be appended to this list when unlocked
+        self.activeWeaponList = ['swordfish', 'bubble', 'trident']
+        # self.activeWeaponList = ['swordfish', 'bubble']
         self.weaponNum = 0
         self.weapon = items.Weapon(self.game, self.weaponList[self.weaponNum], self)
         self.weaponAnimationCount = 0
@@ -731,6 +737,9 @@ class Player(pygame.sprite.Sprite):
             # Player can use Q to switch weapons
             self.weaponNum += 1
             self.weaponNum %= len(self.weaponList)
+            while self.weaponList[self.weaponNum] not in self.activeWeaponList:
+                self.weaponNum += 1
+                self.weaponNum %= len(self.weaponList)
             self.weapon.type = self.weaponList[self.weaponNum]
             self.weapon.updateDamage()
             if self.weapon.type == 'swordfish':
@@ -1745,11 +1754,11 @@ class WeaponDisplay(pygame.sprite.Sprite):
         self._layer = TEXT_LAYER
         self.groups = self.game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
-        self.swordfishWep = {'image': pygame.image.load('Sprites/items/swordfish3.png').convert_alpha(), 'active' : False}
-        self.tridentWep = {'image' : pygame.image.load('Sprites/items/trident3.png').convert_alpha(), 'active' : False}
-        self.bubblegunWep = {'image' : self.game.player.weapon.imagelist[0], 'active' : True}
-        self.weaponList = [self.bubblegunWep,
-                           self.swordfishWep,
+        self.swordfishWep = {'name' : 'swordfish', 'image': pygame.image.load('Sprites/items/swordfish3.png').convert_alpha(), 'inactiveImg' : pygame.image.load('Sprites/items/swordfishGray.png').convert_alpha(), 'active' : True}
+        self.tridentWep = {'name' : 'trident', 'image' : pygame.image.load('Sprites/items/trident3.png').convert_alpha(), 'inactiveImg' : pygame.image.load('Sprites/items/tridentGray.png').convert_alpha(), 'active' : False}
+        self.bubblegunWep = {'name' : 'bubble', 'image' : self.game.player.weapon.imagelist[0], 'inactiveImg' : pygame.image.load('Sprites/items/bubblegunGray.png').convert_alpha(), 'active' : False}
+        self.weaponList = [self.swordfishWep,
+                           self.bubblegunWep,
                            self.tridentWep]
         self.x = WIDTH * 0.83
         self.y = HEIGHT * 0.018
@@ -1785,10 +1794,16 @@ class WeaponDisplay(pygame.sprite.Sprite):
                 self.groups = self.game.all_sprites
                 self.add(self.game.all_sprites)
             for i in range(len(self.weaponList)):
-                currentImage = pygame.transform.scale(self.weaponList[i]['image'].convert_alpha(), (TILESIZE * 0.8, TILESIZE * 0.8))
-                self.image.blit(currentImage, pygame.Rect((self.width*0.1) + self.width * 0.3*(i),self.height * 0.25,0,0))
-                if self.weaponList[i]['active']:
-                    pygame.draw.rect(self.game.screen, self.highlightColorList[self.highlightNumber],(self.x + 10 + self.width * 0.3 * i, self.y + 18, TILESIZE * 1.3, TILESIZE * 1.1), 3)
+                if self.weaponList[i]['name'] in self.game.player.activeWeaponList:
+                    currentImage = pygame.transform.scale(self.weaponList[i]['image'].convert_alpha(), (TILESIZE * 0.8, TILESIZE * 0.8))
+                    self.image.blit(currentImage, pygame.Rect((self.width*0.1) + self.width * 0.3*(i),self.height * 0.25,0,0))
+                    if self.weaponList[i]['active']:
+                        pygame.draw.rect(self.game.screen, self.highlightColorList[self.highlightNumber],(self.x + 10 + self.width * 0.3 * i, self.y + 18, TILESIZE * 1.3, TILESIZE * 1.1), 3)
+                else:
+                    # if the weapons are not in the active list, they will be grayed out on the display
+                    currentImage = pygame.transform.scale(self.weaponList[i]['inactiveImg'].convert_alpha(), (TILESIZE * 0.8, TILESIZE * 0.8))
+                    self.image.blit(currentImage, pygame.Rect((self.width * 0.1) + self.width * 0.3 * (i), self.height * 0.25, 0, 0))
+
         else:
             # removes the weapon hud from the list of sprites to be drawn if it should not be shown
             self.remove(self.game.all_sprites)
