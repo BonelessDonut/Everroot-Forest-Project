@@ -236,18 +236,31 @@ class Player(pygame.sprite.Sprite):
             interactRect = pygame.Rect(self.rect.left-TILESIZE*0.1, self.rect.top-TILESIZE*0.1, TILESIZE*1.2, TILESIZE*1.2)
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
             npc = self.game.npcs.get_sprite(npcIndex)
+            self.game.activeNPC = npc
             collisionList = []
             for rect in npc.TextBox.choiceRectList:
-                collisionList.append(pygame.Rect(rect.left, rect.top, rect.width, rect.height))
+                collisionList.append(pygame.Rect(rect.left, rect.top, rect.width-30, rect.height))
             for rect in range(len(collisionList)):
-                collisionList[rect].x = npc.TextBox.x + 13
-                collisionList[rect].y = npc.TextBox.y + 25 + 30*rect
+                collisionList[rect].x = npc.TextBox.x + 60
+                collisionList[rect].y = npc.TextBox.y + 30 + 45*rect
             if len(collisionList) > 0:
                 highlighted = self.mouseRect.collidelist(collisionList) 
                 if highlighted == -1:
                     return
                 else:
                     npc.TextBox.selectedRect = highlighted
+                    self.game.activeNPC.selectedPotion = highlighted
+
+        elif self.game.state == 'shopping':
+            self.mouseRect.center = pygame.mouse.get_pos()
+            interactRect = pygame.Rect(self.rect.left-TILESIZE*0.1, self.rect.top-TILESIZE*0.1, TILESIZE*1.2, TILESIZE*1.2)
+            collisionList = self.game.activeNPC.potionRects
+            if len(collisionList) > 0:
+                highlighted = self.mouseRect.collidelist(collisionList) 
+                if highlighted == -1:
+                    return
+                else:
+                    self.game.activeNPC.selectedPotion = highlighted
 
     def setLocation(self, x, y):
         pass
@@ -355,7 +368,7 @@ class Player(pygame.sprite.Sprite):
             #Gets the index of the flower that the player interacted with
             flowerIndex = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
             if flowerIndex != -1:
-                interacted = True
+                # interacted = True
                 self.game.state = 'flowerC'
                 self.game.flowers.get_sprite(flowerIndex).state = 'cutting'
                 self.game.flowers.get_sprite(flowerIndex).anim()
@@ -374,7 +387,7 @@ class Player(pygame.sprite.Sprite):
             #Gets the index of the ore that the player interacted with
             oreIndex = interactRect.collidelist(list(ore.rect for ore in self.game.ores))
             if oreIndex != -1:
-                interacted = True
+                # interacted = True
                 self.game.state = 'oreMine'
                 self.game.ores.get_sprite(oreIndex).state = 'mining'
                 self.game.ores.get_sprite(oreIndex).killAnim()
@@ -389,8 +402,11 @@ class Player(pygame.sprite.Sprite):
 
             #Gets the index of the npc that the player interacted with
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
-            if npcIndex != -1:
-                interacted = True
+            if self.game.state == 'shopping':
+                self.game.activeNPC.interaction()
+                #pygame.time.wait(250)
+            elif npcIndex != -1:
+                # interacted = True
                 self.game.npcs.get_sprite(npcIndex).interaction()
                 pygame.time.wait(250)
 
@@ -422,12 +438,23 @@ class Player(pygame.sprite.Sprite):
             if npcIndex != -1:
                 interacted = True
                 npc = self.game.npcs.get_sprite(npcIndex)
+                self.game.activeNPC = npc
                 if keys[pygame.K_w] or keys[pygame.K_UP]:
                     npc.TextBox.selectedRect = npc.TextBox.selectedRect - 1 if npc.TextBox.selectedRect > 0 else npc.TextBox.selectedRect
                     pygame.time.wait(150)
                 else:
                     npc.TextBox.selectedRect = npc.TextBox.selectedRect + 1 if npc.TextBox.selectedRect < len(npc.TextBox.choiceRectList)-1 else npc.TextBox.selectedRect
                     pygame.time.wait(150)
+
+        #Modified: Max Chiu 5/18/2024
+        elif self.game.state == 'shopping' and (keys[pygame.K_a] or keys[pygame.K_d] or keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
+            npc = self.game.activeNPC
+            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+                npc.selectedPotion = npc.selectedPotion - 1 if npc.selectedPotion > 0 else npc.selectedPotion
+                pygame.time.wait(150)
+            else:
+                npc.selectedPotion = npc.selectedPotion + 1 if npc.selectedPotion < len(npc.potionList)-1 else npc.selectedPotion
+                pygame.time.wait(150)
 
 
         #Allows mouse click functionality for interactions
@@ -439,6 +466,7 @@ class Player(pygame.sprite.Sprite):
                 interactRect = pygame.Rect(self.rect.left-TILESIZE*0.1, self.rect.top-TILESIZE*0.1, TILESIZE*1.2, TILESIZE*1.2)
                 npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
                 npc = self.game.npcs.get_sprite(npcIndex)
+                self.game.activeNPC = npc
                 rectCollisionList = npc.TextBox.choiceRectList[:]
 
                 for rect in range(len(rectCollisionList)):
@@ -448,7 +476,12 @@ class Player(pygame.sprite.Sprite):
                     npc.selectedRect = mouseRect.collidelist(rectCollisionList)
                     npc.interaction()
                     pygame.time.wait(200)
-
+            elif self.game.state == 'shopping':
+                interactIndex = mouseRect.collidelist(self.game.activeNPC.potionRects)
+                if interactIndex != -1:
+                    self.game.activeNPC.interaction()
+                    self.game.activeNPC.interaction()
+                    #pygame.time.wait(250)
             else:
                 #Checks if the player is within a square's range of side length 60 pixels of the mouse
                 if ((mouseRect.x-self.rect.x)**2+(mouseRect.y-self.rect.y)**2)**(1/2) <= 60:
@@ -781,14 +814,37 @@ class NPC(pygame.sprite.Sprite):
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
+        self.totalPotionCost = [{'Flower': 20}, {'Ore': 10}, {'Flower': 10}]
+        self.totalPotionList = ['healthPotion', 'damagePotion', 'speedPotion']
+        self.totalPotionDesc = ['Restores health (Consumable) ', 'Permanently increases damage ', 'Permanently increases movement speed ']
+        self.totalPotionImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/trident2.png'), (200, 200)),
+                                pygame.transform.scale(pygame.image.load('Sprites/items/swordfish.png'), (200, 200)),
+                                pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200))]
+        self.potionCost = []
+        self.potionList = []
+        self.potionDesc = []
+        self.potionImgs = []
+        while len(self.potionList) < 3:
+            randomInd = random.randint(0, len(self.totalPotionList)-1)
+            if self.totalPotionList[randomInd] not in self.potionList:
+                self.potionCost.append(self.totalPotionCost[randomInd])
+                self.potionList.append(self.totalPotionList[randomInd])
+                self.potionDesc.append(self.totalPotionDesc[randomInd])
+                self.potionImgs.append(self.totalPotionImgs[randomInd])
+        self.potionRects = []
+        self.selectedPotion = 0
+        self.descFont = pygame.font.SysFont('Garamond', 20)
+
+
         #Always leave a space/punctuation at the end of the quote!
         #Would you rather cum in the sink or sink in the cum? That is indeed the question for which we must all ponder and arrive at our own answers.
-        self.potionList = ['healthPotion', 'damagePotion', 'speedPotion']
+        #change this later
         self.dialogueList = {'01:First Meet':[{'Meetings': 1},
                                                 "Testing dialogue ",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
                                                 "Boom Boom Boom Boom ",
-                                                "%Choices; Shop; Leave; Meow"],
+                                                "%Choices; What do you want to do?; Shop; Leave; Meow",
+                                                "Drink it now, drink it now, drink it now"],
                              '02:Second Meet': [{'Meetings':2},
                                                 "Hi again... "]
                             }
@@ -832,24 +888,30 @@ class NPC(pygame.sprite.Sprite):
             self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 28, 'Garamond', self.name)
             self.dialogueStageIndex += 1
             self.game.state = 'dialogue'
-
+        elif self.game.state == 'shopping':
+            pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
+            self.game.state = 'dialogue'
+            self.potionRects = []
+            return self.selectedPotion
         #While not finished with dialogue section
         elif self.dialogueStageIndex < len(self.dialogueList[self.dialogueStage]):
             nextDialogue = self.dialogueList[self.dialogueStage][self.dialogueStageIndex]
-            #If there are choices displayed on the screen
             pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
+            #If there are choices displayed on the screen
             if len(self.TextBox.choiceRectList) > 0:
-                self.choiceResponse(False)
+                self.choiceResponse()
                 self.dialogueStageIndex += 1
-                if self.dialogueStageIndex == len(self.dialogueList[self.dialogueStage]):
+                if self.dialogueStageIndex == len(self.dialogueList[self.dialogueStage]) and self.game.state != 'shopping':
                     self.TextBox.kill()
                     self.updateDialogue()
                     self.game.state = 'explore'
                     self.game.play_music('stop')
                     self.game.play_music('village')
                 else:
-                    self.interaction()
+                    #self.interaction()
+                    return -1
             #If the next dialogue to display is a choice list
             elif nextDialogue.find('%Choices') != -1:
                 self.TextBox.kill()
@@ -868,11 +930,68 @@ class NPC(pygame.sprite.Sprite):
             self.updateDialogue()
             self.game.state = 'explore'
             self.game.play_music('stop')
+        self.potionRects = []
+        return -1
 
     #READ ME, FINISH WHEN CHOICES ARE DEFINED
-    def choiceResponse(self, isFlavor):
+    #Modified Max Chiu 5/17-5/18/2024
+    def choiceResponse(self):
         self.TextBox.choiceRectList = []
-        pass
+        if self.TextBox.selectedRect == 0:
+            self.game.state = 'shopping'
+            
+            #Displaying each of the potions
+            for potion in range(len(self.potionList)):
+                #Draws the potion on the screen with background Gray
+                potionRect = pygame.Rect(190+potion*350, 190, 200, 300)
+                pygame.draw.rect(self.game.screen, BROWN, potionRect)
+                self.game.screen.blit(self.potionImgs[potion], potionRect)
+                
+                #Displays the text for each potion: name, cost, and description
+                if self.potionList[potion] == 'healthPotion':
+                    nameText = 'Health Potion'
+                elif self.potionList[potion] == 'damagePotion':
+                    nameText = 'Increased Damage'
+                elif self.potionList[potion] == 'speedPotion':
+                    nameText = 'Increased Speed'
+                self.game.screen.blit(self.descFont.render(nameText, False, OFFWHITE), (potionRect.x+100-8*(len(nameText)/2), potionRect.y+200))
+
+                for req in self.potionCost[potion].keys():
+                    if req == 'Flower':
+                        costText = f'Cost: {self.potionCost[potion][req]} Flowers'
+                        self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (potionRect.x+100-8*(len(costText)/2), potionRect.y+220))
+                    elif req == 'Ore':
+                        costText = f'Cost: {self.potionCost[potion][req]} Ores'
+                        self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (potionRect.x+100-8*(len(costText)/2), potionRect.y+220))
+
+                text = self.potionDesc[potion]
+                maxLength = 22
+                numRows = 0
+                while len(text) > 0:
+                    try:
+                        cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9()]', text[maxLength-1::-1]).end()+1
+                    except AttributeError:
+                        cutoffIndex = maxLength
+                    self.game.screen.blit(self.descFont.render(text[:cutoffIndex], False, OFFWHITE), (potionRect.x+100-8*(len(text[:cutoffIndex])/2), potionRect.y+240+numRows*20))
+                    text = text[cutoffIndex:]
+                    numRows += 1
+
+
+                #Displays all the borders
+                if potion == self.selectedPotion:
+                    pygame.draw.rect(self.game.screen, BLUE, potionRect, 2, 2)
+                else:
+                    pygame.draw.rect(self.game.screen, WHITE, potionRect, 2, 2)
+                potionRect.x += 2
+                potionRect.y += 2
+                potionRect.width -= 4
+                potionRect.height -=104
+                pygame.draw.rect(self.game.screen, BLACK, potionRect, 1, 1)
+                if len(self.potionRects) < 3:
+                    self.potionRects.append(potionRect)
+        
+
+
 
 #Authored by Max Chiu 4/16/2024
 class Enemy(pygame.sprite.Sprite):
@@ -1186,13 +1305,13 @@ class Enemy(pygame.sprite.Sprite):
                 self.xChange, self.yChange = change[0]*self.speed, change[1]*self.speed
                 if self.xChange == 0 and self.yChange == 0:
                     self.state = 'chasing'
-
             else:
                 self.state = 'returning'
                 self.path.emptyPath()
             return
         playerPos = [self.game.player.x, self.game.player.y]
 
+        ### MAX FINAL PRESENTATION
         #px and py are the coordinates for the center of the player
         lines=[]
         px = playerPos[0]+self.game.player.width/2
@@ -1201,7 +1320,7 @@ class Enemy(pygame.sprite.Sprite):
         ex = self.x+self.width/2
         ey = self.y+self.height/2
         #split up the line of sight into n line segments and calculate the dx and dy for 1 line segment
-        n = 10
+        n = 5
         dx = (px - ex)/n
         dy = (py - ey)/n
         #print(dx, dy)
@@ -1235,16 +1354,15 @@ class Enemy(pygame.sprite.Sprite):
         surface = pygame.Surface(self.game.screen.get_size(), pygame.SRCALPHA)
         for i in range(n):
             lines.append(pygame.draw.line(surface, (0, 0, 0, 0), (ex+dx*i, ey+dy*i), (ex+dx*(i+1), ey+dy*(i+1)), 1))
-        #line = pygame.draw.line(self.screen, RED, (self.enemy.x+self.enemy.width/2, self.enemy.y+self.enemy.height/2), (self.player.x+self.player.width/2, self.player.y+self.player.height/2), 2)
         index = [line.collidelist(list(block.rect for block in self.game.blocks)) for line in lines]
         isChasing = True
 
         #if any of these indices are not -1, there is no line of sight between the player and the enemy
         for i in index:
             if i != -1:
-                #print(i)
-                #rect = self.game.blocks.get_sprite(i)
-                #rect.image.fill(BLUE)
+                # print(i)
+                # rect = self.game.blocks.get_sprite(i)
+                # rect.image.fill(BLUE)
                 isChasing = False
 
         #if move and not self.path.collision_rects:
@@ -1258,7 +1376,7 @@ class Enemy(pygame.sprite.Sprite):
             self.yChange = dy * self.speed
             #print(self.xChange, self.yChange)
             
-        elif not isChasing and self.state != 'returning':
+        elif not isChasing and self.state not in ['returning', 'standing']:
             
             # self.xChange = 0
             # self.yChange = 0
@@ -1415,6 +1533,8 @@ class Pathfinder:
             self.emptyPath()
             return 0, 0
 
+    #Authored: Max Chiu 5/3/2024
+    #Followed sample code: https://github.com/clear-code-projects/Python-Pathfinder/blob/main/roomba%20project/pathfinding_roomba.py
     def checkCollisions(self):
         if self.collision_rects:
             for rect in self.collision_rects:
@@ -1422,6 +1542,8 @@ class Pathfinder:
                     del self.collision_rects[0]        
             return self.getDirection()
                 
+    #Authored: Max Chiu 5/3/2024
+    #Followed sample code: https://github.com/clear-code-projects/Python-Pathfinder/blob/main/roomba%20project/pathfinding_roomba.py
     def emptyPath(self):
         self.collision_rects = []
         self.path = []
