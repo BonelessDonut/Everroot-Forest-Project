@@ -173,6 +173,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+    #Authored: Max Chiu 5/20/2024
+    #Sets the player's position using a tile position (where xTile goes up to 32 and yTile goes up to 18)
     def setPosition(self, xTile, yTile):
         self.x = xTile*TILESIZE
         self.y = yTile*TILESIZE
@@ -983,7 +985,7 @@ class NPC(pygame.sprite.Sprite):
         return -1
 
     #READ ME, FINISH WHEN CHOICES ARE DEFINED
-    #Modified Max Chiu 5/17-5/18/2024
+    #Modified Max Chiu 5/17-5/20/2024
     def choiceResponse(self):
         self.TextBox.choiceRectList = []
         #variable for each letter width of the font
@@ -993,12 +995,13 @@ class NPC(pygame.sprite.Sprite):
             
             #Displaying each of the potions
             for item in range(len(self.itemList)-1):
-                #Draws the potion on the screen with background Gray
+
+                #Draws the potion on the screen with background BROWN
                 itemRect = pygame.Rect(190+item*350, 140, 200, 300)
                 pygame.draw.rect(self.game.screen, BROWN, itemRect)
                 self.game.screen.blit(self.itemImgs[item], itemRect)
                 
-                #Displays the text for each potion: name, cost, and description
+                #Displays the text for each item: name, cost, and description
                 if self.itemList[item] == 'healthPotion':
                     nameText = 'Health Potion'
                 elif self.itemList[item] == 'damagePotion':
@@ -1011,39 +1014,39 @@ class NPC(pygame.sprite.Sprite):
                     nameText = 'Bubble Gun'
                 self.game.screen.blit(self.descFont.render(nameText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(nameText)/2), itemRect.y+200))
 
+                #Item cost
+                #ShiftedDown checks if there was an extra line of text added right after name for if the user has enough resources
                 shiftedDown = False
                 for req in self.itemCost[item].keys():
+                    if self.game.inventory.get(req) < self.itemCost[item][req]:
+                        shiftedDown = True
+                        self.game.screen.blit(self.descFont.render('Need More Resources', False, RED), (itemRect.x+100-textWidth*(19/2), itemRect.y+220))
+                        break
+
+                numRows = 0
+                #Checks through every requirement for 1 item
+                for req in self.itemCost[item].keys():
                     if req == 'flower':
-                        if self.game.inventory.get(req) >= self.itemCost[item][req]:
-                            costText = f'Cost: {self.itemCost[item][req]} Flowers'
-                            self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(costText)/2), itemRect.y+220))
-                        else:
-                            shiftedDown = True
-                            costText = f'Cost: {self.itemCost[item][req]} Flowers'
-                            self.game.screen.blit(self.descFont.render('Need More Resources', False, RED), (itemRect.x+100-textWidth*(19/2), itemRect.y+220))
-                            self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(costText)/2), itemRect.y+240))
+                        costText = f'Cost: {self.itemCost[item][req]} Flowers'
                     elif req == 'ore':
-                        if self.game.inventory.get(req) >= self.itemCost[item][req]:
-                            costText = f'Cost: {self.itemCost[item][req]} Ores'
-                            self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(costText)/2), itemRect.y+220))
-                        else:
-                            shiftedDown = True
-                            costText = f'Cost: {self.itemCost[item][req]} Ores'
-                            self.game.screen.blit(self.descFont.render('Need More Resources', False, RED), (itemRect.x+100-textWidth*(19/2), itemRect.y+220))
-                            self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(costText)/2), itemRect.y+240))
+                        costText = f'Cost: {self.itemCost[item][req]} Ores'
+                    if not shiftedDown:
+                        self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(costText)/2), itemRect.y+220+numRows*20))
+                    else:
+                        self.game.screen.blit(self.descFont.render(costText, False, OFFWHITE), (itemRect.x+100-textWidth*(len(costText)/2), itemRect.y+240+numRows*20))
+                    numRows += 1
 
                 text = self.itemDesc[item]
                 maxLength = 20
-                numRows = 0
                 while len(text) > 0:
                     try:
                         cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9()]', text[maxLength-1::-1]).end()+1
                     except AttributeError:
                         cutoffIndex = maxLength
                     if shiftedDown:
-                        self.game.screen.blit(self.descFont.render(text[:cutoffIndex], False, OFFWHITE), (itemRect.x+100-textWidth*(len(text[:cutoffIndex])/2), itemRect.y+260+numRows*20))
-                    else:
                         self.game.screen.blit(self.descFont.render(text[:cutoffIndex], False, OFFWHITE), (itemRect.x+100-textWidth*(len(text[:cutoffIndex])/2), itemRect.y+240+numRows*20))
+                    else:
+                        self.game.screen.blit(self.descFont.render(text[:cutoffIndex], False, OFFWHITE), (itemRect.x+100-textWidth*(len(text[:cutoffIndex])/2), itemRect.y+220+numRows*20))
                     text = text[cutoffIndex:]
                     numRows += 1
 
@@ -1278,7 +1281,7 @@ class Enemy(pygame.sprite.Sprite):
         # change = self.path.checkCollisions()
         # if change:
         #     self.xChange, self.yChange = change[0]*self.speed, change[1]*self.speed
-        if self.game.state != 'dialogue' and self.game.state != 'scene' and self.game.state != 'pause' and self.game.state != 'game over':
+        if self.game.state not in ['dialogue', 'scene', 'pause', 'game over', 'shopping']:
             if self.attackType == 'melee':
                 self.searchPlayer()
             self.animate()
