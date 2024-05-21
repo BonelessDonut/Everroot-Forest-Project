@@ -509,11 +509,6 @@ class Game():
         cutscenes.playGameOver(self.cutsceneManage)
         pass
 
-    def speedPotion(self):
-        pass
-    
-    def strengthPotion(self):
-        pass
 
     # Charlenne 5/15/24: to replace the string of a map row where an item needs to be added
     def replaceString(self, string, column, replacement):
