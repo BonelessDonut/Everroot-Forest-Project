@@ -384,13 +384,13 @@ class Game():
                         # teleports the player's position on the screen when they move rooms
                         Teleport(self, col, row)
                         if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
-                            self.player = Player(self, col-1, row, self.clock)
+                            self.player.setPosition(col-1, row)
                         elif prevPosition[0] == 31 and col == 0 and prevPosition[1] == row:
-                            self.player = Player(self, col+1, row, self.clock)
+                            self.player.setPosition(col+1, row)
                         elif prevPosition[1] == 0 and row == 17 and prevPosition[0] == col:
-                            self.player = Player(self, col, row-1, self.clock)
+                            self.player.setPosition(col, row-1)
                         elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
-                            self.player = Player(self, col, row+1, self.clock)
+                            self.player.setPosition(col, row+1)
                         # maintains the previously equipped weapon from the previous screen
                         self.player.weaponNum = priorWeaponNum
                         self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
@@ -461,7 +461,7 @@ class Game():
             # switches weapon equipped using q
             if event.type == pygame.KEYUP and event.key == pygame.K_q and not self.player.itemUsed and self.state == 'explore':
                 self.player.switchWeapons()
-            if event.type == pygame.KEYUP and event.key == pygame.K_p: # pauses the game with P
+            if event.type == pygame.KEYUP and event.key == pygame.K_p and (self.state != 'shopping' and self.state != 'dialogue'): # pauses the game with P
                 self.pause()
             if event.type == pygame.KEYUP and event.key == pygame.K_g and not self.player.itemUsed and self.state == 'explore': # keybind to heal, will have added functionality with potions in the inventory later
                 self.player.getHealth(200)
