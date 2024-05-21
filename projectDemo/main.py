@@ -67,7 +67,6 @@ class Game():
         self.setupImages()
 
         self.tutorialsActive = False
-        self.activeNPC = None
         
         self.running = True
         self.finishedScene = False
@@ -76,7 +75,6 @@ class Game():
         self.soundVol = 10
         self.startPlayerMaxHealth = 1000
         self.priorPlayerHealth = self.startPlayerMaxHealth
-        
     
     #written by Rachel Tang 4/19/24
     #used this website: https://www.educative.io/answers/how-to-play-an-audio-file-in-pygame
@@ -103,12 +101,12 @@ class Game():
             mixer.music.stop()
 
 
-    #Function to create the map on the screen, 
+
     def createTilemap(self, prevPosition):
         #Only for initial map creation
         # -1, -1 is the convention to make known that the map doesnt currently exist
         if self.map == [-1, -1]:
-            # 2, 1 : the map now exists from the list in settings.py
+            # 1, 1 : the map now exists from the list in settings.py
             self.map = [2, 1]
             self.inventory = Inventory(self)
             for row in range(len(settings.currentTileMap[0])):
@@ -144,7 +142,6 @@ class Game():
                 #print()
             # initializes the visual element that displays the player's weapons
             self.weaponsHud = WeaponDisplay(self)
-            
         #For moving between rooms
         else:
             # kill all the current sprites in the current room
@@ -284,9 +281,6 @@ class Game():
                         currentTileMap.append(randomGreenMap) # add the green map 
                         mapNumber = len(currentTileMap)-1
                         mapList[self.map[0]][self.map[1]] = mapNumber
-
-                        
-
                         break
                 # self.play_music('village') The village bgm would play whenever you enter a peaceful npc room
             # if the room is unloaded and listed as -4, the red boss room will be loaded and added to the map list
@@ -334,6 +328,8 @@ class Game():
                 row2 = 'T' + row2[1:]
                 currentTileMap[mapNumber][8] = row1
                 currentTileMap[mapNumber][9] = row2
+                # print('row 1:', row1)
+                # print('row 2:', row2)
             # right
             if self.map[1]+1 <= 12 and mapList[self.map[0]][self.map[1]+1] != -1:
                 row1 = currentTileMap[mapNumber][8]
@@ -357,6 +353,7 @@ class Game():
             self.all_sprites.add(self.weaponsHud)
             self.all_sprites.add(self.player)
             self.all_sprites.add(self.player.weapon)
+
             for row in range(len(settings.currentTileMap[mapNumber])):
                 #print(f"{row} ", end="")
                 for col in range(len(settings.currentTileMap[mapNumber][row])):
@@ -387,17 +384,13 @@ class Game():
                         # teleports the player's position on the screen when they move rooms
                         Teleport(self, col, row)
                         if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
-                            #self.player = Player(self, col-1, row, self.clock)
-                            self.player.setPosition(col-1, row)
+                            self.player = Player(self, col-1, row, self.clock)
                         elif prevPosition[0] == 31 and col == 0 and prevPosition[1] == row:
-                            #self.player = Player(self, col+1, row, self.clock)
-                            self.player.setPosition(col+1, row)
+                            self.player = Player(self, col+1, row, self.clock)
                         elif prevPosition[1] == 0 and row == 17 and prevPosition[0] == col:
-                            #self.player = Player(self, col, row-1, self.clock)
-                            self.player.setPosition(col, row-1)
+                            self.player = Player(self, col, row-1, self.clock)
                         elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
-                            #self.player = Player(self, col, row+1, self.clock)
-                            self.player.setPosition(col, row+1)
+                            self.player = Player(self, col, row+1, self.clock)
                         # maintains the previously equipped weapon from the previous screen
                         self.player.weaponNum = priorWeaponNum
                         self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
@@ -407,34 +400,26 @@ class Game():
 
         # print("mapList:", mapList)
         # print("currentTileMap:", currentTileMap)
-    
-    # Charlenne: to replace the string of a map row where an item needs to be added
-    def replaceString(self, string, column, replacement):
-        beginning = string[:column]
-        end = string[column+1:]
-        newString = beginning + replacement + end
-        return newString
-        
 
-    def addRoom(self, prevPosition):
-        emptyRoom = []
-        for row in range(18):
-            emptyRow = ''
-            for col in range(32):
-                if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
-                    emptyRow += 'T'
-                elif prevPosition[0] == 31 and col == 0 and prevPosition[1] == row:
-                    emptyRow += 'T'
-                elif prevPosition[1] == 0 and row == 17 and prevPosition[0] == col:
-                    emptyRow += 'T'
-                elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
-                    emptyRow += 'T'
-                elif row == 0 or row == 17 or col == 0 or col == 31:
-                    emptyRow += 'B'
-                else:
-                    emptyRow += '.'
-            emptyRoom.append(emptyRow)
-        currentTileMap.append(emptyRoom)
+    # def addRoom(self, prevPosition):
+    #     emptyRoom = []
+    #     for row in range(18):
+    #         emptyRow = ''
+    #         for col in range(32):
+    #             if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
+    #                 emptyRow += 'T'
+    #             elif prevPosition[0] == 31 and col == 0 and prevPosition[1] == row:
+    #                 emptyRow += 'T'
+    #             elif prevPosition[1] == 0 and row == 17 and prevPosition[0] == col:
+    #                 emptyRow += 'T'
+    #             elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
+    #                 emptyRow += 'T'
+    #             elif row == 0 or row == 17 or col == 0 or col == 31:
+    #                 emptyRow += 'B'
+    #             else:
+    #                 emptyRow += '.'
+    #         emptyRoom.append(emptyRow)
+    #     currentTileMap.append(emptyRoom)
 
     def new(self):
 
@@ -503,9 +488,6 @@ class Game():
             # draws the player's health bar on the screen if needed
             if (self.state == 'explore' or self.state == 'oreMine' or self.state == 'flowerC'):
                 self.player.animateHealth()
-            #draws the shop screen if needed
-            if self.state == 'shopping':
-                self.activeNPC.choiceResponse()
             self.weaponsHud.draw() # calls the function to draw the weapon display hud on the screen
             self.clock.tick(FPS)
             pygame.display.update() # updates the screen with any changes
@@ -529,6 +511,15 @@ class Game():
         self.screen.fill(BLACK)
         cutscenes.playGameOver(self.cutsceneManage)
         pass
+
+
+    # Charlenne 5/15/24: to replace the string of a map row where an item needs to be added
+    def replaceString(self, string, column, replacement):
+        beginning = string[:column]
+        end = string[column+1:]
+        newString = beginning + replacement + end
+        return newString
+        
 
     # handles events happening while the game is in the pause state
     def pauseEvents(self):
