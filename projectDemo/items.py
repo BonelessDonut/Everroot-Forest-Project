@@ -75,7 +75,7 @@ class Weapon(pygame.sprite.Sprite):
     #Author: Max Chiu 4/10/2024
     def attack(self):
         if self.timer == 0:
-            #self.player.itemUsed = True
+            # self.player.itemUsed = True
             self.used = True
             #Can only shoot if having enough ammo
             #Since it's a burst weapon, you're only allowed to shoot after each burst is done shooting
@@ -111,7 +111,7 @@ class Weapon(pygame.sprite.Sprite):
             self.timer -= self.timepassed
             if self.timer <= 0:
                 self.timer = 0
-                #self.player.itemUsed = False
+                # self.player.itemUsed = False
                 self.used = False
 
         #moves the Weapon sprite with the player and updates weapon image
@@ -251,6 +251,8 @@ class MeleeAttack(pygame.sprite.Sprite):
         self.groups = self.game.all_sprites, self.game.attacks
         pygame.sprite.Sprite.__init__(self, self.groups)
         #self.image = pygame.transform.scale(pygame.image.load(swordfish_imgs[0]), (TILESIZE//1.5, TILESIZE//1.5))
+
+        self.weapon.updateDamage()
 
         self.x = self.player.x
         self.y = self.player.y
@@ -550,6 +552,7 @@ class MeleeAttack(pygame.sprite.Sprite):
         self.animationCount = 0
         self.player.itemUsed = False
         self.player.swordUsed = False
+        self.player.spearUsed = False
         self.kill()
 
     #EDDIE!!!

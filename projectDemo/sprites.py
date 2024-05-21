@@ -217,7 +217,7 @@ class Player(pygame.sprite.Sprite):
         #Below line: Loads image using right image list (transforms it to scale with width and height) and sets it to the image
 
         # updates the player's image sprite based on the direction they are facing and if they have used the ranged weapon
-        if self.game.state == 'explore' and not self.weapon.used:
+        if self.game.state == 'explore':
             if self.facing == 'right':
                 self.image = self.rightImgList[self.imgindex]
             elif self.facing == 'left':

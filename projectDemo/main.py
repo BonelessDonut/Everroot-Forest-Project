@@ -356,6 +356,7 @@ class Game():
             self.all_sprites.add(self.inventory)
             self.all_sprites.add(self.weaponsHud)
             self.all_sprites.add(self.player)
+            self.all_sprites.add(self.player.weapon)
             for row in range(len(settings.currentTileMap[mapNumber])):
                 #print(f"{row} ", end="")
                 for col in range(len(settings.currentTileMap[mapNumber][row])):
