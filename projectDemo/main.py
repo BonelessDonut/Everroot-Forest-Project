@@ -416,25 +416,25 @@ class Game():
         return newString
         
 
-    def addRoom(self, prevPosition):
-        emptyRoom = []
-        for row in range(18):
-            emptyRow = ''
-            for col in range(32):
-                if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
-                    emptyRow += 'T'
-                elif prevPosition[0] == 31 and col == 0 and prevPosition[1] == row:
-                    emptyRow += 'T'
-                elif prevPosition[1] == 0 and row == 17 and prevPosition[0] == col:
-                    emptyRow += 'T'
-                elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
-                    emptyRow += 'T'
-                elif row == 0 or row == 17 or col == 0 or col == 31:
-                    emptyRow += 'B'
-                else:
-                    emptyRow += '.'
-            emptyRoom.append(emptyRow)
-        currentTileMap.append(emptyRoom)
+    # def addRoom(self, prevPosition):
+    #     emptyRoom = []
+    #     for row in range(18):
+    #         emptyRow = ''
+    #         for col in range(32):
+    #             if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
+    #                 emptyRow += 'T'
+    #             elif prevPosition[0] == 31 and col == 0 and prevPosition[1] == row:
+    #                 emptyRow += 'T'
+    #             elif prevPosition[1] == 0 and row == 17 and prevPosition[0] == col:
+    #                 emptyRow += 'T'
+    #             elif prevPosition[1] == 17 and row == 0 and prevPosition[0] == col:
+    #                 emptyRow += 'T'
+    #             elif row == 0 or row == 17 or col == 0 or col == 31:
+    #                 emptyRow += 'B'
+    #             else:
+    #                 emptyRow += '.'
+    #         emptyRoom.append(emptyRow)
+    #     currentTileMap.append(emptyRoom)
 
     def new(self):
 
@@ -529,6 +529,20 @@ class Game():
         self.screen.fill(BLACK)
         cutscenes.playGameOver(self.cutsceneManage)
         pass
+
+    def speedPotion(self):
+        pass
+    
+    def strengthPotion(self):
+        pass
+
+    # Charlenne 5/15/24: to replace the string of a map row where an item needs to be added
+    def replaceString(self, string, column, replacement):
+        beginning = string[:column]
+        end = string[column+1:]
+        newString = beginning + replacement + end
+        return newString
+
 
     # handles events happening while the game is in the pause state
     def pauseEvents(self):
