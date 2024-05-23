@@ -488,6 +488,8 @@ class Game():
             # draws the player's health bar on the screen if needed
             if (self.state == 'explore' or self.state == 'oreMine' or self.state == 'flowerC'):
                 self.player.animateHealth()
+            if self.state == 'shopping':
+                self.activeNPC.choiceResponse()
             self.weaponsHud.draw() # calls the function to draw the weapon display hud on the screen
             self.clock.tick(FPS)
             pygame.display.update() # updates the screen with any changes
@@ -528,7 +530,7 @@ class Game():
                 pygame.font.quit()
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYUP and event.key == pygame.K_p: # if p is pressed, the pause() function is called to unpause the game
+            if event.type == pygame.KEYUP and event.key == pygame.K_p and (self.state != 'shopping' and self.state != 'dialogue'): # if p is pressed, the pause() function is called to unpause the game
                 self.pause()
             if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE: # escape closes the game
                 pygame.font.quit()

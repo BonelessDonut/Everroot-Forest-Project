@@ -631,6 +631,7 @@ class Flower(pygame.sprite.Sprite):
 
         self.clock = clock
         self.timepassed = 0
+        self.expireTime = random.random()*20+40
         self.imgindex = 1
 
         self.state = 'alive'
@@ -657,16 +658,22 @@ class Flower(pygame.sprite.Sprite):
         self.timepassed += self.clock.get_time() / 1000
         if self.game.state == 'flowerC':
             if self.state == 'cutting':
-                #READ ME, THIS UPDATES ALL THE FLOWERS AT ONCE AFTER INTERACTING WITH ONLY ONE FLOWER. - UNINTENDED OUTCOME, NEEDS FIXING
                 self.anim()
                 self.image = self.imageList[self.flowerSpriteNum][1][self.imgindex % 3]
+        elif self.timepassed > self.expireTime and self.game.state == 'explore':
+            if self.state == 'dying' and self.imgindex == 3:
+                self.kill()
+            else:
+                self.state = 'dying'
+            self.anim()
+            self.image = self.imageList[self.flowerSpriteNum][1][self.imgindex % 3]
 
     def anim(self):
         #realized it was setting the state to flowerC every single loop from the Player.interact() method, so it never went to the else to kill
         #moved it in front to make sure it switched states when the imgindex got to 4
         if self.imgindex > 2:
             self.game.state = 'explore'
-        if self.game.state == 'flowerC':
+        if self.game.state == 'flowerC' or self.state == 'dying':
             if ((self.timepassed) // (0.31) % 3 == self.imgindex):
                 self.imgindex = (self.imgindex + 1)
                 pygame.mixer.Channel(3).set_volume(0.05 * self.game.soundVol)
@@ -694,6 +701,7 @@ class Ore(pygame.sprite.Sprite):
 
         self.clock = clock
         self.timepassed = 0
+        self.expireTime = random.random()*20+40
         self.imgindex = 0
 
         self.state = 'alive'
@@ -717,9 +725,15 @@ class Ore(pygame.sprite.Sprite):
         self.timepassed += self.clock.get_time() / 1000
         if self.game.state == 'oreMine':
             if self.state == 'mining':
-                #READ ME, THIS UPDATES ALL THE FLOWERS AT ONCE AFTER INTERACTING WITH ONLY ONE FLOWER. - UNINTENDED OUTCOME, NEEDS FIXING
                 self.killAnim()
                 self.image = self.imageList[self.oreSpriteNum][1][self.imgindex % 4]
+        elif self.timepassed > self.expireTime and self.game.state == 'explore':
+            if self.state == 'dying' and self.imgindex == 4:
+                self.kill()
+            else:
+                self.state = 'dying'
+            self.killAnim()
+            self.image = self.imageList[self.oreSpriteNum][1][self.imgindex % 4]
 
 
         pass
@@ -727,7 +741,7 @@ class Ore(pygame.sprite.Sprite):
     def killAnim(self):
         if self.imgindex > 2:
             self.game.state = 'explore'
-        if self.game.state == 'oreMine':
+        if self.game.state == 'oreMine' or self.state == 'dying':
             if ((self.timepassed) // (0.31) % 4 == self.imgindex):
                 self.imgindex = (self.imgindex + 1)
                 pygame.mixer.Channel(3).set_volume(0.05 * self.game.soundVol)
