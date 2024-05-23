@@ -428,6 +428,8 @@ class Player(pygame.sprite.Sprite):
             #if not interacted:
             #    self.weapon.attack()
 
+            print('--------------------')
+
             
 
         #EDIT AFTER INVENTORY MADE
@@ -919,6 +921,7 @@ class NPC(pygame.sprite.Sprite):
     def interaction(self):
         #Going into dialogue from explore
         if self.game.state == 'explore':
+            print('state 1')
             self.game.play_music('dialogue')
             pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
@@ -928,6 +931,7 @@ class NPC(pygame.sprite.Sprite):
             self.dialogueStageIndex += 1
             self.game.state = 'dialogue'
         elif self.game.state == 'shopping':
+            print('state 2')
             pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
             purchase = True
@@ -947,6 +951,7 @@ class NPC(pygame.sprite.Sprite):
             return -1
         #While not finished with dialogue section
         elif self.game.state == 'dialogue' and self.dialogueStageIndex < len(self.dialogueList[self.dialogueStage]):
+            print('state 3')
             nextDialogue = self.dialogueList[self.dialogueStage][self.dialogueStageIndex]
             pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
@@ -965,18 +970,21 @@ class NPC(pygame.sprite.Sprite):
                     return -1
             #If the next dialogue to display is a choice list
             elif nextDialogue.find('%Choices') != -1:
+                print('state 4')
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game)
                 choicesList = nextDialogue.split(';')
                 self.TextBox.newText(choicesList[1:], 28, 'Garamond', self.name)
             #Displaying normal dialogue
             else:
+                print('state 5')
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game)
                 self.TextBox.newText(nextDialogue, 28, 'Garamond', self.name)
                 self.dialogueStageIndex += 1
         #When finished with dialogue
         elif self.game.state == 'dialogue':
+            print('state 6')
             self.TextBox.kill()
             self.updateDialogue()
             self.game.state = 'explore'
@@ -987,6 +995,7 @@ class NPC(pygame.sprite.Sprite):
     #READ ME, FINISH WHEN CHOICES ARE DEFINED
     #Modified Max Chiu 5/17-5/20/2024
     def choiceResponse(self):
+        print('choice activated')
         self.TextBox.choiceRectList = []
         #variable for each letter width of the font
         textWidth = 9
