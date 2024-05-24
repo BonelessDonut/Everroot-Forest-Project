@@ -465,6 +465,8 @@ class Game():
                 self.pause()
             if event.type == pygame.KEYUP and event.key == pygame.K_g and not self.player.itemUsed and self.state == 'explore': # keybind to heal, will have added functionality with potions in the inventory later
                 self.player.getHealth(200)
+            if event.type == pygame.KEYUP and event.key == pygame.K_n and not self.player.itemUsed and self.state == 'explore': # keybind to speed, will have added functionality with potions in the inventory later
+                self.game.potions.potionSpeed()
             if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE: # closes the game if escape is pressed
                 pygame.font.quit()
                 pygame.quit()
@@ -521,7 +523,6 @@ class Game():
         end = string[column+1:]
         newString = beginning + replacement + end
         return newString
-        
 
     # handles events happening while the game is in the pause state
     def pauseEvents(self):
@@ -692,7 +693,6 @@ class Game():
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron2.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE))]
-
 
 
 g = Game()

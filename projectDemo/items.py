@@ -756,3 +756,20 @@ class Ore(pygame.sprite.Sprite):
                 pygame.mixer.Channel(3).set_volume(0.01 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
         pass
+
+class Potion(pygame.sprite.Sprite):
+    def __init__(self, game):
+        self.game = game
+        self._layer = ITEM_LAYER
+        self.groups = self.game.all_sprites, self.game.potions
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        
+    def potionSpeed(self):
+        self.speed = PLAYER_SPEED * 0.1
+
+    def potionStrength(self):
+        self.damage = 150
+
+    def potionHealth(self):
+        pass
+        
