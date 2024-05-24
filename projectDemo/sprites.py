@@ -1,5 +1,5 @@
 import pygame
-from pygame.sprite import _Group
+#from pygame.sprite import _Group
 from settings import *
 import items 
 import math
@@ -1627,6 +1627,7 @@ class Pathfinder:
 
 class Boss(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
+        self.groups = self.game.all_sprites, self.game.enemies
         super().__init__(self.groups)
         self.game = game
         self.x = x
