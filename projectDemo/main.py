@@ -467,19 +467,28 @@ class Game():
                     self.player.spearUsed = True
                 MeleeAttack(self, self.player.weapon, self.player)
             # Uses the bubblegun to attack with E if that is the weapon currently equipped is the bubblegun
-            if event.type == pygame.KEYDOWN and ((event.key == pygame.K_j) and not self.player.itemUsed) and (self.player.weapon.type == 'bubble' and self.state == 'explore'):
-                self.player.weapon.attack()
+            if event.type == pygame.KEYDOWN and ((event.key in [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN]) and not self.player.itemUsed) and (self.player.weapon.type == 'bubble' and self.state == 'explore'):
+                if (event.key == pygame.K_LEFT):
+                    self.player.weapon.attack('left')
+                elif (event.key == pygame.K_UP):
+                    self.player.weapon.attack('up')
+                elif (event.key == pygame.K_RIGHT):
+                    self.player.weapon.attack('right')
+                else:
+                    self.player.weapon.attack('down')
             # switches weapon equipped using q
             if event.type == pygame.KEYUP and event.key == pygame.K_q and not self.player.itemUsed and self.state == 'explore':
                 self.player.switchWeapons()
             if event.type == pygame.KEYUP and event.key == pygame.K_p and (self.state != 'shopping' and self.state != 'dialogue'): # pauses the game with P
                 self.pause()
             if event.type == pygame.KEYUP and event.key == pygame.K_g and not self.player.itemUsed and self.state == 'explore': # keybind to heal, will have added functionality with potions in the inventory later
-                self.player.getHealth(200)
+                self.player.getHealth(200) 
             if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE: # closes the game if escape is pressed
                 pygame.font.quit()
                 pygame.quit()
                 sys.exit()
+            # if event.type == pygame.KEYUP and event.key == pygame.K_n and not self.player.itemUsed and self.state == 'explore': # keybind to speed, will have added functionality with potions in the inventory later
+            #     self.game.potions.potionSpeed()
 
     def update(self):
         # game loop updates

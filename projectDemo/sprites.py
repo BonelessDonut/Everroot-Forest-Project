@@ -415,11 +415,14 @@ class Player(pygame.sprite.Sprite):
             #Gets the index of the npc that the player interacted with
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
             if self.game.state == 'shopping':
+                #gets the item that was purchased
                 item = self.game.activeNPC.interaction()
                 if item == 'trident':
                     self.activeWeaponList.append('trident')
                 elif item == 'bubble':
                     self.activeWeaponList.append('bubble')
+                elif item == '':
+                    pass
                 #pygame.time.wait(250)
             elif npcIndex != -1:
                 # interacted = True
@@ -587,7 +590,7 @@ class Player(pygame.sprite.Sprite):
         #https://www.youtube.com/watch?v=GakNgbiAxzs&list=PLkkm3wcQHjT7gn81Wn-e78cAyhwBW3FIc&index=2
         keys = pygame.key.get_pressed()
         if not self.itemUsed: # if there is not an item being used
-            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            if keys[pygame.K_a]:
                 # Two lines below change camera to move around player character, moving all other sprites
                 # comment them out to create a static camera
                 #for sprite in self.game.all_sprites:
@@ -605,7 +608,7 @@ class Player(pygame.sprite.Sprite):
                     self.imgindex
 
 
-            if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+            if keys[pygame.K_d]:
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.x -= PLAYER_SPEED
                 self.xChange += PLAYER_SPEED
@@ -620,7 +623,7 @@ class Player(pygame.sprite.Sprite):
                 else:
                     self.imgindex
 
-            if keys[pygame.K_w] or keys[pygame.K_UP]:
+            if keys[pygame.K_w]:
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.y += PLAYER_SPEED
                 self.yChange -= PLAYER_SPEED
@@ -636,7 +639,7 @@ class Player(pygame.sprite.Sprite):
                     self.imgindex
 
 
-            if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+            if keys[pygame.K_s]:
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.y -= PLAYER_SPEED
                 self.yChange += PLAYER_SPEED
@@ -846,28 +849,40 @@ class NPC(pygame.sprite.Sprite):
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
+<<<<<<< HEAD
         self.totalItemCost = [{'flower': 20}, {'ore': 10}, {'flower': 10}]
+        self.totalItemList = ['healthPotion', 'strengthPotion', 'speedPotion']
+        self.totalItemDesc = ['Restores health (Consumable) ', 'Increases strength ', 'Increases movement speed ']
+=======
+
+        #totalItemList is the total possible list of purchasable items. The cost, desc, and images correspond to each item from totalItemList in the order it's listed
         self.totalItemList = ['healthPotion', 'damagePotion', 'speedPotion']
+        self.totalItemCost = [{'flower': 20}, {'ore': 10}, {'flower': 10}]
         self.totalItemDesc = ['Restores health (Consumable) ', 'Increases damage ', 'Increases movement speed ']
+>>>>>>> 8328a8d590ecf265a5e88417c81f402db000231d
         self.totalItemImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200))]
         
+        #these are empty arrays for which item will be shown by this NPC.
         self.itemCost = []
         self.itemList = []
         self.itemDesc = []
         self.itemImgs = []
 
+        #If the weapons haven't been bought yet, give it priority in what items show
         if 'trident' not in self.game.player.activeWeaponList:
-            self.itemCost.append({'flower': 8})
+            self.itemCost.append({'ore': 8})
             self.itemList.append('trident')
             self.itemDesc.append('Throwing weapon ')
             self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/trident2.png'), (200, 200)))
         if 'bubble' not in self.game.player.activeWeaponList:
-            self.itemCost.append({'flower': 16})
+            self.itemCost.append({'flower': 0})
             self.itemList.append('bubble')
             self.itemDesc.append('Burst gun ')
             self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/bubblegun.png'), (200, 200)))
+
+        #Randomly chooses items to add to the list until 3 are chosen in total
         while len(self.itemList) < 3:
             randomInd = random.randint(0, len(self.totalItemList)-1)
             if self.totalItemList[randomInd] not in self.itemList:
@@ -875,6 +890,8 @@ class NPC(pygame.sprite.Sprite):
                 self.itemList.append(self.totalItemList[randomInd])
                 self.itemDesc.append(self.totalItemDesc[randomInd])
                 self.itemImgs.append(self.totalItemImgs[randomInd])
+        
+        #add a leave button
         self.itemList.append('leave')
         self.itemRects = []
         self.selectedItem = 0
@@ -1015,8 +1032,8 @@ class NPC(pygame.sprite.Sprite):
                 #Displays the text for each item: name, cost, and description
                 if self.itemList[item] == 'healthPotion':
                     nameText = 'Health Potion'
-                elif self.itemList[item] == 'damagePotion':
-                    nameText = 'Increased Damage'
+                elif self.itemList[item] == 'strengthPotion':
+                    nameText = 'Increased Strength'
                 elif self.itemList[item] == 'speedPotion':
                     nameText = 'Increased Speed'
                 elif self.itemList[item] == 'trident':

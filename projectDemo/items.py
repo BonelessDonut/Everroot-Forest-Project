@@ -47,6 +47,7 @@ class Weapon(pygame.sprite.Sprite):
         self.width = TILESIZE//2
         self.height = TILESIZE//2
         self.used = False
+        self.direction = None
 
         self.imagelist = [pygame.image.load('Sprites/items/bubblegun.png'), pygame.image.load('Sprites/items/bubblegunDown.png'), pygame.image.load('Sprites/items/bubblegunUp.png')]
         self.imagelist.append(pygame.transform.flip(pygame.image.load('Sprites/items/bubblegun.png'), True, False))
@@ -73,7 +74,7 @@ class Weapon(pygame.sprite.Sprite):
             self.ammo = 60
     
     #Author: Max Chiu 4/10/2024
-    def attack(self):
+    def attack(self, direction):
         if self.timer == 0:
             # self.player.itemUsed = True
             self.used = True
@@ -82,7 +83,8 @@ class Weapon(pygame.sprite.Sprite):
             #After the first shot of each burst here, the other 2 bubbles are shot in the update method
             self.updateLocation()
             if self.type == 'bubble' and self.ammo > 0 and self.ammo % 3 == 0:
-                Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage, 'player')
+                #Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage, 'player')
+                Bullet(self.game, self.x, self.y, self.calculateAngle(direction), self.range, self.damage, 'player')
                 self.ammo -= 1
                 self.timer = self.pause
 
@@ -102,7 +104,7 @@ class Weapon(pygame.sprite.Sprite):
 
             #To space out the bubble shots by burstTime
             if self.ammo % 3 == 2 and -1*self.burstTime < self.timer - self.pause < 0 or self.ammo % 3 == 1 and -2*self.burstTime < self.timer - self.pause < -1*self.burstTime:
-                Bullet(self.game, self.x, self.y, self.calculateAngle(), self.range, self.damage, 'player')
+                Bullet(self.game, self.x, self.y, self.calculateAngle(self.direction), self.range, self.damage, 'player')
                 self.ammo -= 1
                 pygame.mixer.Channel(1).set_volume(0.09 * self.game.soundVol)
                 pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/shooting-sound-fx-159024.mp3'))
@@ -146,16 +148,26 @@ class Weapon(pygame.sprite.Sprite):
 
     #MAX!!!
     #Author: Max Chiu 4/12/2024
-    def calculateAngle(self):
+    def calculateAngle(self, direction):
+        self.direction = direction
         angle = random.uniform(-1*self.spread, self.spread)
-        if self.player.facing == 'up':
+        if direction == 'up':
             angle += 90
-        elif self.player.facing == 'left':
+        elif direction == 'left':
             angle += 180
-        elif self.player.facing == 'down':
+        elif direction == 'down':
             angle += 270
         angle = angle - 360 if angle >= 360 else angle
         return angle*math.pi/180
+    
+        # if self.player.facing == 'up':
+        #     angle += 90
+        # elif self.player.facing == 'left':
+        #     angle += 180
+        # elif self.player.facing == 'down':
+        #     angle += 270
+        # angle = angle - 360 if angle >= 360 else angle
+        # return angle*math.pi/180
     
 #Author: Max Chiu 4/10/24
 class Bullet(pygame.sprite.Sprite):
@@ -756,4 +768,20 @@ class Ore(pygame.sprite.Sprite):
                 self.game.inventory.add_item('ore', 1)
                 pygame.mixer.Channel(3).set_volume(0.01 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
+        pass
+
+class Potion(pygame.sprite.Sprite):
+    def __init__(self, game):
+        self.game = game
+        self._layer = ITEM_LAYER
+        self.groups = self.game.all_sprites, self.game.potions
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        
+    def potionSpeed(self):
+        self.speed = PLAYER_SPEED * 0.1
+
+    def potionStrength(self):
+        self.damage = 150
+
+    def potionHealth(self):
         pass
