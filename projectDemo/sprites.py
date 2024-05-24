@@ -463,13 +463,22 @@ class Player(pygame.sprite.Sprite):
                     pygame.time.wait(150)
 
         #Modified: Max Chiu 5/18/2024
-        elif self.game.state == 'shopping' and (keys[pygame.K_a] or keys[pygame.K_d] or keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
+        elif self.game.state == 'shopping' and (keys[pygame.K_a] or keys[pygame.K_d] or keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] or keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_UP] or keys[pygame.K_DOWN]):
             npc = self.game.activeNPC
             if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-                npc.selectedItem = npc.selectedItem - 1 if npc.selectedItem > 0 else npc.selectedItem
+                npc.pastItem = npc.selectedItem
+                npc.selectedItem = npc.selectedItem - 1 if (npc.selectedItem > 0 and npc.selectedItem != len(npc.itemList)-1) else npc.selectedItem
+                pygame.time.wait(150)
+            elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+                npc.pastItem = npc.selectedItem
+                npc.selectedItem = npc.selectedItem + 1 if npc.selectedItem < len(npc.itemList)-2 else npc.selectedItem
+                pygame.time.wait(150)
+            elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
+                npc.pastItem = npc.selectedItem
+                npc.selectedItem = len(npc.itemList)-1
                 pygame.time.wait(150)
             else:
-                npc.selectedItem = npc.selectedItem + 1 if npc.selectedItem < len(npc.itemList)-1 else npc.selectedItem
+                npc.selectedItem = npc.pastItem
                 pygame.time.wait(150)
 
 
@@ -869,6 +878,7 @@ class NPC(pygame.sprite.Sprite):
         self.itemList.append('leave')
         self.itemRects = []
         self.selectedItem = 0
+        self.pastItem = 0
         #self.descFont = pygame.font.SysFont('Garamond', 20)
         self.descFont = pygame.font.Font('Fonts/minecraft-font/MinecraftRegular-Bmg3.otf', 16)
         #self.descFont = pygame.font.Font('Fonts/pixel-font/Pixel-y14Y.ttf', 20)

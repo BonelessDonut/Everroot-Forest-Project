@@ -683,7 +683,6 @@ class Flower(pygame.sprite.Sprite):
             if self.state == 'cutting':
                 self.kill()
                 self.game.inventory.add_item('flower', 1)
-                print(self.game.inventory.slots)
                 pygame.mixer.Channel(3).set_volume(0.01 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
 
@@ -752,7 +751,6 @@ class Ore(pygame.sprite.Sprite):
             if self.state == 'mining':
                 self.kill()
                 self.game.inventory.add_item('ore', 1)
-                print(self.game.inventory.slots)
                 pygame.mixer.Channel(3).set_volume(0.01 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
         pass
