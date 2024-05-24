@@ -415,6 +415,7 @@ class Player(pygame.sprite.Sprite):
             #Gets the index of the npc that the player interacted with
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
             if self.game.state == 'shopping':
+                #gets the item that was purchased
                 item = self.game.activeNPC.interaction()
                 if item == 'trident':
                     self.activeWeaponList.append('trident')
@@ -846,18 +847,22 @@ class NPC(pygame.sprite.Sprite):
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
-        self.totalItemCost = [{'flower': 20}, {'ore': 10}, {'flower': 10}]
+
+        #totalItemList is the total possible list of purchasable items. The cost, desc, and images correspond to each item from totalItemList in the order it's listed
         self.totalItemList = ['healthPotion', 'damagePotion', 'speedPotion']
+        self.totalItemCost = [{'flower': 20}, {'ore': 10}, {'flower': 10}]
         self.totalItemDesc = ['Restores health (Consumable) ', 'Increases damage ', 'Increases movement speed ']
         self.totalItemImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200))]
         
+        #these are empty arrays for which item will be shown by this NPC.
         self.itemCost = []
         self.itemList = []
         self.itemDesc = []
         self.itemImgs = []
 
+        #If the weapons haven't been bought yet, give it priority in what items show
         if 'trident' not in self.game.player.activeWeaponList:
             self.itemCost.append({'ore': 8})
             self.itemList.append('trident')
@@ -868,6 +873,8 @@ class NPC(pygame.sprite.Sprite):
             self.itemList.append('bubble')
             self.itemDesc.append('Burst gun ')
             self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/bubblegun.png'), (200, 200)))
+
+        #Randomly chooses items to add to the list until 3 are chosen in total
         while len(self.itemList) < 3:
             randomInd = random.randint(0, len(self.totalItemList)-1)
             if self.totalItemList[randomInd] not in self.itemList:
@@ -875,6 +882,8 @@ class NPC(pygame.sprite.Sprite):
                 self.itemList.append(self.totalItemList[randomInd])
                 self.itemDesc.append(self.totalItemDesc[randomInd])
                 self.itemImgs.append(self.totalItemImgs[randomInd])
+        
+        #add a leave button
         self.itemList.append('leave')
         self.itemRects = []
         self.selectedItem = 0
