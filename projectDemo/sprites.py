@@ -252,6 +252,7 @@ class Player(pygame.sprite.Sprite):
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
             npc = self.game.npcs.get_sprite(npcIndex)
             self.game.activeNPC = npc
+            self.game.activeNPC.pastItem = self.game.activeNPC.selectedItem
             collisionList = []
             for rect in npc.TextBox.choiceRectList:
                 collisionList.append(pygame.Rect(rect.left, rect.top, rect.width-30, rect.height))
@@ -421,6 +422,8 @@ class Player(pygame.sprite.Sprite):
                     self.activeWeaponList.append('trident')
                 elif item == 'bubble':
                     self.activeWeaponList.append('bubble')
+                elif item == 'healthPotion':
+                    self.game.inventory.add_item('potion', 1)
                 elif item == '':
                     pass
                 #pygame.time.wait(250)
@@ -461,7 +464,7 @@ class Player(pygame.sprite.Sprite):
                 if keys[pygame.K_w] or keys[pygame.K_UP]:
                     npc.TextBox.selectedRect = npc.TextBox.selectedRect - 1 if npc.TextBox.selectedRect > 0 else npc.TextBox.selectedRect
                     pygame.time.wait(150)
-                else:
+                elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
                     npc.TextBox.selectedRect = npc.TextBox.selectedRect + 1 if npc.TextBox.selectedRect < len(npc.TextBox.choiceRectList)-1 else npc.TextBox.selectedRect
                     pygame.time.wait(150)
 
@@ -478,9 +481,12 @@ class Player(pygame.sprite.Sprite):
                 pygame.time.wait(150)
             elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
                 npc.pastItem = npc.selectedItem
+                print(npc.pastItem)
                 npc.selectedItem = len(npc.itemList)-1
                 pygame.time.wait(150)
-            else:
+            elif keys[pygame.K_w] or keys[pygame.K_UP]:
+                if npc.pastItem == 3:
+                    npc.pastItem = 1
                 npc.selectedItem = npc.pastItem
                 pygame.time.wait(150)
 
@@ -512,6 +518,8 @@ class Player(pygame.sprite.Sprite):
                         self.activeWeaponList.append('trident')
                     elif item == 'bubble':
                         self.activeWeaponList.append('bubble')
+                    elif item == 'healthPotion':
+                        self.game.inventory.add_item('potion', 1)
                     self.game.activeNPC.interaction()
                     #pygame.time.wait(250)
             else:
@@ -851,9 +859,10 @@ class NPC(pygame.sprite.Sprite):
         self.dialogueStageIndex = 1
 
         #totalItemList is the total possible list of purchasable items. The cost, desc, and images correspond to each item from totalItemList in the order it's listed
-        self.totalItemList = ['healthPotion', 'damagePotion', 'speedPotion']
-        self.totalItemCost = [{'flower': 20}, {'ore': 10}, {'flower': 10}]
-        self.totalItemDesc = ['Restores health (Consumable) ', 'Increases damage ', 'Increases movement speed ']
+
+        self.totalItemList = ['healthPotion', 'strengthPotion', 'speedPotion']
+        self.totalItemCost = [{'flower': 1}, {'ore': 10}, {'flower': 10}]
+        self.totalItemDesc = ['Restores health (Consumable) ', 'Increases strength ', 'Increases movement speed ']
 
         self.totalItemImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
@@ -867,12 +876,12 @@ class NPC(pygame.sprite.Sprite):
 
         #If the weapons haven't been bought yet, give it priority in what items show
         if 'trident' not in self.game.player.activeWeaponList:
-            self.itemCost.append({'ore': 8})
+            self.itemCost.append({'ore': 1})
             self.itemList.append('trident')
             self.itemDesc.append('Throwing weapon ')
             self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/trident2.png'), (200, 200)))
         if 'bubble' not in self.game.player.activeWeaponList:
-            self.itemCost.append({'flower': 0})
+            self.itemCost.append({'flower': 1})
             self.itemList.append('bubble')
             self.itemDesc.append('Burst gun ')
             self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/bubblegun.png'), (200, 200)))
@@ -908,7 +917,8 @@ class NPC(pygame.sprite.Sprite):
                                                 "%Choices; What do you want to do?; Shop; Leave; Meow ",
                                                 "Drink it now, drink it now, drink it now "],
                              '02:Second Meet': [{'Meetings':2},
-                                                "Hi again... "]
+                                                "Hi again... ",
+                                                "%Choices; What do you want to do?; Shop; Leave; Meow "]
                             }
         
         #What needs to be done:
