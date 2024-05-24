@@ -1,4 +1,5 @@
 import pygame
+from pygame.sprite import _Group
 from settings import *
 import items 
 import math
@@ -1261,26 +1262,9 @@ class Enemy(pygame.sprite.Sprite):
 
     #Authored: Max Chiu 4/18/2024
     def update(self):
-        #self.searchPlayer()
-        #print(f'pos: {self.game.player.x}, {self.game.player.y}')
-        #print(f'pos+middle: {self.game.player.x+self.game.player.width//2}, {self.game.player.y+self.game.player.height//2}')
-        #print(f'center: {self.game.player.rect.center}')
-        #print(f'pos: {self.x}, {self.y}')
-        #print(f'pos+middle: {self.x+self.width//2}, {self.y+self.height//2}')
-        #print(f'center: {self.rect.center}')
-        #playerPos = [self.game.player.x//TILESIZE, self.game.player.y//TILESIZE]
-        #playerPos = self.game.player.rect.center
-        #enemyPos = [(self.x+TILESIZE//2)//TILESIZE, (self.y+TILESIZE//2)//TILESIZE]
         enemyPos = self.rect.center
-        #self.xChange, self.yChange = self.path.createPath((enemyPos[0]//TILESIZE, enemyPos[1]//TILESIZE), (playerPos[0]//TILESIZE, playerPos[1]//TILESIZE))
         self.path.start = (enemyPos[0], enemyPos[1])
-        # print('start', enemyPos[0], enemyPos[1])
-        # print('end', self.path.collision_rects[0].center[0], self.path.collision_rects[0].center[1])
-        #print('start', self.start[0]*TILESIZE, self.start[1]*TILESIZE)
-            #print('end', end[0], end[1])
-        # change = self.path.checkCollisions()
-        # if change:
-        #     self.xChange, self.yChange = change[0]*self.speed, change[1]*self.speed
+
         if self.game.state not in ['dialogue', 'scene', 'pause', 'game over', 'shopping']:
             if self.attackType == 'melee':
                 self.searchPlayer()
@@ -1298,14 +1282,20 @@ class Enemy(pygame.sprite.Sprite):
                         self.stunCount = 0
 
             elif self.state == 'knockback':
-                self.rect.x += self.xChange * -1
+                if self.rect.x + self.rect.width + self.xChange *-1 > 1240:
+                    self.rect.x = 1240-self.rect.width
+                else:
+                    self.rect.x += self.xChange * -1
                 self.collideBlocks('x')
-                self.rect.y += self.yChange * -1
+                if self.rect.y + self.rect.height + self.yChange *-1 > 680:
+                    self.rect.y = 680-self.rect.height
+                else:
+                    self.rect.y += self.yChange * -1
                 self.collideBlocks('y')
 
                 self.x = self.rect.x
                 self.y = self.rect.y
-            #     pass
+
             else: #self.state == 'chasing'
                 self.searchPlayer()
                 self.rect.x += self.xChange
@@ -1488,7 +1478,7 @@ class Enemy(pygame.sprite.Sprite):
             #    if self.xChange < 0:
             #        self.rect.x = self.game.player.rect.right
             #elif hits and hits[0] != self:
-            if hits and hits[0] != self:
+            if hits:
                 if self.xChange > 0:
                     self.rect.x = hits[0].rect.left - self.rect.width
                 if self.xChange < 0:
@@ -1503,7 +1493,7 @@ class Enemy(pygame.sprite.Sprite):
             #    if self.yChange < 0:
             #        self.rect.y = self.game.player.rect.bottom
             #elif hits and hits[0] != self:
-            if hits and hits[0] != self:
+            if hits: 
                 if self.yChange > 0:
                     self.rect.y = hits[0].rect.top - self.rect.height
                 if self.yChange < 0:
@@ -1593,30 +1583,32 @@ class Pathfinder:
                 y = (point.y*TILESIZE)+self.enemy.width/2
                 rect = pygame.Rect((x-1), (y-1), 2, 2)
                 self.collision_rects.append(rect)
-            #print(self.collision_rects)
     
     #Authored: Max Chiu 5/3/2024
     #Followed sample code: https://github.com/clear-code-projects/Python-Pathfinder/blob/main/roomba%20project/pathfinding_roomba.py
     def getDirection(self):
-        if self.collision_rects:
-            end = self.collision_rects[0].center
-            #print('start', self.start[0], self.start[1])
-            #print('end', end[0], end[1])
-            dx = (end[0] - self.start[0])
-            dy = (end[1] - self.start[1])
-            #print('dx', dx, 'dy', dy)
+        try:
+            if self.collision_rects:
+                end = self.collision_rects[0].center
+                #print('start', self.start[0], self.start[1])
+                #print('end', end[0], end[1])
+                dx = (end[0] - self.start[0])
+                dy = (end[1] - self.start[1])
+                #print('dx', dx, 'dy', dy)
 
-            #find the distance between player and enemy, check if this distance is outside the range of the enemy
-            # distance = math.sqrt((dx)**2+(dy)**2)
-            # dx /= distance
-            # dy /= distance
-            dx, dy = Multiclass.normalize(dx, dy)
-            #if not dx or not dy:
-                #print(end[0], self.start[0], end[1], self.start[1])
-            return dx, dy
-        else:
+                #find the distance between player and enemy, check if this distance is outside the range of the enemy
+                # distance = math.sqrt((dx)**2+(dy)**2)
+                # dx /= distance
+                # dy /= distance
+                dx, dy = Multiclass.normalize(dx, dy)
+                return dx, dy
+            else:
+                self.emptyPath()
+                return 0, 0
+        except AttributeError:
             self.emptyPath()
-            return 0, 0
+            return 0,0
+
 
     #Authored: Max Chiu 5/3/2024
     #Followed sample code: https://github.com/clear-code-projects/Python-Pathfinder/blob/main/roomba%20project/pathfinding_roomba.py
@@ -1633,6 +1625,56 @@ class Pathfinder:
         self.collision_rects = []
         self.path = []
 
+class Boss(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        super().__init__(self.groups)
+        self.game = game
+        self.x = x
+        self.y = y
+        self.width = TILESIZE * 2
+        self.height = TILESIZE * 2
+
+        self.maxHealth = 250
+        self.currentHealth = self.maxHealth
+        self.healthBarLength = WIDTH * 0.6
+        self.healthBarHeight = HEIGHT * 0.05
+        # Line below to be used to pull boss images from the main.py file, where the images should be pre-loaded at the start of the game within the setupimages function.
+        # May not look exactly like this, but this is the way that boss images should be referenced. There will be seperate lists of images within the overall bossImageList.
+        # These lists will hold base boss sprites, as well as attacking sprites.
+        # self.imageList = self.game.bossImageList[0]
+        # self.imageIndex = 0
+        # self.image = self.imageList[self.imageIndex]
+
+        self.attackTimer = 0
+        self.attackLimiter = 60
+        self.attacking = False
+        self.moving = False
+
+    # Every frame of the game loop this will be called. 
+    # The boss should move if needed, the healthbar will be displayer, the boss's title should be displayed above the healthbar, and the boss should attack if needed.
+    def update(self):
+        pass
+
+    # Function should create the boss's healthbar on the screen, including the max length and the current percentage of health remaining. The boss's name would also be displayed right above the healthbar.
+    def healthbar(self):
+        pass
+
+    # This function will cause the boss to perform an attack in which they launch a cascading wave type attack out. 
+    # This might go in the player's direction, or it could just be an attack that hits a predetermined location.
+    def attackWave(self):
+        pass
+
+    # The boss should move around the room in a certain pattern. The specific pattern they follow could depend on the player's position, but they should not just strictly follow the player around.
+    def move(self):
+        if not self.moving:
+            return
+        pass
+
+    # Resets the boss's status back to default, which should be moving around the boss room.
+    def resetStatus(self):
+        self.attacking = False
+        self.moving = True
+        pass
 
         
 class Teleport(pygame.sprite.Sprite):
