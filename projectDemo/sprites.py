@@ -587,7 +587,7 @@ class Player(pygame.sprite.Sprite):
         #https://www.youtube.com/watch?v=GakNgbiAxzs&list=PLkkm3wcQHjT7gn81Wn-e78cAyhwBW3FIc&index=2
         keys = pygame.key.get_pressed()
         if not self.itemUsed: # if there is not an item being used
-            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            if keys[pygame.K_a]:
                 # Two lines below change camera to move around player character, moving all other sprites
                 # comment them out to create a static camera
                 #for sprite in self.game.all_sprites:
@@ -605,7 +605,7 @@ class Player(pygame.sprite.Sprite):
                     self.imgindex
 
 
-            if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+            if keys[pygame.K_d]:
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.x -= PLAYER_SPEED
                 self.xChange += PLAYER_SPEED
@@ -620,7 +620,7 @@ class Player(pygame.sprite.Sprite):
                 else:
                     self.imgindex
 
-            if keys[pygame.K_w] or keys[pygame.K_UP]:
+            if keys[pygame.K_w]:
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.y += PLAYER_SPEED
                 self.yChange -= PLAYER_SPEED
@@ -636,7 +636,7 @@ class Player(pygame.sprite.Sprite):
                     self.imgindex
 
 
-            if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+            if keys[pygame.K_s]:
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.y -= PLAYER_SPEED
                 self.yChange += PLAYER_SPEED
@@ -859,12 +859,12 @@ class NPC(pygame.sprite.Sprite):
         self.itemImgs = []
 
         if 'trident' not in self.game.player.activeWeaponList:
-            self.itemCost.append({'flower': 8})
+            self.itemCost.append({'ore': 8})
             self.itemList.append('trident')
             self.itemDesc.append('Throwing weapon ')
             self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/trident2.png'), (200, 200)))
         if 'bubble' not in self.game.player.activeWeaponList:
-            self.itemCost.append({'flower': 16})
+            self.itemCost.append({'flower': 0})
             self.itemList.append('bubble')
             self.itemDesc.append('Burst gun ')
             self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/bubblegun.png'), (200, 200)))

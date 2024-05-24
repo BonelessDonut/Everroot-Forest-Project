@@ -456,8 +456,15 @@ class Game():
                     self.player.spearUsed = True
                 MeleeAttack(self, self.player.weapon, self.player)
             # Uses the bubblegun to attack with E if that is the weapon currently equipped is the bubblegun
-            if event.type == pygame.KEYDOWN and ((event.key == pygame.K_e) and not self.player.itemUsed) and (self.player.weapon.type == 'bubble' and self.state == 'explore'):
-                self.player.weapon.attack()
+            if event.type == pygame.KEYDOWN and ((event.key in [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN]) and not self.player.itemUsed) and (self.player.weapon.type == 'bubble' and self.state == 'explore'):
+                if (event.key == pygame.K_LEFT):
+                    self.player.weapon.attack('left')
+                elif (event.key == pygame.K_UP):
+                    self.player.weapon.attack('up')
+                elif (event.key == pygame.K_RIGHT):
+                    self.player.weapon.attack('right')
+                else:
+                    self.player.weapon.attack('down')
             # switches weapon equipped using q
             if event.type == pygame.KEYUP and event.key == pygame.K_q and not self.player.itemUsed and self.state == 'explore':
                 self.player.switchWeapons()
