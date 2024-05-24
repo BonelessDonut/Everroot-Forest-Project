@@ -29,12 +29,12 @@ GROUND_LAYER = 1
 UNMADE_ROOM = -1
 
 # -1 = rooms that will never be loaded | -2 = unloaded purple rooms | -3 = unloaded green rooms | -4 = unloaded boss room
-mapList = [[-1, -1, -1, -1, -1, -1, -1, -1, -3, -2, -3, -1, -1,],
-           [-1,  2, -1, -1, -2, -3, -1, -2, -2, -1, -1, -1, -1,],
-           [ 4,  0,  1, -2, -2, -2, -2, -2, -2, -1, -2, -4, -1,],
-           [-1,  3, -1, -3, -1, -2, -2, -1, -2, -2, -2, -1, -1,],
-           [-1, -1, -1, -2, -2, -1, -3, -1, -1, -3, -1, -1, -1,],
-           [-1, -1, -1, -1, -2, -2, -2, -1, -1, -1, -1, -1, -1]]
+mapList = [[-1, -1, -1, -1, -1, -1, -1, -1, -1, -3, -2, -3, -1, -1,],
+           [-1,  2, -1, -1, -1, -3, -1, -1, -2, -2, -1, -1, -1, -1,],
+           [ 4,  0,  1, -2, -2, -2, -2, -4, -1, -2, -1, -2, -4, -1,],
+           [-1,  3, -1, -3, -1, -2, -2, -1, -1, -2, -2, -2, -1, -1,],
+           [-1, -1, -1, -2, -2, -1, -3, -1, -1, -1, -3, -1, -1, -1,],
+           [-1, -1, -1, -1, -2, -2, -2, -1, -1, -1, -1, -1, -1, -1]]
 
 #tiles to represent the world, each 'B' represents a block, the 'P' is the player's position
 #There are 32 horizontal tiles (width of 1280 / 40) and 18 vertical tiles (height of 720 / 40))
@@ -296,8 +296,8 @@ greenRandomRooms = [[ # 0: water swirl room
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
     'BRRRB.FFFRRRB....RR..BBRRRRRRF.B',
     'BRRBB..FFRRB......R....BRRRFFF.B',
-    'BRRB..NFRRBF......BR....BR..NFRB',
-    'BRRB....RRBFFFFF...BR....B..FRRB',
+    'BRRB..NFRRB.......BR....BRFFFFRB',
+    'BRRB....RRBFF......BR....B..FRRB',
     'B.RB....RRBRRRFFF...RR.......RBB',
     'B.RRB..RRRRRRRRRR...........RB.B',
     'B.RRB..RFRRRRBRRRR..........RB.B',
@@ -342,7 +342,7 @@ greenRandomRooms = [[ # 0: water swirl room
     'B...GGGF...FFFGGG...SGGG.......B',
     'B..............NR..GGGRGG......B',
     'B...........GG......FFRRG......B',
-    'BG.S.......GGGG......FFFGN.....B',
+    'BG.S.......GGGG......FFFG......B',
     'BGG......GGGRRGF...G...FFF...SGB',
     'BGGFF...FFGGFFFF..GGG.......FGGB',
     'BGGGF.....S.......GRGG.....FFGRB',

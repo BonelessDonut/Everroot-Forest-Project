@@ -424,6 +424,8 @@ class Player(pygame.sprite.Sprite):
                     self.activeWeaponList.append('bubble')
                 elif item == 'healthPotion':
                     self.game.inventory.add_item('potion', 1)
+                elif item == '':
+                    pass
                 #pygame.time.wait(250)
             elif npcIndex != -1:
                 # interacted = True
@@ -857,9 +859,9 @@ class NPC(pygame.sprite.Sprite):
         self.dialogueStageIndex = 1
 
         #totalItemList is the total possible list of purchasable items. The cost, desc, and images correspond to each item from totalItemList in the order it's listed
-        self.totalItemList = ['healthPotion', 'damagePotion', 'speedPotion']
+        self.totalItemList = ['healthPotion', 'strengthPotion', 'speedPotion']
         self.totalItemCost = [{'flower': 1}, {'ore': 10}, {'flower': 10}]
-        self.totalItemDesc = ['Restores health (Consumable) ', 'Increases damage ', 'Increases movement speed ']
+        self.totalItemDesc = ['Restores health (Consumable) ', 'Increases strength ', 'Increases movement speed ']
         self.totalItemImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200))]
@@ -1033,8 +1035,8 @@ class NPC(pygame.sprite.Sprite):
                 #Displays the text for each item: name, cost, and description
                 if self.itemList[item] == 'healthPotion':
                     nameText = 'Health Potion'
-                elif self.itemList[item] == 'damagePotion':
-                    nameText = 'Increased Damage'
+                elif self.itemList[item] == 'strengthPotion':
+                    nameText = 'Increased Strength'
                 elif self.itemList[item] == 'speedPotion':
                     nameText = 'Increased Speed'
                 elif self.itemList[item] == 'trident':
