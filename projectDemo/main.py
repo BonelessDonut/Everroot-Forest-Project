@@ -478,6 +478,8 @@ class Game():
                 pygame.font.quit()
                 pygame.quit()
                 sys.exit()
+            # if event.type == pygame.KEYUP and event.key == pygame.K_n and not self.player.itemUsed and self.state == 'explore': # keybind to speed, will have added functionality with potions in the inventory later
+            #     self.game.potions.potionSpeed()
 
     def update(self):
         # game loop updates
