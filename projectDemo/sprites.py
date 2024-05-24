@@ -859,7 +859,6 @@ class NPC(pygame.sprite.Sprite):
         self.dialogueStageIndex = 1
 
         #totalItemList is the total possible list of purchasable items. The cost, desc, and images correspond to each item from totalItemList in the order it's listed
-
         self.totalItemList = ['healthPotion', 'strengthPotion', 'speedPotion']
         self.totalItemCost = [{'flower': 1}, {'ore': 10}, {'flower': 10}]
         self.totalItemDesc = ['Restores health (Consumable) ', 'Increases strength ', 'Increases movement speed ']
