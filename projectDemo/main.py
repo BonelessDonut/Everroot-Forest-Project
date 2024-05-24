@@ -473,7 +473,7 @@ class Game():
             if event.type == pygame.KEYUP and event.key == pygame.K_p and (self.state != 'shopping' and self.state != 'dialogue'): # pauses the game with P
                 self.pause()
             if event.type == pygame.KEYUP and event.key == pygame.K_g and not self.player.itemUsed and self.state == 'explore': # keybind to heal, will have added functionality with potions in the inventory later
-                self.player.getHealth(200)
+                self.player.getHealth(200) 
             if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE: # closes the game if escape is pressed
                 pygame.font.quit()
                 pygame.quit()
