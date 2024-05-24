@@ -545,6 +545,7 @@ class MeleeAttack(pygame.sprite.Sprite):
 
         for enemy in self.game.enemies:
             if pygame.sprite.collide_rect(self, enemy):
+                #print('here')
                 if not enemy.hitInvincible and not betweenBlocks:
                     if not self.checkWalls():
                         #print("colliding")
@@ -556,7 +557,9 @@ class MeleeAttack(pygame.sprite.Sprite):
                         #print(f"enemy health is {enemy.health}")
             else:
                 #print("not colliding")
+                #print('here in the else statement')
                 enemy.hitInvincible = False
+                #print(enemy.hitInvincible)
 
         pass
 
@@ -765,4 +768,20 @@ class Ore(pygame.sprite.Sprite):
                 self.game.inventory.add_item('ore', 1)
                 pygame.mixer.Channel(3).set_volume(0.01 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
+        pass
+
+class Potion(pygame.sprite.Sprite):
+    def __init__(self, game):
+        self.game = game
+        self._layer = ITEM_LAYER
+        self.groups = self.game.all_sprites, self.game.potions
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        
+    def potionSpeed(self):
+        self.speed = PLAYER_SPEED * 0.1
+
+    def potionStrength(self):
+        self.damage = 150
+
+    def potionHealth(self):
         pass
