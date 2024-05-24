@@ -1627,37 +1627,80 @@ class Pathfinder:
 
 class Boss(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
-        self.groups = self.game.all_sprites, self.game.enemies
-        super().__init__(self.groups)
         self.game = game
+        self.groups = self.game.all_sprites, self.game.enemies
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self._layer = ENEMY_LAYER
         self.x = x
         self.y = y
         self.width = TILESIZE * 2
         self.height = TILESIZE * 2
 
-        self.maxHealth = 250
+        self.speed = PLAYER_SPEED * 0.65
+
+        self.maxHealth = 30
         self.currentHealth = self.maxHealth
         self.healthBarLength = WIDTH * 0.6
         self.healthBarHeight = HEIGHT * 0.05
         # Line below to be used to pull boss images from the main.py file, where the images should be pre-loaded at the start of the game within the setupimages function.
         # May not look exactly like this, but this is the way that boss images should be referenced. There will be seperate lists of images within the overall bossImageList.
         # These lists will hold base boss sprites, as well as attacking sprites.
-        # self.imageList = self.game.bossImageList[0]
-        # self.imageIndex = 0
-        # self.image = self.imageList[self.imageIndex]
+        self.imageListNum = 0
+        self.imageList = self.game.bossImageList[self.imageListNum]
+        self.imageIndex = 0
+        self.image = pygame.transform.scale(self.imageList[self.imageIndex], (self.width, self.height))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
 
         self.attackTimer = 0
         self.attackLimiter = 60
         self.attacking = False
         self.moving = False
+        self.dying = False
+        self.hitInvincible = False
+        self.hitInvulnerable = False
+        self.hitInvulnerableTime = 0
+        self.invulnerableTimer = 24
 
     # Every frame of the game loop this will be called. 
     # The boss should move if needed, the healthbar will be displayer, the boss's title should be displayed above the healthbar, and the boss should attack if needed.
     def update(self):
+        if self.hitInvulnerable:
+            self.hitInvulnerableTime += 1
+            if self.hitInvulnerableTime > self.invulnerableTimer:
+                self.hitInvulnerable = False
+                self.hitInvulnerableTime = 0
+        self.flicker()
+        if (not self.game.player.swordUsed and not self.game.player.spearUsed and not self.game.player.weapon.used):
+            self.hitInvincible = False
+        #print(f'self.hitInvulnerable is {self.hitInvulnerable}, self.hitInvincible is {self.hitInvincible}')
         pass
 
     # Function should create the boss's healthbar on the screen, including the max length and the current percentage of health remaining. The boss's name would also be displayed right above the healthbar.
     def healthbar(self):
+        pass
+
+    def dealtDamage(self, damage, type):
+        if not self.hitInvulnerable:
+            self.currentHealth -= damage
+            self.hitInvulnerable = True
+        if self.currentHealth <= 0:
+            self.death()
+        pass
+
+    def flicker(self):
+        alpha = 0
+        value = math.sin(pygame.time.get_ticks())
+        if value >= 0:
+            alpha = 255
+        else:
+            alpha = 0
+        if self.hitInvulnerable:
+            self.image.set_alpha(alpha)
+            #print(self.image.get_alpha())
+        else:
+            self.image.set_alpha(255)
         pass
 
     # This function will cause the boss to perform an attack in which they launch a cascading wave type attack out. 
@@ -1675,6 +1718,11 @@ class Boss(pygame.sprite.Sprite):
     def resetStatus(self):
         self.attacking = False
         self.moving = True
+        pass
+
+    def death(self):
+        self.game.bossDefeated = True
+        self.kill()
         pass
 
         

@@ -533,6 +533,7 @@ class MeleeAttack(pygame.sprite.Sprite):
 
         for enemy in self.game.enemies:
             if pygame.sprite.collide_rect(self, enemy):
+                #print('here')
                 if not enemy.hitInvincible and not betweenBlocks:
                     if not self.checkWalls():
                         #print("colliding")
@@ -544,7 +545,9 @@ class MeleeAttack(pygame.sprite.Sprite):
                         #print(f"enemy health is {enemy.health}")
             else:
                 #print("not colliding")
+                #print('here in the else statement')
                 enemy.hitInvincible = False
+                #print(enemy.hitInvincible)
 
         pass
 

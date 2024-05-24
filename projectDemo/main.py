@@ -44,6 +44,9 @@ class Game():
         self.inventory = None
         self.weaponsHud = None
         self.state = 'opening'
+        self.boss = None
+        self.bossActive = False
+        self.bossDefeated = False
         #Game states:
         #explore - Player can move around
         #dialogue - Player is currently in dialogue, player can't move
@@ -142,6 +145,8 @@ class Game():
                 #print()
             # initializes the visual element that displays the player's weapons
             self.weaponsHud = WeaponDisplay(self)
+            # THIS LINE BELOW IS HERE FOR TESTING THE BOSS ONLY
+            self.boss = Boss(self, WIDTH * 0.4, HEIGHT * 0.4)
         #For moving between rooms
         else:
             # kill all the current sprites in the current room
@@ -289,6 +294,8 @@ class Game():
                 currentTileMap.append(redMap)
                 mapNumber = len(currentTileMap)-1
                 mapList[self.map[0]][self.map[1]] = mapNumber
+                if not self.bossDefeated:
+                    self.bossActive = True
 
             print(self.map, mapNumber)
             print('up:', self.map[0]-1 >= 0, end = ' ')
@@ -395,6 +402,8 @@ class Game():
                         self.player.weaponNum = priorWeaponNum
                         self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
                         self.player.weapon.updateDamage()
+            if self.bossActive:
+                self.boss = Boss(self, WIDTH * 0.4, HEIGHT * 0.4)
 
 
 
@@ -446,7 +455,7 @@ class Game():
                 pygame.quit()
                 sys.exit()
             # Use E to attack using a melee weapon
-            if event.type == pygame.KEYDOWN and (event.key == pygame.K_e and not self.player.itemUsed) and ((self.player.weapon.type == 'swordfish' or self.player.weapon.type == 'trident') and self.state == 'explore'):
+            if event.type == pygame.KEYDOWN and (event.key == pygame.K_j and not self.player.itemUsed) and ((self.player.weapon.type == 'swordfish' or self.player.weapon.type == 'trident') and self.state == 'explore'):
                 self.player.itemUsed = True
                 if False: # This line is a placeholder for a conditional that will check if the melee weapon type is the spear weapon or swordfish
                     pass
@@ -456,7 +465,7 @@ class Game():
                     self.player.spearUsed = True
                 MeleeAttack(self, self.player.weapon, self.player)
             # Uses the bubblegun to attack with E if that is the weapon currently equipped is the bubblegun
-            if event.type == pygame.KEYDOWN and ((event.key == pygame.K_e) and not self.player.itemUsed) and (self.player.weapon.type == 'bubble' and self.state == 'explore'):
+            if event.type == pygame.KEYDOWN and ((event.key == pygame.K_j) and not self.player.itemUsed) and (self.player.weapon.type == 'bubble' and self.state == 'explore'):
                 self.player.weapon.attack()
             # switches weapon equipped using q
             if event.type == pygame.KEYUP and event.key == pygame.K_q and not self.player.itemUsed and self.state == 'explore':
@@ -692,7 +701,7 @@ class Game():
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron2.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE))]
-
+        self.bossImageList = [[pygame.image.load('Sprites/npcs/boss/bossHead.png'), pygame.image.load('Sprites/npcs/boss/bossidea4_5.png')], [pygame.image.load('Sprites/npcs/boss/bossattack.png'), pygame.image.load('Sprites/npcs/boss/bossattack_2.png'), pygame.image.load('Sprites/npcs/boss/bossattack_3.png')]]
 
 
 g = Game()
