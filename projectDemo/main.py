@@ -714,6 +714,7 @@ class Game():
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE))]
         self.bossImageList = [[pygame.image.load('Sprites/npcs/boss/bossHead.png'), pygame.image.load('Sprites/npcs/boss/bossidea4_5.png')], [pygame.image.load('Sprites/npcs/boss/bossattack.png'), pygame.image.load('Sprites/npcs/boss/bossattack_2.png'), pygame.image.load('Sprites/npcs/boss/bossattack_3.png')]]
         self.particleList = [[pygame.image.load('Sprites/particles_vfx/bossparticles1.png'), pygame.image.load('Sprites/particles_vfx/bossparticles2.png'), pygame.image.load('Sprites/particles_vfx/bossparticles3.png')], [pygame.image.load('Sprites/particles_vfx/genparticles1.png'), pygame.image.load('Sprites/particles_vfx/genparticles2.png'), pygame.image.load('Sprites/particles_vfx/genparticles3.png')]]
+        self.bossAttacks = [pygame.transform.scale(pygame.image.load('Sprites/items/bubbleCluster.png').convert_alpha(), (TILESIZE, TILESIZE))]
 
 g = Game()
 g.intro_screen()

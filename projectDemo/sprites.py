@@ -849,17 +849,12 @@ class NPC(pygame.sprite.Sprite):
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
-<<<<<<< HEAD
-        self.totalItemCost = [{'flower': 20}, {'ore': 10}, {'flower': 10}]
-        self.totalItemList = ['healthPotion', 'strengthPotion', 'speedPotion']
-        self.totalItemDesc = ['Restores health (Consumable) ', 'Increases strength ', 'Increases movement speed ']
-=======
 
         #totalItemList is the total possible list of purchasable items. The cost, desc, and images correspond to each item from totalItemList in the order it's listed
         self.totalItemList = ['healthPotion', 'damagePotion', 'speedPotion']
         self.totalItemCost = [{'flower': 20}, {'ore': 10}, {'flower': 10}]
         self.totalItemDesc = ['Restores health (Consumable) ', 'Increases damage ', 'Increases movement speed ']
->>>>>>> 8328a8d590ecf265a5e88417c81f402db000231d
+
         self.totalItemImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200))]
@@ -1688,9 +1683,10 @@ class Boss(pygame.sprite.Sprite):
         self.currentParticleIn = 0
 
         self.attackTimer = 0
-        self.attackLimiter = 300
+        self.attackLimiter = 220
         self.attacking = False
         self.doneAttacking = True
+        self.chosenAttack = ''
         self.moving = False
         self.dying = False
         self.hitInvincible = False
@@ -1725,7 +1721,8 @@ class Boss(pygame.sprite.Sprite):
         pass
 
     def ui(self):
-        self.healthbar()
+        if self.game.bossActive:
+            self.healthbar()
 
     # Function should create the boss's healthbar on the screen, including the max length and the current percentage of health remaining. The boss's name would also be displayed right above the healthbar.
     def healthbar(self):
@@ -1763,8 +1760,16 @@ class Boss(pygame.sprite.Sprite):
             self.attackTimer += 1
             if self.attackTimer >= self.attackLimiter:
                 self.attackTimer = 0
-                if random.randint(0, 100) >= 50:
-                    self.attackWave()
+                randomNum = random.randint(0, 100)
+                if randomNum >= 50 and randomNum <= 75:
+                    self.chosenAttack = 'wave'
+
+                elif randomNum > 75:
+                    self.chosenAttack = 'barrage'
+        if self.chosenAttack == 'wave':
+            self.attackWave()
+        elif self.chosenAttack == 'barrage':
+            self.attackBarrage()
         pass
 
     # This function will cause the boss to perform an attack in which they launch a cascading wave type attack out. 
@@ -1772,8 +1777,21 @@ class Boss(pygame.sprite.Sprite):
     def attackWave(self):
         self.moving = False
         self.attacking = True
+        if self.doneAttacking == True:
+            self.doneAttacking = False
+            for attack in range(6):
+                BossAttack(self.game, self.x + attack * (self.width // 6), self.y + self.height * 1.05, 150, (math.cos(math.pi * attack), math.sin(math.pi * attack)))
         self.resetStatus()
         pass
+
+    def attackBarrage(self):
+        self.moving = False
+        self.attacking = True
+        if self.doneAttacking == True:
+            self.doneAttacking = False
+            BossAttack(self.game, self.x + self.width * 0.5, self.y + self.height * 1.1, 240, self.getPlayerDirection())
+        self.resetStatus()
+
 
     def animate(self):
         pass
@@ -1809,6 +1827,7 @@ class Boss(pygame.sprite.Sprite):
     # Resets the boss's status back to default, which should be moving around the boss room.
     def resetStatus(self):
         self.attacking = False
+        self.doneAttacking = True
         self.moving = True
         pass
 
@@ -1878,13 +1897,44 @@ class Particle(pygame.sprite.Sprite):
 
 
 class BossAttack(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, damage, width=TILESIZE, height=TILESIZE):
+    def __init__(self, game, x, y, damage, direction):
         self.game = game
         self.x = x
         self.y = y
         self.damage = damage
-        self.width = width
-        self.height = height
+        self.direction = direction
+        self.speed = 3
+        self.image = self.game.bossAttacks[0]
+        self.groups = self.game.all_sprites, self.game.attacks
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+    def setPosition(self, newX, newY):
+        self.x = newX
+        self.y = newX
+
+        pass
+
+    def move(self):
+        self.x += self.direction[0] * self.speed
+        self.y += self.direction[1] * self.speed
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+    def update(self):
+        self.move()
+        self.collision()
+        pass
+
+    def collision(self):
+        if pygame.sprite.collide_rect(self, self.game.player):
+            self.game.player.getDamage(self.damage)
+        for block in self.game.blocks:
+            if pygame.sprite.collide_rect(self, block):
+                self.kill()
+        pass
 
 
 
