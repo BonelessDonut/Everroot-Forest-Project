@@ -1644,34 +1644,45 @@ class Boss(pygame.sprite.Sprite):
         self.x = x
         self.y = y
         self.width = TILESIZE * 2
-        self.height = TILESIZE * 2
+        self.height = TILESIZE * 2.5
 
-        self.speed = PLAYER_SPEED * 0.65
+        self.speed = PLAYER_SPEED * 0.35
 
         self.maxHealth = 30
         self.currentHealth = self.maxHealth
         self.healthBarLength = WIDTH * 0.6
         self.healthBarHeight = HEIGHT * 0.05
+        self.healthBarPos = (WIDTH * 0.3, HEIGHT * 0.8)
+        self.collideDamage = 200
         # Line below to be used to pull boss images from the main.py file, where the images should be pre-loaded at the start of the game within the setupimages function.
         # May not look exactly like this, but this is the way that boss images should be referenced. There will be seperate lists of images within the overall bossImageList.
         # These lists will hold base boss sprites, as well as attacking sprites.
         self.imageListNum = 0
         self.imageList = self.game.bossImageList[self.imageListNum]
-        self.imageIndex = 0
+        self.imageIndex = 1
         self.image = pygame.transform.scale(self.imageList[self.imageIndex], (self.width, self.height))
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+        self.directionX = 0
+        self.directionY = 0
+
+        self.particles = self.game.particleList[0]
+        self.currentParticleIn = 0
 
         self.attackTimer = 0
-        self.attackLimiter = 60
+        self.attackLimiter = 300
         self.attacking = False
+        self.doneAttacking = True
         self.moving = False
         self.dying = False
         self.hitInvincible = False
         self.hitInvulnerable = False
         self.hitInvulnerableTime = 0
         self.invulnerableTimer = 24
+        self.animateTime = 0
+        self.animateTimer = 60
+        self.particles = Particle(self.game, self.x, self.y + self.height * 0.7, self.width, self.height * 0.3, 'boss')
 
     # Every frame of the game loop this will be called. 
     # The boss should move if needed, the healthbar will be displayer, the boss's title should be displayed above the healthbar, and the boss should attack if needed.
@@ -1685,7 +1696,19 @@ class Boss(pygame.sprite.Sprite):
         if (not self.game.player.swordUsed and not self.game.player.spearUsed and not self.game.player.weapon.used):
             self.hitInvincible = False
         #print(f'self.hitInvulnerable is {self.hitInvulnerable}, self.hitInvincible is {self.hitInvincible}')
+        # This line is a placeholder, there will be a conditional that will check if the boss should be moving currently.
+        # Haven't thought of what condition that will be checking yet, maybe just if the boss is not currently attacking.
+        if not self.attacking:
+            self.moving = True
+        self.attack()
+        self.move()
+        self.animate()
+        self.ui()
+        self.particles.setPosition(self.x, self.y + self.height * 0.7)
         pass
+
+    def ui(self):
+        self.healthbar()
 
     # Function should create the boss's healthbar on the screen, including the max length and the current percentage of health remaining. The boss's name would also be displayed right above the healthbar.
     def healthbar(self):
@@ -1713,15 +1736,57 @@ class Boss(pygame.sprite.Sprite):
             self.image.set_alpha(255)
         pass
 
+    # General attack function for boss
+    # Will function to decide which attacks the boss is going to use if there needs to be a choice made
+    # An attack choice will happen when the boss is not attacking and it is not on attack cooldown (there will be multiple attacks to choose from, assuming these are implemented properly)
+    def attack(self):
+        if pygame.sprite.collide_rect(self, self.game.player):
+            self.game.player.getDamage(self.collideDamage)
+        if not self.attacking:
+            self.attackTimer += 1
+            if self.attackTimer >= self.attackLimiter:
+                self.attackTimer = 0
+                if random.randint(0, 100) >= 50:
+                    self.attackWave()
+        pass
+
     # This function will cause the boss to perform an attack in which they launch a cascading wave type attack out. 
     # This might go in the player's direction, or it could just be an attack that hits a predetermined location.
     def attackWave(self):
+        self.moving = False
+        self.attacking = True
+        self.resetStatus()
         pass
+
+    def animate(self):
+        pass
+
+    # Inspired by https://www.youtube.com/watch?v=QU1pPzEGrqw
+    def getPlayerDirection(self):
+        player = self.game.player
+        enemyVector = pygame.math.Vector2(self.rect.center)
+        playerVector = pygame.math.Vector2(player.rect.center)
+        distance = (playerVector - enemyVector).magnitude()
+
+        if distance > 0:
+            direction = (playerVector - enemyVector).normalize()
+        else:
+            direction = pygame.math.Vector2()
+
+        return direction
 
     # The boss should move around the room in a certain pattern. The specific pattern they follow could depend on the player's position, but they should not just strictly follow the player around.
     def move(self):
         if not self.moving:
-            return
+            return False
+        self.directionX = self.getPlayerDirection()[0]
+        self.directionY = self.getPlayerDirection()[1]
+        self.x += self.directionX * self.speed
+        self.y += self.directionY * self.speed
+        self.rect.x = self.x
+        self.rect.y = self.y
+        #print(self.directionX, self.directionY)
+
         pass
 
     # Resets the boss's status back to default, which should be moving around the boss room.
@@ -1732,10 +1797,80 @@ class Boss(pygame.sprite.Sprite):
 
     def death(self):
         self.game.bossDefeated = True
+        self.particles.kill()
         self.kill()
         pass
 
-        
+class Particle(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, width, height, version='general'):
+        self.game = game
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.groups = self.game.all_sprites, self.game.particles
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self._layer = ITEM_LAYER
+        # version should be boss or general, this will determine which list of images the particle effect will reference
+        self.version = version
+        self.imageList = self.game.particleList[1]
+        self.image = pygame.transform.scale(self.imageList[0], (self.width, self.height))
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+        self.animationTimer = 40
+        self.animationCount = 0
+        self.animationPhase = 1
+
+        self.setup()
+
+    def setup(self):
+        if self.version == 'boss':
+            self.imageList = self.game.particleList[1]
+        else:
+            self.imageList = self.game.particleList[0]
+
+    def update(self):
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.animate()
+        pass
+
+    def reset(self):
+        self.animationCount = 0
+        self.animationPhase = 1
+
+    def animate(self):
+        self.animationCount += 1
+        if self.animationCount >= self.animationTimer:
+            self.reset()
+        if self.animationCount < (self.animationTimer // 3):
+            self.animationPhase = 1
+        elif self.animationCount < (self.animationTimer // 3 * 2):
+            self.animationPhase = 2
+        elif self.animationCount < (self.animationTimer):
+            self.animationPhase = 3
+        self.image = pygame.transform.scale(self.imageList[self.animationPhase - 1], (self.width, self.height))
+
+        pass
+
+    def setPosition(self, newX, newY):
+        self.x = newX
+        self.y = newY
+
+
+class BossAttack(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, damage, width=TILESIZE, height=TILESIZE):
+        self.game = game
+        self.x = x
+        self.y = y
+        self.damage = damage
+        self.width = width
+        self.height = height
+
+
+
 class Teleport(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game

@@ -161,6 +161,7 @@ class Game():
             self.teleport.empty()
             self.enemies.empty()
             self.teleport.empty()
+            self.particles.empty()
 
 
             # This is a variable to allow the weapon that was equipped in the current room to stay equipped
@@ -445,6 +446,7 @@ class Game():
         self.weapons = pygame.sprite.LayeredUpdates()
         self.attacks = pygame.sprite.LayeredUpdates()
         self.bullets = pygame.sprite.LayeredUpdates()
+        self.particles = pygame.sprite.LayeredUpdates()
         self.createTilemap(None)
         #self.player = Player(self, 1, 2)
     def events(self):
@@ -702,7 +704,7 @@ class Game():
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE))]
         self.bossImageList = [[pygame.image.load('Sprites/npcs/boss/bossHead.png'), pygame.image.load('Sprites/npcs/boss/bossidea4_5.png')], [pygame.image.load('Sprites/npcs/boss/bossattack.png'), pygame.image.load('Sprites/npcs/boss/bossattack_2.png'), pygame.image.load('Sprites/npcs/boss/bossattack_3.png')]]
-
+        self.particleList = [[pygame.image.load('Sprites/particles_vfx/bossparticles1.png'), pygame.image.load('Sprites/particles_vfx/bossparticles2.png'), pygame.image.load('Sprites/particles_vfx/bossparticles3.png')], [pygame.image.load('Sprites/particles_vfx/genparticles1.png'), pygame.image.load('Sprites/particles_vfx/genparticles2.png'), pygame.image.load('Sprites/particles_vfx/genparticles3.png')]]
 
 g = Game()
 g.intro_screen()
