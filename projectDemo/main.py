@@ -299,8 +299,7 @@ class Game():
                 currentTileMap.append(redMap)
                 mapNumber = len(currentTileMap)-1
                 mapList[self.map[0]][self.map[1]] = mapNumber
-                if not self.bossDefeated:
-                    self.bossActive = True
+
 
             print(self.map, mapNumber)
             print('up:', self.map[0]-1 >= 0, end = ' ')
@@ -407,8 +406,13 @@ class Game():
                         self.player.weaponNum = priorWeaponNum
                         self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
                         self.player.weapon.updateDamage()
-            if self.bossActive:
+            # [2, 7] and [2, 12] are currently the two locations in the maplist where the boss room is located
+            if (self.map == [2, 12] or self.map == [2, 7]):
                 self.boss = Boss(self, WIDTH * 0.4, HEIGHT * 0.4)
+                self.bossActive = True
+                self.play_music('boss')
+            else:
+                self.bossActive = False
 
 
 
@@ -474,12 +478,16 @@ class Game():
             if event.type == pygame.KEYDOWN and ((event.key in [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN]) and not self.player.itemUsed) and (self.player.weapon.type == 'bubble' and self.state == 'explore'):
                 if (event.key == pygame.K_LEFT):
                     self.player.weapon.attack('left')
+                    self.player.rangedAttackVisual('left')
                 elif (event.key == pygame.K_UP):
                     self.player.weapon.attack('up')
+                    self.player.rangedAttackVisual('up')
                 elif (event.key == pygame.K_RIGHT):
                     self.player.weapon.attack('right')
+                    self.player.rangedAttackVisual('right')
                 else:
                     self.player.weapon.attack('down')
+                    self.player.rangedAttackVisual('down')
             # switches weapon equipped using q
             if event.type == pygame.KEYUP and event.key == pygame.K_q and not self.player.itemUsed and self.state == 'explore':
                 self.player.switchWeapons()

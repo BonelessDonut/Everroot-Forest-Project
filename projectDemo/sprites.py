@@ -182,6 +182,17 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+    # function is supposed to update the player's sprite when they use the ranged attack. doesn't currently work
+    def rangedAttackVisual(self, direction):
+        if direction == 'right':
+           self.image = self.rangedWeaponList[0]
+        elif direction == 'left':
+           self.image = self.rangedWeaponList[3]
+        elif direction == 'up':
+           self.image = self.rangedWeaponList[2]
+        else: # self.facing == 'down':
+           self.image = self.rangedWeaponList[1]
+
     def update(self):
         # checks for any movement from the player
         self.movement()
@@ -228,15 +239,15 @@ class Player(pygame.sprite.Sprite):
             else: # self.facing == 'down':
                 self.image = self.downImgList[self.imgindex]
         # if they have used the ranged attack, sets their sprites accordingly
-        elif self.weapon.used and self.weapon.type == 'bubble'and self.weapon.ammo != 0:
-            if self.facing == 'right':
-                self.image = self.rangedWeaponList[0]
-            elif self.facing == 'left':
-                self.image = self.rangedWeaponList[3]
-            elif self.facing == 'up':
-                self.image = self.rangedWeaponList[2]
-            else: # self.facing == 'down':
-                self.image = self.rangedWeaponList[1]
+        #elif self.weapon.used and self.weapon.type == 'bubble'and self.weapon.ammo != 0:
+        #    if self.facing == 'right':
+        #        self.image = self.rangedWeaponList[0]
+        #    elif self.facing == 'left':
+        #        self.image = self.rangedWeaponList[3]
+        #    elif self.facing == 'up':
+        #        self.image = self.rangedWeaponList[2]
+        #    else: # self.facing == 'down':
+        #        self.image = self.rangedWeaponList[1]
 
         # makes the player's current sprite flicker if they are invulnerable after taking damage
         self.flicker()
@@ -1680,8 +1691,8 @@ class Boss(pygame.sprite.Sprite):
         # Line below to be used to pull boss images from the main.py file, where the images should be pre-loaded at the start of the game within the setupimages function.
         # May not look exactly like this, but this is the way that boss images should be referenced. There will be seperate lists of images within the overall bossImageList.
         # These lists will hold base boss sprites, as well as attacking sprites.
-        self.imageListNum = 0
-        self.imageList = self.game.bossImageList[self.imageListNum]
+        # self.imageListNum = 0
+        self.imageList = self.game.bossImageList[0]
         self.imageIndex = 1
         self.image = pygame.transform.scale(self.imageList[self.imageIndex], (self.width, self.height))
         self.rect = self.image.get_rect()
@@ -1699,10 +1710,10 @@ class Boss(pygame.sprite.Sprite):
         self.doneAttacking = True
         self.chosenAttack = ''
 
-        self.wavePause = 16
-        self.wavePauseCount = 0
-        self.waveDurationCounter = 0
-        self.waveDuration = 150
+        self.attackPause = 16
+        self.attackPauseCount = 0
+        self.attackDurationCounter = 0
+        self.attackDuration = 150
         self.reachedDestination = False
         self.currentDestination = (0, 0)
 
@@ -1714,7 +1725,7 @@ class Boss(pygame.sprite.Sprite):
         self.hitInvulnerableTime = 0
         self.invulnerableTimer = 24
         self.animateTime = 0
-        self.animateTimer = 60
+        self.animateTimer = 40
         self.particles = Particle(self.game, self.x, self.y + self.height * 0.7, self.width, self.height * 0.3, 'boss')
 
     # Every frame of the game loop this will be called. 
@@ -1725,7 +1736,7 @@ class Boss(pygame.sprite.Sprite):
             if self.hitInvulnerableTime > self.invulnerableTimer:
                 self.hitInvulnerable = False
                 self.hitInvulnerableTime = 0
-        self.flicker()
+
         if (not self.game.player.swordUsed and not self.game.player.spearUsed and not self.game.player.weapon.used):
             self.hitInvincible = False
         #print(f'self.hitInvulnerable is {self.hitInvulnerable}, self.hitInvincible is {self.hitInvincible}')
@@ -1736,9 +1747,10 @@ class Boss(pygame.sprite.Sprite):
         self.attack()
         self.move()
         self.animate()
+        self.flicker()
         self.ui()
         self.particles.setPosition(self.x, self.y + self.height * 0.7)
-        if (not isinstance(self.directionX, int) or not isinstance(self.directionY, int) or (self.x == self.currentDestination[0] and self.y == self.currentDestination[1])) and self.attacking:
+        if (not isinstance(self.directionX, float) or not isinstance(self.directionY, float) or (self.x == self.currentDestination[0] and self.y == self.currentDestination[1])) and self.attacking:
             self.reachedDestination = True
 
         pass
@@ -1748,7 +1760,7 @@ class Boss(pygame.sprite.Sprite):
             self.healthbar()
             bossTitle = "Bro"
             self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(bossTitle.strip(), False, WHITE),(self.healthBarPos[0], self.healthBarPos[1] - HEIGHT * 0.04))
-            pygame.display.update()
+            pygame.display.update()#
 
     # Function should create the boss's healthbar on the screen, including the max length and the current percentage of health remaining. The boss's name would also be displayed right above the healthbar.
     def healthbar(self):
@@ -1792,10 +1804,10 @@ class Boss(pygame.sprite.Sprite):
             if self.attackTimer >= self.attackLimiter:
                 self.attackTimer = 0
                 randomNum = random.randint(0, 100)
-                if randomNum >= 45 and randomNum <= 75:
+                if randomNum >= 20 and randomNum <= 50:
                     self.chosenAttack = 'wave'
 
-                elif randomNum > 75:
+                elif randomNum > 50:
                     self.chosenAttack = 'barrage'
         if self.chosenAttack == 'wave':
             self.attackWave()
@@ -1806,39 +1818,57 @@ class Boss(pygame.sprite.Sprite):
     # This function will cause the boss to perform an attack in which they launch a cascading wave type attack out. 
     # This might go in the player's direction, or it could just be an attack that hits a predetermined location.
     def attackWave(self):
+        self.attackDuration = 300
         self.moving = False
         self.attacking = True
-        self.waveDurationCounter += 1
+        if self.reachedDestination:
+            self.attackDurationCounter += 1
         if self.doneAttacking and self.reachedDestination:
             self.doneAttacking = False
             for attack in range(20):
                 BossAttack(self.game, self.x + attack * (self.width // 20), self.y + self.height * 1.05, 160, (math.cos(math.pi / (57.7 / ((attack + 1) * 18))), math.sin(math.pi / (57.7 / ((attack+1) * 18)))))
-        self.wavePauseCount += 1
-        if self.wavePauseCount >= self.wavePause:
-            self.wavePauseCount = 0
+        self.attackPauseCount += 1
+        if self.attackPauseCount >= self.attackPause:
+            self.attackPauseCount = 0
             self.doneAttacking = True
-        if self.waveDurationCounter >= self.waveDuration:
-            self.waveDurationCounter = 0
+        if self.attackDurationCounter >= self.attackDuration:
+            self.attackDurationCounter = 0
             self.resetStatus()
         pass
 
     def attackBarrage(self):
+        self.attackDuration = 150
         self.moving = False
         self.attacking = True
-        self.waveDurationCounter += 1
+        self.attackDurationCounter += 1
         if self.doneAttacking == True:
             self.doneAttacking = False
             BossAttack(self.game, self.x + self.width * 0.5, self.y + self.height * 1.1, 160, self.getDirection(self.game.player.rect.center))
-        self.wavePauseCount += 1
-        if self.wavePauseCount >= self.wavePause:
-            self.wavePauseCount = 0
+        self.attackPauseCount += 1
+        if self.attackPauseCount >= self.attackPause:
+            self.attackPauseCount = 0
             self.doneAttacking = True
-        if self.waveDurationCounter >= self.waveDuration:
-            self.waveDurationCounter = 0
+        if self.attackDurationCounter >= self.attackDuration:
+            self.attackDurationCounter = 0
             self.resetStatus()
 
 
     def animate(self):
+        if self.reachedDestination and self.attacking and self.chosenAttack == 'wave':
+            self.imageList = self.game.bossImageList[1]
+            self.animateTime += 1
+            if self.animateTime >= self.animateTimer:
+                self.animateTime = 0
+            if self.animateTime < (self.animateTimer // 3):
+                self.imageIndex = 0
+            elif self.animateTime < (self.animateTimer // 3 * 2):
+                self.imageIndex = 1
+            elif self.animateTime < (self.animateTimer):
+                self.imageIndex = 2
+        elif not self.reachedDestination and not self.attacking:
+            self.animateTime = 0
+        self.image = pygame.transform.scale(self.imageList[self.imageIndex], (self.width, self.height))
+
         pass
 
     # Inspired by https://www.youtube.com/watch?v=QU1pPzEGrqw
@@ -1893,6 +1923,9 @@ class Boss(pygame.sprite.Sprite):
         self.moving = True
         self.chosenAttack = ''
         self.reachedDestination = False
+        self.imageList = self.game.bossImageList[0]
+        self.imageIndex = 1
+        self.attackDuration = 150
         pass
 
     def death(self):
