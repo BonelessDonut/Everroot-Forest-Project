@@ -683,7 +683,7 @@ class Game():
             self.state = 'explore'
             self.play_music('village')
         pass
-    
+
 
     # This function sets up many of the images to be used in the game, then stores them in lists
     def setupImages(self):

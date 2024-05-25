@@ -1708,6 +1708,7 @@ class Boss(pygame.sprite.Sprite):
         self.attackLimiter = 100
         self.attacking = False
         self.doneAttacking = True
+        self.attackList = ['wave', 'barrage', 'quickbarrage']
         self.chosenAttack = ''
 
         self.attackPause = 16
@@ -1804,21 +1805,26 @@ class Boss(pygame.sprite.Sprite):
             if self.attackTimer >= self.attackLimiter:
                 self.attackTimer = 0
                 randomNum = random.randint(0, 100)
-                if randomNum >= 20 and randomNum <= 50:
-                    self.chosenAttack = 'wave'
-
-                elif randomNum > 50:
-                    self.chosenAttack = 'barrage'
-        if self.chosenAttack == 'wave':
+                if randomNum >= 20 and randomNum <= 45:
+                    self.chosenAttack = self.attackList[0]
+                elif randomNum > 65:
+                    self.chosenAttack = self.attackList[1]
+                elif randomNum > 45 and randomNum <= 65:
+                    self.chosenAttack = self.attackList[2]
+        if self.chosenAttack == self.attackList[0]:
             self.attackWave()
-        elif self.chosenAttack == 'barrage':
+        elif self.chosenAttack == self.attackList[1]:
             self.attackBarrage()
+        elif self.chosenAttack == self.attackList[2]:
+            self.attackBarrageQuick()
+        #print(self.chosenAttack)
         pass
 
     # This function will cause the boss to perform an attack in which they launch a cascading wave type attack out. 
     # This might go in the player's direction, or it could just be an attack that hits a predetermined location.
     def attackWave(self):
         self.attackDuration = 300
+        self.attackPause = 16
         self.moving = False
         self.attacking = True
         if self.reachedDestination:
@@ -1838,6 +1844,24 @@ class Boss(pygame.sprite.Sprite):
 
     def attackBarrage(self):
         self.attackDuration = 150
+        self.attackPause = 16
+        self.moving = False
+        self.attacking = True
+        self.attackDurationCounter += 1
+        if self.doneAttacking == True:
+            self.doneAttacking = False
+            BossAttack(self.game, self.x + self.width * 0.5, self.y + self.height * 1.1, 160, self.getDirection(self.game.player.rect.center))
+        self.attackPauseCount += 1
+        if self.attackPauseCount >= self.attackPause:
+            self.attackPauseCount = 0
+            self.doneAttacking = True
+        if self.attackDurationCounter >= self.attackDuration:
+            self.attackDurationCounter = 0
+            self.resetStatus()
+
+    def attackBarrageQuick(self):
+        self.attackDuration = 200
+        self.attackPause = 4
         self.moving = False
         self.attacking = True
         self.attackDurationCounter += 1
