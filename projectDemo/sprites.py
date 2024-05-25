@@ -1181,8 +1181,8 @@ class Enemy(pygame.sprite.Sprite):
 
         # holds the data for the enemy types
 
-        self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 60, 'health': 100, 'speed': PLAYER_SPEED * 0.5}
-        self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 80, 'health': 70}
+        self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 80, 'health': 100, 'speed': PLAYER_SPEED * 0.5}
+        self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 100, 'health': 70}
 
         self.imagelist = self.pumpkinRobot['down']
         #self.deathImgList = [pygame.transform.scale(pygame.image.load('').convert_alpha(), (self.width, self.height))]

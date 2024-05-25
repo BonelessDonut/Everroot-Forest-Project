@@ -85,7 +85,7 @@ class Scene:
         return True
 
 class ImageScene(Scene):
-    def __init__(self, text, duration, images, imageNum, fontColor=WHITE, skip=True):
+    def __init__(self, text, duration, images, imageNum, fontColor=WHITE, bgcolor=BLACK, skip=True):
         self.text = text
         self.duration = duration
         self.images = images
@@ -95,6 +95,7 @@ class ImageScene(Scene):
         self.start_ticks = pygame.time.get_ticks()
         self.elapsed_time = 0
         self.skipAppear = skip
+        self.bgcolor = bgcolor
         pass
 
     def __str__(self):
@@ -108,7 +109,7 @@ class ImageScene(Scene):
         self.elapsed_time = (current_ticks - self.start_ticks) / 1000
 
     def draw(self, screen):
-        screen.fill(BLACK)
+        screen.fill(self.bgcolor)
         currentImg = pygame.transform.scale(self.images[self.imageNum], (WIDTH//1.3, HEIGHT//1.68))
         imgRect = (WIDTH - WIDTH//1.125, HEIGHT - HEIGHT // 1.25)
         screen.blit(currentImg, imgRect)
@@ -229,7 +230,7 @@ def playIntroScene(cutscene_manager):
 def playGameOver(cutscene_manager):
     cutscene_manager.game.play_music('death')
     cutscene_manager.clear_scenes()
-    cutscene_manager.add_scene(ImageScene('You Died. Press R to restart or exit with Space / Escape', 300, [pygame.image.load('Sprites/deth.jpg').convert_alpha()], 0, WHITE, False))
+    cutscene_manager.add_scene(ImageScene('You Died. Press R to restart or exit with Space / Escape', 300, [pygame.image.load('Sprites/deth.jpg').convert_alpha()], 0, WHITE, BLACK, False))
     cutscene_manager.start()
     sceneTimeDuration = 300
     start_ticks = 0
@@ -269,13 +270,13 @@ def playGameWon(cutscene_manager):
     cutscene_manager.game.play_music('win')
     cutscene_manager.clear_scenes()
     cutscene_manager.add_scene(ImageScene('You defeated the ceo of pollution and saved Everroot Forest. Nice job!', 15,
-                                          [pygame.image.load('Sprites/hudImages/title3.png').convert_alpha()], 0, WHITE, False))
+                                          [pygame.image.load('Sprites/hudImages/title3.png').convert_alpha()], 0, WHITE, SWAMPGREEN, True))
     cutscene_manager.add_scene(ImageScene('Now just to find that place...', 10,
-                                          [pygame.image.load('Sprites/hudImages/title3.png').convert_alpha()], 0, WHITE,
-                                          False))
+                                          [pygame.image.load('Sprites/hudImages/title3.png').convert_alpha()], 0, WHITE, SWAMPGREEN,
+                                          True))
     cutscene_manager.add_scene(ImageScene('Thanks for playing!', 200,
-                                          [pygame.image.load('Sprites/hudImages/title3.png').convert_alpha()], 0, WHITE,
-                                          False))
+                                          [pygame.image.load('Sprites/hudImages/title3.png').convert_alpha()], 0, WHITE, SWAMPGREEN,
+                                          True))
     cutscene_manager.start()
     sceneTimeDuration = 225
     start_ticks = 0
