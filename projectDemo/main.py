@@ -100,6 +100,10 @@ class Game():
             mixer.music.load('Music/Bleach_-_Never_meant_to_belong.mp3')
             mixer.music.set_volume(0.070 * self.musicVol)
             mixer.music.play(10)
+        elif songType == 'win':
+            mixer.music.load('Music/Aspertia.ogg')
+            mixer.music.set_volume(0.06 * self.musicVol)
+            mixer.music.play(10)
         if songType.lower() == 'stop':
             mixer.music.stop()
 
@@ -146,7 +150,7 @@ class Game():
             # initializes the visual element that displays the player's weapons
             self.weaponsHud = WeaponDisplay(self)
             # THIS LINE BELOW IS HERE FOR TESTING THE BOSS ONLY
-            self.boss = Boss(self, WIDTH * 0.4, HEIGHT * 0.4)
+            # self.boss = Boss(self, WIDTH * 0.4, HEIGHT * 0.4)
         #For moving between rooms
         else:
             # kill all the current sprites in the current room
@@ -498,7 +502,7 @@ class Game():
         self.player.tutorial.checkAppear() # checks if the tutorial should be drawn on the screen, if it is enabled
 
     def draw(self):
-        if self.state != 'game over':
+        if self.state != 'game over' and self.state != 'victory':
             self.screen.fill(BLACK)
             self.all_sprites.draw(self.screen)
 
@@ -511,6 +515,8 @@ class Game():
                 self.player.animateHealth()
             if self.state == 'shopping':
                 self.activeNPC.choiceResponse()
+            if self.bossActive:
+                self.boss.ui()
             self.weaponsHud.draw() # calls the function to draw the weapon display hud on the screen
             self.clock.tick(FPS)
             pygame.display.update() # updates the screen with any changes
@@ -534,6 +540,11 @@ class Game():
         self.screen.fill(BLACK)
         cutscenes.playGameOver(self.cutsceneManage)
         pass
+
+    def game_won(self):
+        self.state = 'victory'
+        self.screen.fill(SWAMPGREEN)
+        cutscenes.playGameWon(self.cutsceneManage)
 
 
     # Charlenne 5/15/24: to replace the string of a map row where an item needs to be added

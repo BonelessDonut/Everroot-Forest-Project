@@ -1013,6 +1013,7 @@ class NPC(pygame.sprite.Sprite):
             self.updateDialogue()
             self.game.state = 'explore'
             self.game.play_music('stop')
+            self.game.play_music('village')
         self.itemRects = []
         return -1
 
@@ -1132,7 +1133,7 @@ class Enemy(pygame.sprite.Sprite):
         self.timepassed = 0
 
         self.health = 100
-        self.damage = 120
+        self.damage = 60
         self.speed = PLAYER_SPEED * 0.6
 
         # Variables to handle enemy - player attack interaction
@@ -1180,8 +1181,8 @@ class Enemy(pygame.sprite.Sprite):
 
         # holds the data for the enemy types
 
-        self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 120, 'health': 100, 'speed': PLAYER_SPEED * 0.5}
-        self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 100, 'health': 70}
+        self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 60, 'health': 100, 'speed': PLAYER_SPEED * 0.5}
+        self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 80, 'health': 70}
 
         self.imagelist = self.pumpkinRobot['down']
         #self.deathImgList = [pygame.transform.scale(pygame.image.load('').convert_alpha(), (self.width, self.height))]
@@ -1669,12 +1670,13 @@ class Boss(pygame.sprite.Sprite):
 
         self.speed = PLAYER_SPEED * 0.35
 
-        self.maxHealth = 30
+        self.maxHealth = 500
         self.currentHealth = self.maxHealth
         self.healthBarLength = WIDTH * 0.6
         self.healthBarHeight = HEIGHT * 0.05
-        self.healthBarPos = (WIDTH * 0.3, HEIGHT * 0.8)
-        self.collideDamage = 200
+        self.healthBarPos = (WIDTH * 0.25, HEIGHT * 0.8)
+        self.healthRatio = self.maxHealth / self.healthBarLength
+        self.collideDamage = 135
         # Line below to be used to pull boss images from the main.py file, where the images should be pre-loaded at the start of the game within the setupimages function.
         # May not look exactly like this, but this is the way that boss images should be referenced. There will be seperate lists of images within the overall bossImageList.
         # These lists will hold base boss sprites, as well as attacking sprites.
@@ -1692,10 +1694,19 @@ class Boss(pygame.sprite.Sprite):
         self.currentParticleIn = 0
 
         self.attackTimer = 0
-        self.attackLimiter = 220
+        self.attackLimiter = 100
         self.attacking = False
         self.doneAttacking = True
         self.chosenAttack = ''
+
+        self.wavePause = 16
+        self.wavePauseCount = 0
+        self.waveDurationCounter = 0
+        self.waveDuration = 150
+        self.reachedDestination = False
+        self.currentDestination = (0, 0)
+
+
         self.moving = False
         self.dying = False
         self.hitInvincible = False
@@ -1727,19 +1738,30 @@ class Boss(pygame.sprite.Sprite):
         self.animate()
         self.ui()
         self.particles.setPosition(self.x, self.y + self.height * 0.7)
+        if (not isinstance(self.directionX, int) or not isinstance(self.directionY, int) or (self.x == self.currentDestination[0] and self.y == self.currentDestination[1])) and self.attacking:
+            self.reachedDestination = True
+
         pass
 
     def ui(self):
         if self.game.bossActive:
             self.healthbar()
+            bossTitle = "Bro"
+            self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(bossTitle.strip(), False, WHITE),(self.healthBarPos[0], self.healthBarPos[1] - HEIGHT * 0.04))
+            pygame.display.update()
 
     # Function should create the boss's healthbar on the screen, including the max length and the current percentage of health remaining. The boss's name would also be displayed right above the healthbar.
     def healthbar(self):
+        pygame.draw.rect(self.game.screen, (255, 0, 0),(self.healthBarPos[0], self.healthBarPos[1], self.currentHealth / self.healthRatio, self.healthBarHeight))
+        pygame.draw.rect(self.game.screen, (255, 255, 255), (self.healthBarPos[0], self.healthBarPos[1], self.healthBarLength, self.healthBarHeight), 4)
         pass
 
     def dealtDamage(self, damage, type):
         if not self.hitInvulnerable:
-            self.currentHealth -= damage
+            if type == 'trident':
+                self.currentHealth -= damage * 1.5
+            else:
+                self.currentHealth -= damage
             self.hitInvulnerable = True
         if self.currentHealth <= 0:
             self.death()
@@ -1770,7 +1792,7 @@ class Boss(pygame.sprite.Sprite):
             if self.attackTimer >= self.attackLimiter:
                 self.attackTimer = 0
                 randomNum = random.randint(0, 100)
-                if randomNum >= 50 and randomNum <= 75:
+                if randomNum >= 45 and randomNum <= 75:
                     self.chosenAttack = 'wave'
 
                 elif randomNum > 75:
@@ -1786,50 +1808,81 @@ class Boss(pygame.sprite.Sprite):
     def attackWave(self):
         self.moving = False
         self.attacking = True
-        if self.doneAttacking == True:
+        self.waveDurationCounter += 1
+        if self.doneAttacking and self.reachedDestination:
             self.doneAttacking = False
-            for attack in range(6):
-                BossAttack(self.game, self.x + attack * (self.width // 6), self.y + self.height * 1.05, 150, (math.cos(math.pi * attack), math.sin(math.pi * attack)))
-        self.resetStatus()
+            for attack in range(20):
+                BossAttack(self.game, self.x + attack * (self.width // 20), self.y + self.height * 1.05, 160, (math.cos(math.pi / (57.7 / ((attack + 1) * 18))), math.sin(math.pi / (57.7 / ((attack+1) * 18)))))
+        self.wavePauseCount += 1
+        if self.wavePauseCount >= self.wavePause:
+            self.wavePauseCount = 0
+            self.doneAttacking = True
+        if self.waveDurationCounter >= self.waveDuration:
+            self.waveDurationCounter = 0
+            self.resetStatus()
         pass
 
     def attackBarrage(self):
         self.moving = False
         self.attacking = True
+        self.waveDurationCounter += 1
         if self.doneAttacking == True:
             self.doneAttacking = False
-            BossAttack(self.game, self.x + self.width * 0.5, self.y + self.height * 1.1, 240, self.getPlayerDirection())
-        self.resetStatus()
+            BossAttack(self.game, self.x + self.width * 0.5, self.y + self.height * 1.1, 160, self.getDirection(self.game.player.rect.center))
+        self.wavePauseCount += 1
+        if self.wavePauseCount >= self.wavePause:
+            self.wavePauseCount = 0
+            self.doneAttacking = True
+        if self.waveDurationCounter >= self.waveDuration:
+            self.waveDurationCounter = 0
+            self.resetStatus()
 
 
     def animate(self):
         pass
 
     # Inspired by https://www.youtube.com/watch?v=QU1pPzEGrqw
-    def getPlayerDirection(self):
-        player = self.game.player
+    def getDirection(self, location):
         enemyVector = pygame.math.Vector2(self.rect.center)
-        playerVector = pygame.math.Vector2(player.rect.center)
-        distance = (playerVector - enemyVector).magnitude()
+        objVector = pygame.math.Vector2(location)
+        distance = (objVector - enemyVector).magnitude()
 
         if distance > 0:
-            direction = (playerVector - enemyVector).normalize()
+            direction = (objVector - enemyVector).normalize()
         else:
             direction = pygame.math.Vector2()
 
         return direction
 
+    def getDistance(self, location):
+        enemyVector = pygame.math.Vector2(self.rect.center)
+        objVector = pygame.math.Vector2(location)
+        distance = (objVector - enemyVector).magnitude()
+
+        return distance
+
     # The boss should move around the room in a certain pattern. The specific pattern they follow could depend on the player's position, but they should not just strictly follow the player around.
     def move(self):
-        if not self.moving:
-            return False
-        self.directionX = self.getPlayerDirection()[0]
-        self.directionY = self.getPlayerDirection()[1]
-        self.x += self.directionX * self.speed
-        self.y += self.directionY * self.speed
-        self.rect.x = self.x
-        self.rect.y = self.y
+        if self.moving:
+            self.directionX = self.getDirection(self.game.player.rect.center)[0]
+            self.directionY = self.getDirection(self.game.player.rect.center)[1]
         #print(self.directionX, self.directionY)
+        elif self.attacking and self.chosenAttack == 'wave':
+            self.directionX, self.directionY = self.getDirection((WIDTH * 0.5, HEIGHT * 0.5))
+            self.currentDestination = (WIDTH * 0.5, HEIGHT * 0.5)
+            if self.getDistance(self.currentDestination) < 10:
+                self.reachedDestination = True
+        try:
+            self.x += self.directionX * self.speed
+            self.y += self.directionY * self.speed
+            self.rect.x = self.x
+            self.rect.y = self.y
+        except TypeError:
+            self.x = self.x
+            self.y = self.y
+            self.rect.x = self.x
+            self.rect.y = self.y
+            print("error avoided")
 
         pass
 
@@ -1838,12 +1891,15 @@ class Boss(pygame.sprite.Sprite):
         self.attacking = False
         self.doneAttacking = True
         self.moving = True
+        self.chosenAttack = ''
+        self.reachedDestination = False
         pass
 
     def death(self):
         self.game.bossDefeated = True
         self.particles.kill()
         self.kill()
+        self.game.game_won()
         pass
 
 class Particle(pygame.sprite.Sprite):
@@ -1912,7 +1968,7 @@ class BossAttack(pygame.sprite.Sprite):
         self.y = y
         self.damage = damage
         self.direction = direction
-        self.speed = 3
+        self.speed = 4
         self.image = self.game.bossAttacks[0]
         self.groups = self.game.all_sprites, self.game.attacks
         pygame.sprite.Sprite.__init__(self, self.groups)
