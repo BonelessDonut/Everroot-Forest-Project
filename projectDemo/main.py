@@ -100,6 +100,10 @@ class Game():
             mixer.music.load('Music/Bleach_-_Never_meant_to_belong.mp3')
             mixer.music.set_volume(0.070 * self.musicVol)
             mixer.music.play(10)
+        elif songType == 'win':
+            mixer.music.load('Music/Aspertia.ogg')
+            mixer.music.set_volume(0.06 * self.musicVol)
+            mixer.music.play(10)
         if songType.lower() == 'stop':
             mixer.music.stop()
 
@@ -146,7 +150,7 @@ class Game():
             # initializes the visual element that displays the player's weapons
             self.weaponsHud = WeaponDisplay(self)
             # THIS LINE BELOW IS HERE FOR TESTING THE BOSS ONLY
-            self.boss = Boss(self, WIDTH * 0.4, HEIGHT * 0.4)
+            # self.boss = Boss(self, WIDTH * 0.4, HEIGHT * 0.4)
         #For moving between rooms
         else:
             # kill all the current sprites in the current room
@@ -161,6 +165,7 @@ class Game():
             self.teleport.empty()
             self.enemies.empty()
             self.teleport.empty()
+            self.particles.empty()
 
 
             # This is a variable to allow the weapon that was equipped in the current room to stay equipped
@@ -294,8 +299,7 @@ class Game():
                 currentTileMap.append(redMap)
                 mapNumber = len(currentTileMap)-1
                 mapList[self.map[0]][self.map[1]] = mapNumber
-                if not self.bossDefeated:
-                    self.bossActive = True
+
 
             print(self.map, mapNumber)
             print('up:', self.map[0]-1 >= 0, end = ' ')
@@ -402,8 +406,13 @@ class Game():
                         self.player.weaponNum = priorWeaponNum
                         self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
                         self.player.weapon.updateDamage()
-            if self.bossActive:
+            # [2, 7] and [2, 12] are currently the two locations in the maplist where the boss room is located
+            if (self.map == [2, 12] or self.map == [2, 7]):
                 self.boss = Boss(self, WIDTH * 0.4, HEIGHT * 0.4)
+                self.bossActive = True
+                self.play_music('boss')
+            else:
+                self.bossActive = False
 
 
 
@@ -445,6 +454,7 @@ class Game():
         self.weapons = pygame.sprite.LayeredUpdates()
         self.attacks = pygame.sprite.LayeredUpdates()
         self.bullets = pygame.sprite.LayeredUpdates()
+        self.particles = pygame.sprite.LayeredUpdates()
         self.createTilemap(None)
         #self.player = Player(self, 1, 2)
     def events(self):
@@ -468,12 +478,16 @@ class Game():
             if event.type == pygame.KEYDOWN and ((event.key in [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN]) and not self.player.itemUsed) and (self.player.weapon.type == 'bubble' and self.state == 'explore'):
                 if (event.key == pygame.K_LEFT):
                     self.player.weapon.attack('left')
+                    self.player.rangedAttackVisual('left')
                 elif (event.key == pygame.K_UP):
                     self.player.weapon.attack('up')
+                    self.player.rangedAttackVisual('up')
                 elif (event.key == pygame.K_RIGHT):
                     self.player.weapon.attack('right')
+                    self.player.rangedAttackVisual('right')
                 else:
                     self.player.weapon.attack('down')
+                    self.player.rangedAttackVisual('down')
             # switches weapon equipped using q
             if event.type == pygame.KEYUP and event.key == pygame.K_q and not self.player.itemUsed and self.state == 'explore':
                 self.player.switchWeapons()
@@ -496,7 +510,7 @@ class Game():
         self.player.tutorial.checkAppear() # checks if the tutorial should be drawn on the screen, if it is enabled
 
     def draw(self):
-        if self.state != 'game over':
+        if self.state != 'game over' and self.state != 'victory':
             self.screen.fill(BLACK)
             self.all_sprites.draw(self.screen)
 
@@ -509,6 +523,8 @@ class Game():
                 self.player.animateHealth()
             if self.state == 'shopping':
                 self.activeNPC.choiceResponse()
+            if self.bossActive:
+                self.boss.ui()
             self.weaponsHud.draw() # calls the function to draw the weapon display hud on the screen
             self.clock.tick(FPS)
             pygame.display.update() # updates the screen with any changes
@@ -532,6 +548,11 @@ class Game():
         self.screen.fill(BLACK)
         cutscenes.playGameOver(self.cutsceneManage)
         pass
+
+    def game_won(self):
+        self.state = 'victory'
+        self.screen.fill(SWAMPGREEN)
+        cutscenes.playGameWon(self.cutsceneManage)
 
 
     # Charlenne 5/15/24: to replace the string of a map row where an item needs to be added
@@ -662,7 +683,7 @@ class Game():
             self.state = 'explore'
             self.play_music('village')
         pass
-    
+
 
     # This function sets up many of the images to be used in the game, then stores them in lists
     def setupImages(self):
@@ -712,7 +733,8 @@ class Game():
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE))]
         self.bossImageList = [[pygame.image.load('Sprites/npcs/boss/bossHead.png'), pygame.image.load('Sprites/npcs/boss/bossidea4_5.png')], [pygame.image.load('Sprites/npcs/boss/bossattack.png'), pygame.image.load('Sprites/npcs/boss/bossattack_2.png'), pygame.image.load('Sprites/npcs/boss/bossattack_3.png')]]
-
+        self.particleList = [[pygame.image.load('Sprites/particles_vfx/bossparticles1.png'), pygame.image.load('Sprites/particles_vfx/bossparticles2.png'), pygame.image.load('Sprites/particles_vfx/bossparticles3.png')], [pygame.image.load('Sprites/particles_vfx/genparticles1.png'), pygame.image.load('Sprites/particles_vfx/genparticles2.png'), pygame.image.load('Sprites/particles_vfx/genparticles3.png')]]
+        self.bossAttacks = [pygame.transform.scale(pygame.image.load('Sprites/items/bubbleCluster.png').convert_alpha(), (TILESIZE, TILESIZE))]
 
 g = Game()
 g.intro_screen()

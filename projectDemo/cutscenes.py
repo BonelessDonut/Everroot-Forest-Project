@@ -17,6 +17,7 @@ class CutsceneManager:
         self.active_scene = None
         self.scene_index = 0
         self.game = game
+        self.done = False
 
     def add_scene(self, scene):
         self.scenes.append(scene)
@@ -31,6 +32,9 @@ class CutsceneManager:
             self.scene_index = 0
             # print(self.active_scene)
             self.active_scene.start()
+
+    def getCurrentScene(self):
+        return self.active_scene
 
     def update(self):
         if self.active_scene is not None:
@@ -52,6 +56,11 @@ class CutsceneManager:
     def draw(self, screen):
         if self.active_scene is not None:
             self.active_scene.draw(screen)
+        else:
+            self.done = True
+
+    def finished(self):
+        return self.done
 
 
 # Base class for scenes
@@ -76,7 +85,7 @@ class Scene:
         return True
 
 class ImageScene(Scene):
-    def __init__(self, text, duration, images, imageNum, fontColor=WHITE, skip=True):
+    def __init__(self, text, duration, images, imageNum, fontColor=WHITE, bgcolor=BLACK, skip=True):
         self.text = text
         self.duration = duration
         self.images = images
@@ -86,6 +95,7 @@ class ImageScene(Scene):
         self.start_ticks = pygame.time.get_ticks()
         self.elapsed_time = 0
         self.skipAppear = skip
+        self.bgcolor = bgcolor
         pass
 
     def __str__(self):
@@ -99,7 +109,7 @@ class ImageScene(Scene):
         self.elapsed_time = (current_ticks - self.start_ticks) / 1000
 
     def draw(self, screen):
-        screen.fill(BLACK)
+        screen.fill(self.bgcolor)
         currentImg = pygame.transform.scale(self.images[self.imageNum], (WIDTH//1.3, HEIGHT//1.68))
         imgRect = (WIDTH - WIDTH//1.125, HEIGHT - HEIGHT // 1.25)
         screen.blit(currentImg, imgRect)
@@ -117,6 +127,9 @@ class ImageScene(Scene):
 
     def is_finished(self):
         return self.elapsed_time >= self.duration
+
+    def finishScene(self):
+        self.elapsed_time = self.duration + 1
 
 
 # Example of a specific scene
@@ -203,8 +216,10 @@ def playIntroScene(cutscene_manager):
                 pygame.quit()
                 sys.exit()
         if cutscene_manager.game.cutsceneSkip:
-            elapsedTime = sceneTimeDuration + 1
-        if elapsedTime > sceneTimeDuration:
+            if cutscene_manager.getCurrentScene() != None:
+                cutscene_manager.getCurrentScene().finishScene()
+                cutscene_manager.game.cutsceneSkip = False
+        if elapsedTime > sceneTimeDuration or cutscene_manager.finished():
             cutscene_manager.game.finishedScene = True
             cutscene_manager.game.state = 'playing'
             cutscene_manager.game.new()
@@ -215,7 +230,7 @@ def playIntroScene(cutscene_manager):
 def playGameOver(cutscene_manager):
     cutscene_manager.game.play_music('death')
     cutscene_manager.clear_scenes()
-    cutscene_manager.add_scene(ImageScene('You Died. Press R to restart or exit with Space / Escape', 300, [pygame.image.load('Sprites/deth.jpg').convert_alpha()], 0, WHITE, False))
+    cutscene_manager.add_scene(ImageScene('You Died. Press R to restart or exit with Space / Escape', 300, [pygame.image.load('Sprites/deth.jpg').convert_alpha()], 0, WHITE, BLACK, False))
     cutscene_manager.start()
     sceneTimeDuration = 300
     start_ticks = 0
@@ -250,6 +265,54 @@ def playGameOver(cutscene_manager):
             pygame.quit()
             sys.exit()
     pass
+
+def playGameWon(cutscene_manager):
+    cutscene_manager.game.play_music('win')
+    cutscene_manager.clear_scenes()
+    cutscene_manager.add_scene(ImageScene('You defeated the ceo of pollution and saved Everroot Forest. Nice job!', 15,
+                                          [pygame.image.load('Sprites/hudImages/title3.png').convert_alpha()], 0, WHITE, SWAMPGREEN, True))
+    cutscene_manager.add_scene(ImageScene('Now just to find that place...', 10,
+                                          [pygame.image.load('Sprites/hudImages/title3.png').convert_alpha()], 0, WHITE, SWAMPGREEN,
+                                          True))
+    cutscene_manager.add_scene(ImageScene('Thanks for playing!', 200,
+                                          [pygame.image.load('Sprites/hudImages/title3.png').convert_alpha()], 0, WHITE, SWAMPGREEN,
+                                          True))
+    cutscene_manager.start()
+    sceneTimeDuration = 225
+    start_ticks = 0
+    elapsedTime = 0
+    cutscene_manager.game.finishedScene = False
+    while not cutscene_manager.game.finishedScene:
+        cutscene_manager.update()
+        cutscene_manager.draw(cutscene_manager.game.screen)
+        current_ticks = pygame.time.get_ticks()
+        elapsedTime = (current_ticks - start_ticks) / 1000
+        for event in pygame.event.get():
+            if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+                cutscene_manager.game.cutsceneSkip = True
+            if event.type == pygame.KEYUP and event.key == pygame.K_r:
+                cutscene_manager.game.__init__()
+                # cutscene_manager.game.new()
+                cutscene_manager.game.intro_screen()
+            if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+                pygame.font.quit()
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.QUIT:
+                pygame.font.quit()
+                pygame.quit()
+                sys.exit()
+        if cutscene_manager.game.cutsceneSkip:
+            if cutscene_manager.getCurrentScene() != None:
+                cutscene_manager.getCurrentScene().finishScene()
+                cutscene_manager.game.cutsceneSkip = False
+        if elapsedTime > sceneTimeDuration or cutscene_manager.finished():
+            cutscene_manager.game.finishedScene = True
+            # cutscene_manager.game.createTilemap(None)
+            cutscene_manager.game.cutsceneSkip = False
+            cutscene_manager.game.play_music('stop')
+            pygame.quit()
+            sys.exit()
 
 def transition_Out(game):
 
