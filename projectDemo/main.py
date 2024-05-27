@@ -97,7 +97,14 @@ class Game():
             mixer.music.load('Music/everrootforestVillagetheme.mp3')
             mixer.music.set_volume(0.065 * self.musicVol)
             mixer.music.play(100)
+        elif songType == 'enemy':
+            mixer.music.load('Music/enemy-music.mp3')
+            mixer.music.set_volume(0.065 * self.musicVol)
+            mixer.music.play(100)
         elif songType == 'boss': # Add boss music to be played when facing a boss, perhaps use music Jose recommended? - Eddie
+            # mixer.music.load('Music/boss_music_final.mp3')
+            # mixer.music.set_volume(0.065 * self.musicVol)
+            # mixer.music.play(100)
             pass
         elif songType == 'death':
             mixer.music.load('Music/Bleach_-_Never_meant_to_belong.mp3')
@@ -192,6 +199,9 @@ class Game():
                 mapNumber = mapList[self.map[0]-1][self.map[1]] 
                 self.map[0] -= 1
 
+            purpleRoomsIndexes = []
+            greenRoomsIndexes = [0, 1, 2, 3, 4]
+
             # if the room is unloaded and listed as -2, a randomly assigned purple enemy room will be loaded and added to the map list
             if mapNumber == -2:
                 purpleRandomRoomIndex = random.randint(0, len(purpleRandomRooms)-1)
@@ -282,8 +292,9 @@ class Game():
 
                 currentTileMap.append(randomPurpleMap)
                 mapNumber = len(currentTileMap)-1
+                purpleRoomsIndexes.append(mapNumber) # keeps track of purple room numbers to play music in
                 mapList[self.map[0]][self.map[1]] = mapNumber
-                # play enemy fighting music in this room
+                # doesnt work here -char | self.play_music('enemy') play enemy bgm fighting music in this room
             # if the room is unloaded and listed as -3, a randomly assigned green npc room will be loaded and added to the map list
             elif mapNumber == -3:
                 usedGreenRooms = [] # empty list that holds all green room indexes so that green rooms don't repeat throughout exploration
@@ -294,9 +305,10 @@ class Game():
                         randomGreenMap = greenRandomRooms[greenRandomRoomIndex]
                         currentTileMap.append(randomGreenMap) # add the green map 
                         mapNumber = len(currentTileMap)-1
+                        greenRoomsIndexes.append(mapNumber) # keeps track of green room numbers to play music in
                         mapList[self.map[0]][self.map[1]] = mapNumber
                         break
-                # self.play_music('village') The village bgm would play whenever you enter a peaceful npc room
+                # doesnt work here - char | self.play_music('village') The village bgm would play whenever you enter a peaceful npc room
             # if the room is unloaded and listed as -4, the red boss room will be loaded and added to the map list
             elif mapNumber == -4:
                 # redMap / boss room
@@ -304,8 +316,22 @@ class Game():
                 mapNumber = len(currentTileMap)-1
                 mapList[self.map[0]][self.map[1]] = mapNumber
 
+            
+            print('mapNumber:', mapNumber)
+            if mapNumber in greenRoomsIndexes:
+                print('greenRoomsIndexes', greenRoomsIndexes)
+                if mapNumber-1 in greenRoomsIndexes:
+                    pass
+                else:    
+                    self.play_music('village')
+            elif mapNumber in purpleRoomsIndexes:
+                print('purpleRoomsIndexes', purpleRoomsIndexes)
+                if mapNumber-1 in purpleRoomsIndexes:
+                    pass
+                else:   
+                    self.play_music('enemy')
 
-            print(self.map, mapNumber)
+            print('self.map:', self.map, 'mapNumber', mapNumber)
             print('up:', self.map[0]-1 >= 0, end = ' ')
             if self.map[0]-1 >= 0:
                 print(mapList[self.map[0]-1][self.map[1]] != -1, end = ' ')
