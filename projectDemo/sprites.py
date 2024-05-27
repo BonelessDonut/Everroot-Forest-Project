@@ -1944,15 +1944,15 @@ class Boss(pygame.sprite.Sprite):
         print(self.attackPauseCount)
         self.attackPauseCount += 1
         if self.attackPauseCount >= self.attackPause - 10:
-            for attack in range(16):
-                if attack < 4:
-                    BossAttack(self.game, self.upLeftClusterLoc[0], self.upLeftClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 72)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack+1) * 72)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
-                elif attack >= 4 and attack < 8:
-                    BossAttack(self.game, self.downLeftClusterLoc[0], self.downLeftClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 72)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack + 1) * 72)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
-                elif attack >= 8 and attack < 12:
-                    BossAttack(self.game, self.upRightClusterLoc[0], self.upRightClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 72)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack + 1) * 72)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
+            for attack in range(12):
+                if attack < 3:
+                    BossAttack(self.game, self.upLeftClusterLoc[0], self.upLeftClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 36)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack+1) * 36)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
+                elif attack >= 3 and attack < 6:
+                    BossAttack(self.game, self.downLeftClusterLoc[0], self.downLeftClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 36)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack + 1) * 36)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
+                elif attack >= 6 and attack < 9:
+                    BossAttack(self.game, self.upRightClusterLoc[0], self.upRightClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 36)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack + 1) * 36)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
                 else:
-                    BossAttack(self.game, self.downRightClusterLoc[0], self.downRightClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 72)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack + 1) * 72)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
+                    BossAttack(self.game, self.downRightClusterLoc[0], self.downRightClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 36)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack + 1) * 36)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
         if self.attackPauseCount >= self.attackPause:
             self.attackPauseCount = 0
         elif self.attackPauseCount == 0 or self.attackPauseCount == 1:
