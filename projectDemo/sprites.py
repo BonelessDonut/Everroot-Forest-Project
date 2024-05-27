@@ -304,6 +304,7 @@ class Player(pygame.sprite.Sprite):
             self.hitInvulnerable = True
             if self.targetHealth > 0:
                 self.targetHealth = self.targetHealth - amount # decreases the target health for the animated healthbar
+                self.game.screenshake = amount // 5
             if self.targetHealth <=0:
                 self.targetHealth = 0 # target health cannot go below zero
             pygame.mixer.Channel(1).set_volume(0.035 * self.game.soundVol)
