@@ -98,7 +98,10 @@ class Game():
             mixer.music.set_volume(0.065 * self.musicVol)
             mixer.music.play(100)
         elif songType == 'boss': # Add boss music to be played when facing a boss, perhaps use music Jose recommended? - Eddie
-            pass
+            # PLACEHOLDER BOSS MUSIC
+            mixer.music.load('Music/Jaernbattle.ogg')
+            mixer.music.set_volume(0.03 * self.musicVol)
+            mixer.music.play(10)
         elif songType == 'death':
             mixer.music.load('Music/Bleach_-_Never_meant_to_belong.mp3')
             mixer.music.set_volume(0.070 * self.musicVol)
@@ -762,7 +765,7 @@ class Game():
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE))]
         self.bossImageList = [[pygame.image.load('Sprites/npcs/boss/bossHead.png'), pygame.image.load('Sprites/npcs/boss/bossidea4_5.png')], [pygame.image.load('Sprites/npcs/boss/bossattack.png'), pygame.image.load('Sprites/npcs/boss/bossattack_2.png'), pygame.image.load('Sprites/npcs/boss/bossattack_3.png')]]
         self.particleList = [[pygame.image.load('Sprites/particles_vfx/bossparticles1.png'), pygame.image.load('Sprites/particles_vfx/bossparticles2.png'), pygame.image.load('Sprites/particles_vfx/bossparticles3.png')], [pygame.image.load('Sprites/particles_vfx/genparticles1.png'), pygame.image.load('Sprites/particles_vfx/genparticles2.png'), pygame.image.load('Sprites/particles_vfx/genparticles3.png')]]
-        self.bossAttacks = [pygame.transform.scale(pygame.image.load('Sprites/items/bubbleCluster.png').convert_alpha(), (TILESIZE, TILESIZE))]
+        self.bossAttacks = [pygame.transform.scale(pygame.image.load('Sprites/items/bubbleCluster.png').convert_alpha(), (TILESIZE, TILESIZE)), pygame.transform.scale(pygame.image.load('Sprites/items/bubble.png').convert_alpha(), (TILESIZE * 3, TILESIZE * 3))]
 
 g = Game()
 g.intro_screen()

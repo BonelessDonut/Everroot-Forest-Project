@@ -1031,6 +1031,7 @@ class NPC(pygame.sprite.Sprite):
             self.updateDialogue()
             self.game.state = 'explore'
             self.game.play_music('stop')
+            self.game.play_music('village')
         self.itemRects = []
         return -1
 
@@ -1726,7 +1727,7 @@ class Boss(pygame.sprite.Sprite):
         self.attackLimiter = 100
         self.attacking = False
         self.doneAttacking = True
-        self.attackList = ['wave', 'barrage', 'quickbarrage']
+        self.attackList = ['wave', 'barrage', 'quickbarrage', 'cluster']
         self.chosenAttack = ''
 
         self.attackPause = 16
@@ -1735,6 +1736,11 @@ class Boss(pygame.sprite.Sprite):
         self.attackDuration = 150
         self.reachedDestination = False
         self.currentDestination = (0, 0)
+
+        self.upLeftClusterLoc = (WIDTH * 0.22, HEIGHT * 0.22)
+        self.upRightClusterLoc = (WIDTH * 0.68, HEIGHT * 0.22)
+        self.downLeftClusterLoc = (WIDTH * 0.22, HEIGHT * 0.68)
+        self.downRightClusterLoc = (WIDTH * 0.68, HEIGHT * 0.68)
 
 
         self.moving = False
@@ -1823,18 +1829,22 @@ class Boss(pygame.sprite.Sprite):
             if self.attackTimer >= self.attackLimiter:
                 self.attackTimer = 0
                 randomNum = random.randint(0, 100)
-                if randomNum >= 20 and randomNum <= 45:
+                if randomNum >= 20 and randomNum <= 40:
                     self.chosenAttack = self.attackList[0]
-                elif randomNum > 65:
+                elif randomNum > 77:
                     self.chosenAttack = self.attackList[1]
-                elif randomNum > 45 and randomNum <= 65:
+                elif randomNum > 35 and randomNum <= 55:
                     self.chosenAttack = self.attackList[2]
+                elif randomNum > 55 and randomNum <= 77:
+                    self.chosenAttack = self.attackList[3]
         if self.chosenAttack == self.attackList[0]:
             self.attackWave()
         elif self.chosenAttack == self.attackList[1]:
             self.attackBarrage()
         elif self.chosenAttack == self.attackList[2]:
             self.attackBarrageQuick()
+        elif self.chosenAttack == self.attackList[3]:
+            self.attackCluster()
         #print(self.chosenAttack)
         pass
 
@@ -1850,7 +1860,7 @@ class Boss(pygame.sprite.Sprite):
         if self.doneAttacking and self.reachedDestination:
             self.doneAttacking = False
             for attack in range(20):
-                BossAttack(self.game, self.x + attack * (self.width // 20), self.y + self.height * 1.05, 160, (math.cos(math.pi / (57.7 / ((attack + 1) * 18))), math.sin(math.pi / (57.7 / ((attack+1) * 18)))))
+                BossAttack(self.game, self.x + attack * (self.width // 20), self.y + self.height * 1.05, 110, (math.cos(math.pi / (57.7 / ((attack + 1) * 18)) + self.attackDurationCounter % 15), math.sin(math.pi / (57.7 / ((attack+1) * 18)) + self.attackDurationCounter % 15)))
         self.attackPauseCount += 1
         if self.attackPauseCount >= self.attackPause:
             self.attackPauseCount = 0
@@ -1885,7 +1895,7 @@ class Boss(pygame.sprite.Sprite):
         self.attackDurationCounter += 1
         if self.doneAttacking == True:
             self.doneAttacking = False
-            BossAttack(self.game, self.x + self.width * 0.5, self.y + self.height * 1.1, 160, self.getDirection(self.game.player.rect.center))
+            BossAttack(self.game, self.x + self.width * 0.5, self.y + self.height * 1.1, 130, self.getDirection(self.game.player.rect.center), 6)
         self.attackPauseCount += 1
         if self.attackPauseCount >= self.attackPause:
             self.attackPauseCount = 0
@@ -1893,6 +1903,43 @@ class Boss(pygame.sprite.Sprite):
         if self.attackDurationCounter >= self.attackDuration:
             self.attackDurationCounter = 0
             self.resetStatus()
+
+    def attackCluster(self):
+        self.attackDuration = 350
+        self.moving = False
+        self.attacking = True
+        self.doneAttacking = False
+        self.directionX = 0
+        self.directionY = 0
+        self.attackDurationCounter += 1
+        print("doing attack cluster")
+        self.attackClustersBurst()
+        if self.attackDurationCounter >= self.attackDuration:
+            self.attackDurationCounter = 0
+            self.resetStatus()
+
+    def attackClustersBurst(self):
+        self.attackPause = self.attackDuration / 3
+        print(self.attackPauseCount)
+        self.attackPauseCount += 1
+        if self.attackPauseCount >= self.attackPause - 10:
+            for attack in range(16):
+                if attack < 4:
+                    BossAttack(self.game, self.upLeftClusterLoc[0], self.upLeftClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 72)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack+1) * 72)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
+                elif attack >= 4 and attack < 8:
+                    BossAttack(self.game, self.downLeftClusterLoc[0], self.downLeftClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 72)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack + 1) * 72)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
+                elif attack >= 8 and attack < 12:
+                    BossAttack(self.game, self.upRightClusterLoc[0], self.upRightClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 72)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack + 1) * 72)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
+                else:
+                    BossAttack(self.game, self.downRightClusterLoc[0], self.downRightClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 72)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack + 1) * 72)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
+        if self.attackPauseCount >= self.attackPause:
+            self.attackPauseCount = 0
+        elif self.attackPauseCount == 0 or self.attackPauseCount == 1:
+            BossAttackIndicator(self.game, self.upLeftClusterLoc[0], self.upLeftClusterLoc[1], TILESIZE, TILESIZE, 'circle', self.attackPause - 10)
+            BossAttackIndicator(self.game, self.upRightClusterLoc[0], self.upRightClusterLoc[1], TILESIZE, TILESIZE,'circle', self.attackPause - 10)
+            BossAttackIndicator(self.game, self.downLeftClusterLoc[0], self.downLeftClusterLoc[1], TILESIZE, TILESIZE,'circle', self.attackPause - 10)
+            BossAttackIndicator(self.game, self.downRightClusterLoc[0], self.downRightClusterLoc[1], TILESIZE, TILESIZE,'circle', self.attackPause - 10)
+
 
 
     def animate(self):
@@ -2037,19 +2084,23 @@ class Particle(pygame.sprite.Sprite):
 
 
 class BossAttack(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, damage, direction):
+    def __init__(self, game, x, y, damage, direction, speed=4, moving = True):
         self.game = game
         self.x = x
         self.y = y
         self.damage = damage
         self.direction = direction
-        self.speed = 4
+        self.speed = speed
+        self.moving = moving
         self.image = self.game.bossAttacks[0]
         self.groups = self.game.all_sprites, self.game.attacks
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+        self.decayTimer = 180
+        if not self.moving:
+            self.decayTimer = 40
 
     def setPosition(self, newX, newY):
         self.x = newX
@@ -2066,6 +2117,7 @@ class BossAttack(pygame.sprite.Sprite):
     def update(self):
         self.move()
         self.collision()
+        self.decay()
         pass
 
     def collision(self):
@@ -2076,7 +2128,36 @@ class BossAttack(pygame.sprite.Sprite):
                 self.kill()
         pass
 
-        
+    def decay(self):
+        self.decayTimer -= 1
+        if self.decayTimer <= 0:
+            self.kill()
+
+class BossAttackIndicator(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, width, height, shape, decay):
+        self.game = game
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.groups = self.game.all_sprites, self.game.non_background
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        if shape == 'circle':
+            self.image = pygame.transform.scale(pygame.image.load('Sprites/items/bubble.png').convert_alpha(), (TILESIZE, TILESIZE))
+        else:
+            self.image = pygame.Surface((self.width, self.height))
+            self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.decayLength = decay
+
+    def update(self):
+        self.decayLength -= 1
+        if self.decayLength <= 0:
+            self.kill()
+
+
 class Teleport(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
