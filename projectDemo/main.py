@@ -698,6 +698,7 @@ class Game():
             self.play_music('village')
         pass
 
+    # credit comes from https://www.youtube.com/watch?v=3nhQLJq0Lwk and https://www.youtube.com/watch?v=2JXR7IASSog
     def doScreenShake(self):
         if self.screenshake > 0:
             self.screenshake -= 1
