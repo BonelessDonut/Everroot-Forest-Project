@@ -436,12 +436,16 @@ class Player(pygame.sprite.Sprite):
                 item = self.game.activeNPC.interaction()
                 if item == 'trident':
                     self.activeWeaponList.append('trident')
+                    self.game.activeNPC.resetInventory('trident')
                 elif item == 'bubble':
                     self.activeWeaponList.append('bubble')
+                    self.game.activeNPC.resetInventory('bubble')
                 elif item == 'speedPotion':
                     self.speed += 3
                 elif item == 'strengthPotion':
                     self.damage += 30
+                elif item == 'healthPotion':
+                    self.game.inventory.add_item('potion', 1)
                 #pygame.time.wait(250)
             elif npcIndex != -1:
                 # interacted = True
@@ -876,7 +880,7 @@ class NPC(pygame.sprite.Sprite):
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
-        self.totalItemCost = [{'flower': 20}, {'ore': 10}, {'flower': 10}]
+        self.totalItemCost = [{'flower': 8}, {'ore': 6}, {'flower': 3}]
         self.totalItemList = ['healthPotion', 'strengthPotion', 'speedPotion']
         self.totalItemDesc = ['Restores health (Consumable) ', 'Increases strength ', 'Increases movement speed ']
 
@@ -893,12 +897,12 @@ class NPC(pygame.sprite.Sprite):
 
         #If the weapons haven't been bought yet, give it priority in what items show
         if 'trident' not in self.game.player.activeWeaponList:
-            self.itemCost.append({'ore': 8})
+            self.itemCost.append({'ore': 12})
             self.itemList.append('trident')
             self.itemDesc.append('Throwing weapon ')
             self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/trident2.png'), (200, 200)))
         if 'bubble' not in self.game.player.activeWeaponList:
-            self.itemCost.append({'flower': 0})
+            self.itemCost.append({'flower': 4})
             self.itemList.append('bubble')
             self.itemDesc.append('Burst gun ')
             self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/bubblegun.png'), (200, 200)))
@@ -1137,6 +1141,23 @@ class NPC(pygame.sprite.Sprite):
                 pygame.draw.rect(self.game.screen, BLUE, itemRect, 2, 2)
             else:
                 pygame.draw.rect(self.game.screen, WHITE, itemRect, 2, 2)
+
+    #Authored: Max Chiu 5/27/24
+    def resetInventory(self, item):
+        index = self.itemList.index(item)
+        print('index at', index)
+        self.itemCost.pop(index)
+        self.itemList.pop(index)
+        self.itemDesc.pop(index)
+        self.itemImgs.pop(index)
+        print(len(self.itemList))
+        while len(self.itemList) < 4:
+            randomInd = random.randint(0, len(self.totalItemList)-1)
+            if self.totalItemList[randomInd] not in self.itemList:
+                self.itemCost.insert(index, self.totalItemCost[randomInd])
+                self.itemList.insert(index, self.totalItemList[randomInd])
+                self.itemDesc.insert(index, self.totalItemDesc[randomInd])
+                self.itemImgs.insert(index, self.totalItemImgs[randomInd])
         
 
 
