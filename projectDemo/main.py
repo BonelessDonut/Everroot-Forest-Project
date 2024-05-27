@@ -521,6 +521,8 @@ class Game():
             self.renderSurface.fill(BLACK)
             self.doScreenShake()
             self.all_sprites.draw(self.renderSurface)
+            # credit for the sorting camera comes from this video - https://www.youtube.com/watch?v=u7LPRqrzry8
+            # the line below sorts the sprites in the non_background group based on their y positions, putting those at a lower position on a layer in front.
             for sprite in sorted(self.non_background, key = lambda sprite: sprite.rect.centery):
                 self.renderSurface.blit(sprite.image, sprite.rect)
             self.screen.blit(self.renderSurface, self.renderOffset)
