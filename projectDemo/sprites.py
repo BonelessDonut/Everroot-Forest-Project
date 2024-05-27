@@ -871,16 +871,9 @@ class NPC(pygame.sprite.Sprite):
         self.totalItemList = ['healthPotion', 'strengthPotion', 'speedPotion']
         self.totalItemCost = [{'flower': 1}, {'ore': 10}, {'flower': 10}]
         self.totalItemDesc = ['Restores health (Consumable) ', 'Increases strength ', 'Increases movement speed ']
-<<<<<<< HEAD
         self.totalItemImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/HealthPotion2.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/StrengthPotion.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/SpeedPotion.png'), (200, 200))]
-=======
-
-        self.totalItemImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
-                                pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
-                                pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200))]
->>>>>>> b1036b71d212b6bbf11e859f79aedd577f3e1ba4
         
         #these are empty arrays for which item will be shown by this NPC.
         self.itemCost = []
