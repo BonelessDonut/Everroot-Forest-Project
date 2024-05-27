@@ -493,7 +493,6 @@ class Player(pygame.sprite.Sprite):
                 pygame.time.wait(150)
             elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
                 npc.pastItem = npc.selectedItem
-                print(npc.pastItem)
                 npc.selectedItem = len(npc.itemList)-1
                 pygame.time.wait(150)
             elif keys[pygame.K_w] or keys[pygame.K_UP]:
@@ -837,7 +836,6 @@ class WalkableBlock(pygame.sprite.Sprite):
         #self.imagelist = [pygame.transform.scale(pygame.image.load('Sprites/tiles/crossBridge1.png').convert_alpha(), (self.width, self.height)),
         #                pygame.transform.scale(pygame.image.load('Sprites/tiles/growth1.png').convert_alpha(), (self.width, self.height))]
         self.image = self.game.tileList[0][index]
-        #self.image.fill(RED)
 
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -874,10 +872,16 @@ class NPC(pygame.sprite.Sprite):
         self.totalItemList = ['healthPotion', 'strengthPotion', 'speedPotion']
         self.totalItemCost = [{'flower': 1}, {'ore': 10}, {'flower': 10}]
         self.totalItemDesc = ['Restores health (Consumable) ', 'Increases strength ', 'Increases movement speed ']
+<<<<<<< HEAD
+        self.totalItemImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/HealthPotion2.png'), (200, 200)),
+                                pygame.transform.scale(pygame.image.load('Sprites/items/StrengthPotion.png'), (200, 200)),
+                                pygame.transform.scale(pygame.image.load('Sprites/items/SpeedPotion.png'), (200, 200))]
+=======
 
         self.totalItemImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200))]
+>>>>>>> b1036b71d212b6bbf11e859f79aedd577f3e1ba4
         
         #these are empty arrays for which item will be shown by this NPC.
         self.itemCost = []
@@ -991,6 +995,7 @@ class NPC(pygame.sprite.Sprite):
             return -1
         #While not finished with dialogue section
         elif self.game.state == 'dialogue' and self.dialogueStageIndex < len(self.dialogueList[self.dialogueStage]):
+            #print('state 3')
             nextDialogue = self.dialogueList[self.dialogueStage][self.dialogueStageIndex]
             pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
@@ -1005,6 +1010,7 @@ class NPC(pygame.sprite.Sprite):
                     self.game.play_music('stop')
                     self.game.play_music('village')
                 else:
+                    #print('state 3b')
                     #self.interaction()
                     return -1
             #If the next dialogue to display is a choice list
@@ -1015,12 +1021,14 @@ class NPC(pygame.sprite.Sprite):
                 self.TextBox.newText(choicesList[1:], 28, 'Garamond', self.name)
             #Displaying normal dialogue
             else:
+                #print('state 3a')
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game)
                 self.TextBox.newText(nextDialogue, 28, 'Garamond', self.name)
                 self.dialogueStageIndex += 1
         #When finished with dialogue
         elif self.game.state == 'dialogue':
+            #print('state 2')
             self.TextBox.kill()
             self.updateDialogue()
             self.game.state = 'explore'
@@ -1119,6 +1127,8 @@ class NPC(pygame.sprite.Sprite):
                 pygame.draw.rect(self.game.screen, BLUE, itemRect, 2, 2)
             else:
                 pygame.draw.rect(self.game.screen, WHITE, itemRect, 2, 2)
+        elif self.TextBox.selectedRect != 0:
+            pass
         
 
 
