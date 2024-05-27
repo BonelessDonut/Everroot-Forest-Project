@@ -176,7 +176,7 @@ class Bullet(pygame.sprite.Sprite):
         self.clock = game.clock
         self.timepassed = 0
         self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.bullets
+        self.groups = self.game.all_sprites, self.game.bullets, self.game.non_background
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x
         self.y = y
@@ -260,7 +260,7 @@ class MeleeAttack(pygame.sprite.Sprite):
         self.clock = game.clock
         self._layer = PLAYER_LAYER
         self.player = player
-        self.groups = self.game.all_sprites, self.game.attacks
+        self.groups = self.game.all_sprites, self.game.attacks, self.game.non_background
         pygame.sprite.Sprite.__init__(self, self.groups)
         #self.image = pygame.transform.scale(pygame.image.load(swordfish_imgs[0]), (TILESIZE//1.5, TILESIZE//1.5))
 
@@ -636,7 +636,7 @@ class Flower(pygame.sprite.Sprite):
     def __init__(self, game, x, y, clock):
         self.game = game
         self._layer = ITEM_LAYER
-        self.groups = self.game.all_sprites, self.game.flowers
+        self.groups = self.game.all_sprites, self.game.flowers, self.game.non_background
         pygame.sprite.Sprite.__init__(self, self.groups)
 
         self.x = x*TILESIZE
@@ -705,7 +705,7 @@ class Ore(pygame.sprite.Sprite):
     def __init__(self, game, x, y, clock):
         self.game = game
         self._layer = ITEM_LAYER
-        self.groups = self.game.all_sprites, self.game.ores
+        self.groups = self.game.all_sprites, self.game.ores, self.game.non_background
         pygame.sprite.Sprite.__init__(self, self.groups)
 
         self.x = x*TILESIZE

@@ -18,12 +18,12 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, game, x, y, clock):
         self.game = game
         self._layer = PLAYER_LAYER
-        self.groups = self.game.all_sprites
+        self.groups = self.game.all_sprites, self.game.non_background
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.width = 30
-        self.height = 30
+        self.width = TILESIZE * 0.98
+        self.height = TILESIZE * 0.98
 
         # The weapons available to the player are stored in a list
 
@@ -315,6 +315,7 @@ class Player(pygame.sprite.Sprite):
             self.hitInvulnerable = True
             if self.targetHealth > 0:
                 self.targetHealth = self.targetHealth - amount # decreases the target health for the animated healthbar
+                self.game.screenshake = amount // 4
             if self.targetHealth <=0:
                 self.targetHealth = 0 # target health cannot go below zero
             pygame.mixer.Channel(1).set_volume(0.035 * self.game.soundVol)
@@ -847,7 +848,7 @@ class NPC(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
         self._layer = PLAYER_LAYER
-        self.groups = self.game.all_sprites, self.game.npcs
+        self.groups = self.game.all_sprites, self.game.npcs, self.game.non_background
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
         self.y = y * TILESIZE
@@ -1130,7 +1131,7 @@ class Enemy(pygame.sprite.Sprite):
         self.clock = self.game.clock
         self.map = currentTileMap[mapList[self.game.map[0]][self.game.map[1]]]
         self._layer = ENEMY_LAYER
-        self.groups = self.game.all_sprites, self.game.enemies
+        self.groups = self.game.all_sprites, self.game.enemies, self.game.non_background
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
         self.y = y * TILESIZE
@@ -1671,7 +1672,7 @@ class Pathfinder:
 class Boss(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
-        self.groups = self.game.all_sprites, self.game.enemies
+        self.groups = self.game.all_sprites, self.game.enemies, self.game.non_background
         pygame.sprite.Sprite.__init__(self, self.groups)
         self._layer = ENEMY_LAYER
         self.x = x

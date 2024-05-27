@@ -25,6 +25,9 @@ class Game():
         pygame.init()
         pygame.font.init()
         self.screen = pygame.display.set_mode((WIDTH,HEIGHT))
+        self.renderSurface = pygame.Surface((WIDTH, HEIGHT))
+        self.renderOffset = [0, 0]
+        self.screenshake = 0
 
         # The title for the game window is randomly selected at the start, because why not? - Eddie Suber
         windowTitle = ['Everroot Forrest - A CS Story',
@@ -166,6 +169,7 @@ class Game():
             self.enemies.empty()
             self.teleport.empty()
             self.particles.empty()
+            self.non_background.empty()
 
 
             # This is a variable to allow the weapon that was equipped in the current room to stay equipped
@@ -364,6 +368,7 @@ class Game():
             self.all_sprites.add(self.weaponsHud)
             self.all_sprites.add(self.player)
             self.all_sprites.add(self.player.weapon)
+            self.non_background.add(self.player)
 
             for row in range(len(settings.currentTileMap[mapNumber])):
                 #print(f"{row} ", end="")
@@ -443,6 +448,7 @@ class Game():
 
         self.playing = True
         self.all_sprites = pygame.sprite.LayeredUpdates()
+        self.non_background = pygame.sprite.LayeredUpdates()
         self.blocks = pygame.sprite.LayeredUpdates()
         self.walk_blocks = pygame.sprite.LayeredUpdates()
         self.ground = pygame.sprite.LayeredUpdates()
@@ -494,7 +500,7 @@ class Game():
             if event.type == pygame.KEYUP and event.key == pygame.K_p and (self.state != 'shopping' and self.state != 'dialogue'): # pauses the game with P
                 self.pause()
             if event.type == pygame.KEYUP and event.key == pygame.K_h and not self.player.itemUsed and self.state == 'explore' and self.inventory.get('potion') > 0: # keybind to heal, will have added functionality with potions in the inventory later
-                self.player.getHealth(200) 
+                self.player.getHealth(300)
                 self.inventory.add_item('potion', -1)
             if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE: # closes the game if escape is pressed
                 pygame.font.quit()
@@ -512,7 +518,13 @@ class Game():
     def draw(self):
         if self.state != 'game over' and self.state != 'victory':
             self.screen.fill(BLACK)
-            self.all_sprites.draw(self.screen)
+            self.renderSurface.fill(BLACK)
+            self.doScreenShake()
+            self.all_sprites.draw(self.renderSurface)
+            for sprite in sorted(self.non_background, key = lambda sprite: sprite.rect.centery):
+                self.renderSurface.blit(sprite.image, sprite.rect)
+            self.screen.blit(self.renderSurface, self.renderOffset)
+            #self.all_sprites.draw(self.screen)
 
 
             # draws the tutorial text on screen if needed
@@ -683,6 +695,14 @@ class Game():
             self.state = 'explore'
             self.play_music('village')
         pass
+
+    def doScreenShake(self):
+        if self.screenshake > 0:
+            self.screenshake -= 1
+        if self.screenshake:
+            self.renderOffset[0] = random.randint(0, self.screenshake // 5) - self.screenshake // 10
+            self.renderOffset[1] = random.randint(0, self.screenshake // 4) - self.screenshake // 8
+
 
 
     # This function sets up many of the images to be used in the game, then stores them in lists
