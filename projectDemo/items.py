@@ -691,8 +691,9 @@ class Flower(pygame.sprite.Sprite):
         if self.game.state == 'flowerC' or self.state == 'dying':
             if ((self.timepassed) // (0.31) % 3 == self.imgindex):
                 self.imgindex = (self.imgindex + 1)
-                pygame.mixer.Channel(3).set_volume(0.03 * self.game.soundVol)
-                pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/22_Slash_04.wav'))
+                if self.state != 'dying':
+                    pygame.mixer.Channel(3).set_volume(0.03 * self.game.soundVol)
+                    pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/22_Slash_04.wav'))
 
         else:
             if self.state == 'cutting':
@@ -758,9 +759,10 @@ class Ore(pygame.sprite.Sprite):
         if self.game.state == 'oreMine' or self.state == 'dying':
             if ((self.timepassed) // (0.31) % 4 == self.imgindex):
                 self.imgindex = (self.imgindex + 1)
-                pygame.mixer.Channel(3).set_volume(0.05 * self.game.soundVol)
-                pygame.mixer.Channel(3).play(
-                pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/08_Bite_04.wav'))
+                if self.state != 'dying':
+                    pygame.mixer.Channel(3).set_volume(0.05 * self.game.soundVol)
+                    pygame.mixer.Channel(3).play(
+                    pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/08_Bite_04.wav'))
 
         else:
             if self.state == 'mining':
