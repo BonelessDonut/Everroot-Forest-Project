@@ -1020,14 +1020,19 @@ class NPC(pygame.sprite.Sprite):
         textWidth = 9
         if self.TextBox.selectedRect == 0:
             self.game.state = 'shopping'
+
+            # displays the count of flowers when in the shop
             pygame.draw.rect(self.game.screen, BLACK, (WIDTH * 0.4, HEIGHT * 0.08, TILESIZE, TILESIZE))
             pygame.draw.rect(self.game.screen, OFFWHITE, (WIDTH * 0.4, HEIGHT * 0.08, TILESIZE, TILESIZE), 1)
             self.game.screen.blit(self.game.sunFloImgL[0], pygame.Rect(WIDTH * 0.4, HEIGHT * 0.08, 0, 0))
             self.game.screen.blit(self.descFont.render(f"Flowers held: {self.game.inventory.get('flower')}", False, OFFWHITE), (WIDTH * 0.37, HEIGHT * 0.15))
+
+            # displays the count of ores when in the shop
             pygame.draw.rect(self.game.screen, BLACK, (WIDTH * 0.57, HEIGHT * 0.08, TILESIZE, TILESIZE))
             pygame.draw.rect(self.game.screen, OFFWHITE, (WIDTH * 0.57, HEIGHT * 0.08, TILESIZE, TILESIZE), 1)
             self.game.screen.blit(self.game.amethImageL[0], pygame.Rect(WIDTH * 0.57, HEIGHT * 0.08, 0, 0))
             self.game.screen.blit(self.descFont.render(f"Ores held: {self.game.inventory.get('ore')}", False, OFFWHITE),(WIDTH * 0.54, HEIGHT * 0.15))
+
             #Displaying each of the potions
             for item in range(len(self.itemList)-1):
 
