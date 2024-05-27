@@ -170,6 +170,7 @@ class Game():
             self.teleport.empty()
             self.particles.empty()
             self.non_background.empty()
+            self.user_interface.empty()
 
 
             # This is a variable to allow the weapon that was equipped in the current room to stay equipped
@@ -461,6 +462,7 @@ class Game():
         self.attacks = pygame.sprite.LayeredUpdates()
         self.bullets = pygame.sprite.LayeredUpdates()
         self.particles = pygame.sprite.LayeredUpdates()
+        self.user_interface = pygame.sprite.LayeredUpdates()
         self.createTilemap(None)
         #self.player = Player(self, 1, 2)
     def events(self):
@@ -525,6 +527,8 @@ class Game():
             # the line below sorts the sprites in the non_background group based on their y positions, putting those at a lower position on a layer in front.
             for sprite in sorted(self.non_background, key = lambda sprite: sprite.rect.centery):
                 self.renderSurface.blit(sprite.image, sprite.rect)
+            for element in self.user_interface:
+                self.renderSurface.blit(element.image, element.rect)
             self.screen.blit(self.renderSurface, self.renderOffset)
             #self.all_sprites.draw(self.screen)
 
@@ -540,6 +544,7 @@ class Game():
             if self.bossActive:
                 self.boss.ui()
             self.weaponsHud.draw() # calls the function to draw the weapon display hud on the screen
+            self.inventory.draw()
             self.clock.tick(FPS)
             pygame.display.update() # updates the screen with any changes
 

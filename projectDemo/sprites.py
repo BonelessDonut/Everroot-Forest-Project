@@ -18,12 +18,12 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, game, x, y, clock):
         self.game = game
         self._layer = PLAYER_LAYER
-        self.groups = self.game.all_sprites
+        self.groups = self.game.all_sprites, self.game.non_background
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.width = 30
-        self.height = 30
+        self.width = TILESIZE * 0.98
+        self.height = TILESIZE * 0.98
         self.speed = PLAYER_SPEED
 
         # The weapons available to the player are stored in a list
@@ -834,7 +834,7 @@ class NPC(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
         self._layer = PLAYER_LAYER
-        self.groups = self.game.all_sprites, self.game.npcs
+        self.groups = self.game.all_sprites, self.game.npcs, self.game.non_background
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
         self.y = y * TILESIZE
@@ -858,15 +858,11 @@ class NPC(pygame.sprite.Sprite):
         self.totalItemCost = [{'flower': 20}, {'ore': 10}, {'flower': 10}]
         self.totalItemList = ['healthPotion', 'strengthPotion', 'speedPotion']
         self.totalItemDesc = ['Restores health (Consumable) ', 'Increases strength ', 'Increases movement speed ']
-<<<<<<< HEAD
+
         self.totalItemImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/HealthPotion2.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/StrengthPotion.png'), (200, 200)),
                                 pygame.transform.scale(pygame.image.load('Sprites/items/SpeedPotion.png'), (200, 200))]
-=======
-        self.totalItemImgs = [pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
-                                pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200)),
-                                pygame.transform.scale(pygame.image.load('Sprites/items/potion.png'), (200, 200))]
->>>>>>> 3ace59fd83e5a6af878cc94d6f1ddd205b25b75d
+
         
         #these are empty arrays for which item will be shown by this NPC.
         self.itemCost = []
@@ -1024,7 +1020,14 @@ class NPC(pygame.sprite.Sprite):
         textWidth = 9
         if self.TextBox.selectedRect == 0:
             self.game.state = 'shopping'
-            
+            pygame.draw.rect(self.game.screen, BLACK, (WIDTH * 0.4, HEIGHT * 0.08, TILESIZE, TILESIZE))
+            pygame.draw.rect(self.game.screen, OFFWHITE, (WIDTH * 0.4, HEIGHT * 0.08, TILESIZE, TILESIZE), 1)
+            self.game.screen.blit(self.game.sunFloImgL[0], pygame.Rect(WIDTH * 0.4, HEIGHT * 0.08, 0, 0))
+            self.game.screen.blit(self.descFont.render(f"Flowers held: {self.game.inventory.get('flower')}", False, OFFWHITE), (WIDTH * 0.37, HEIGHT * 0.15))
+            pygame.draw.rect(self.game.screen, BLACK, (WIDTH * 0.57, HEIGHT * 0.08, TILESIZE, TILESIZE))
+            pygame.draw.rect(self.game.screen, OFFWHITE, (WIDTH * 0.57, HEIGHT * 0.08, TILESIZE, TILESIZE), 1)
+            self.game.screen.blit(self.game.amethImageL[0], pygame.Rect(WIDTH * 0.57, HEIGHT * 0.08, 0, 0))
+            self.game.screen.blit(self.descFont.render(f"Ores held: {self.game.inventory.get('ore')}", False, OFFWHITE),(WIDTH * 0.54, HEIGHT * 0.15))
             #Displaying each of the potions
             for item in range(len(self.itemList)-1):
 
@@ -1778,7 +1781,7 @@ class TextBox(pygame.sprite.Sprite):
     def __init__(self, game):
         self.game = game
         self._layer = TEXT_LAYER
-        self.groups = self.game.all_sprites
+        self.groups = self.game.all_sprites, self.game.user_interface
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.width = 920
         self.height = 170
@@ -1892,7 +1895,7 @@ class Inventory(pygame.sprite.Sprite):
     def __init__(self, game):
         self.game = game
         self._layer = TEXT_LAYER
-        self.groups = self.game.all_sprites
+        self.groups = self.game.all_sprites, self.game.user_interface
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.hotbar_img = [pygame.transform.scale(pygame.image.load('Sprites/items/sunflowernew.png').convert_alpha(), (TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreAmethyst.png').convert_alpha(), (TILESIZE, TILESIZE)),
@@ -1949,12 +1952,21 @@ class Inventory(pygame.sprite.Sprite):
     def get(self, item):
         return self.slots.get(item)
 
+    def draw(self):
+        if self.game.state == 'explore' or self.game.state == 'oreMine' or self.game.state == 'flowerC':
+            if self not in self.game.all_sprites:
+                self.groups = self.game.all_sprites, self.game.user_interface
+                self.add(self.game.all_sprites, self.game.user_interface)
+        else:
+        # removes the inventory from the list of sprites to be drawn if it should not be shown
+            self.remove(self.game.all_sprites, self.game.user_interface)
+
 
 class WeaponDisplay(pygame.sprite.Sprite):
     def __init__(self, game):
         self.game = game
         self._layer = TEXT_LAYER
-        self.groups = self.game.all_sprites
+        self.groups = self.game.all_sprites, self.game.user_interface
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.swordfishWep = {'name' : 'swordfish', 'image': pygame.image.load('Sprites/items/swordfish3.png').convert_alpha(), 'inactiveImg' : pygame.image.load('Sprites/items/swordfishGray.png').convert_alpha(), 'active' : True}
         self.tridentWep = {'name' : 'trident', 'image' : pygame.image.load('Sprites/items/trident3.png').convert_alpha(), 'inactiveImg' : pygame.image.load('Sprites/items/tridentGray.png').convert_alpha(), 'active' : False}
@@ -1993,8 +2005,8 @@ class WeaponDisplay(pygame.sprite.Sprite):
     def draw(self):
         if self.game.state == 'explore' or self.game.state == 'oreMine' or self.game.state == 'flowerC':
             if self not in self.game.all_sprites:
-                self.groups = self.game.all_sprites
-                self.add(self.game.all_sprites)
+                self.groups = self.game.all_sprites, self.game.user_interface
+                self.add(self.game.all_sprites, self.game.user_interface)
             for i in range(len(self.weaponList)):
                 if self.weaponList[i]['name'] in self.game.player.activeWeaponList:
                     currentImage = pygame.transform.scale(self.weaponList[i]['image'].convert_alpha(), (TILESIZE * 0.8, TILESIZE * 0.8))
@@ -2008,7 +2020,7 @@ class WeaponDisplay(pygame.sprite.Sprite):
 
         else:
             # removes the weapon hud from the list of sprites to be drawn if it should not be shown
-            self.remove(self.game.all_sprites)
+            self.remove(self.game.all_sprites, self.game.user_interface)
 
     # checks the weapon that is actively equipped and updates the info within the hud to reflect that
     def checkActiveWep(self):
