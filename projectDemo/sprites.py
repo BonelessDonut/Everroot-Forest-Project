@@ -932,15 +932,21 @@ class NPC(pygame.sprite.Sprite):
         #Would you rather cum in the sink or sink in the cum? That is indeed the question for which we must all ponder and arrive at our own answers.
         #change this later
         self.dialogueList = {'01:First Meet':[{'Meetings': 1},
-                                                "Testing dialogue ",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
                                                 "Boom Boom Boom Boom ",
-                                                "%Choices; What do you want to do?; Shop; Leave; Meow ",
-                                                "Drink it now, drink it now, drink it now "],
+                                                "%Choices; What do you want to do?; Shop; Leave; Meow "],
                              '02:Second Meet': [{'Meetings':2},
                                                 "Hi again... ",
                                                 "%Choices; What do you want to do?; Shop; Leave; Meow "]
                             }
+        
+        self.choiceList = {'01:Shop': ["Hope your purchase helps you not die!"],
+                           '01:Leave': ["Byeeeeee "],
+                           '01:Meow': ["Meow!"],
+                           '02:Shop': ["I better see you again! >:("],
+                           '02:Leave': ["Bye again "],
+                           '02:Meow': ["Woof Woof Woof RGHHHHH", "I mean... Meow!"]
+                          }
         
         #What needs to be done:
         #For Choices strings, make it a list instead, depending on choice do selectedRect for next dialogue and then next dialogue after the choices string
@@ -1007,6 +1013,11 @@ class NPC(pygame.sprite.Sprite):
             #If there are choices displayed on the screen
             if len(self.TextBox.choiceRectList) > 0:
                 self.choiceResponse()
+                selection = self.dialogueList[self.dialogueStage][self.dialogueStageIndex].split(';')
+                selection = selection[self.TextBox.selectedRect+2]
+                selection = f'{self.dialogueStage[0:2]}:{selection.strip()}'
+                for line in self.choiceList[selection]:
+                    self.dialogueList[self.dialogueStage].append(line)
                 self.dialogueStageIndex += 1
                 if self.dialogueStageIndex == len(self.dialogueList[self.dialogueStage]) and self.game.state != 'shopping':
                     self.TextBox.kill()
@@ -1014,8 +1025,8 @@ class NPC(pygame.sprite.Sprite):
                     self.game.state = 'explore'
                     self.game.play_music('stop')
                     self.game.play_music('village')
-                else:
-                    #self.interaction()
+                elif self.selectedItem != 0:
+                    self.interaction()
                     return -1
             #If the next dialogue to display is a choice list
             elif nextDialogue.find('%Choices') != -1:
@@ -1031,6 +1042,14 @@ class NPC(pygame.sprite.Sprite):
                 self.dialogueStageIndex += 1
         #When finished with dialogue
         elif self.game.state == 'dialogue':
+            index = -1
+            for i in range(len(self.dialogueList[self.dialogueStage])):
+                text = self.dialogueList[self.dialogueStage][i]
+                if isinstance(text, str) and text.find('%Choices') != -1:
+                    index = i+1
+            if index != -1:
+                self.dialogueList[self.dialogueStage] = self.dialogueList[self.dialogueStage][0:index]
+            self.selectedItem = -1
             self.TextBox.kill()
             self.updateDialogue()
             self.game.state = 'explore'
@@ -1145,12 +1164,10 @@ class NPC(pygame.sprite.Sprite):
     #Authored: Max Chiu 5/27/24
     def resetInventory(self, item):
         index = self.itemList.index(item)
-        print('index at', index)
         self.itemCost.pop(index)
         self.itemList.pop(index)
         self.itemDesc.pop(index)
         self.itemImgs.pop(index)
-        print(len(self.itemList))
         while len(self.itemList) < 4:
             randomInd = random.randint(0, len(self.totalItemList)-1)
             if self.totalItemList[randomInd] not in self.itemList:
@@ -1289,7 +1306,6 @@ class Enemy(pygame.sprite.Sprite):
     #Authored: Max Chiu 4/18/2024
     # Does damage to the enemy based on type of the attack it is hit with
     def dealtDamage(self, damage, type):
-        # print(self.hitInvincible)
         if not self.hitInvulnerable:
             if type == 'bubble':
                 self.health -= damage
