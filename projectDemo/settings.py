@@ -137,7 +137,7 @@ currentTileMap = [[ #index 0
 ]]
 
 purpleRandomRooms = [[
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBp',
     'B..............................B',
     'B........E.....................B',
     'B.........B..........B.........B',
@@ -156,7 +156,7 @@ purpleRandomRooms = [[
     'B..............................B',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ], [
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBp',
     'BBBBBB....................BBBBBB',
     'BBB.....E............E.......BBB',
     'BB............................BB',
@@ -175,7 +175,7 @@ purpleRandomRooms = [[
     'BBBBBB....................BBBBBB',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ], [
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBp',
     'B..............................B',
     'B..............................B',
     'B..........E.............E.....B',
@@ -194,7 +194,7 @@ purpleRandomRooms = [[
     'B..............................B',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ], [
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBp',
     'B..............................B',
     'B..............................B',
     'B....B...E.....B.....E....B....B',
@@ -213,7 +213,7 @@ purpleRandomRooms = [[
     'B..............................B',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ], [
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBp',
     'BBBB........................BBBB',
     'BB......E.....................BB',
     'B........................E.....B',
@@ -232,7 +232,7 @@ purpleRandomRooms = [[
     'BBBB........................BBBB',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ], [
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBp',
     'BBBB........................BBBB',
     'BBBB................E.......BBBB',
     'BBB........B........B........BBB',
@@ -255,7 +255,7 @@ purpleRandomRooms = [[
 #Authored by Charlenne Tan 4/27/2024
 # B = block/wall | W = water | F = flower | P = path/bridge | S = stone/rock
 greenRandomRooms = [[ # 0: water swirl room
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBg',
     'BWWWWWWWWWWWWW.......FFWWWWWWWWB',
     'BWWWWWWWWF............FFWWWWWWWB',
     'BWWWWWWFF..............FFFFWWWWB',
@@ -274,7 +274,7 @@ greenRandomRooms = [[ # 0: water swirl room
     'BWWWWWWWWWWWWWWFFFFF.......FFFFB',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
     ],[ # 1: balance room
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBg',
     'BBBBBFF....................BBBBB',
     'BBBFFF...BBBB.............FFFBBB',
     'BBFF...BB.....B.....BBBBBFFF..BB',
@@ -293,7 +293,7 @@ greenRandomRooms = [[ # 0: water swirl room
     'BBBBB....................FFBBBBB',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
     ],[ # 2: stone walls room
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBg',
     'BRRRB.FFFRRRB....RR..BBRRRRRRF.B',
     'BRRBB..FFRRB......R....BRRRFFF.B',
     'BRRB..NFRRB.......BR....BRFFFFRB',
@@ -312,7 +312,7 @@ greenRandomRooms = [[ # 0: water swirl room
     'B.RRB....BRR.......FFFFR...RRRRB',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
     ],[ # 3: rocky caves room
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBg',
     'BBBBBRR..RWWWWR........RRRWWWWWB',
     'BBBBRR....RWWR............RRWWWB',
     'BBBBR....RWR..........RR...RWWWB',
@@ -331,7 +331,7 @@ greenRandomRooms = [[ # 0: water swirl room
     'BBRRWWWWWRRR....FFFFRRRRRBBBBBBB',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
     ],[ # 4: forest room
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBg',
     'BGF......FGGG......GGGGRRGG....B',
     'BFGF..S.FGGSGGF......FGGRGFF...B',
     'B.GG....FFFFFF........FGGFF....B',
@@ -350,7 +350,7 @@ greenRandomRooms = [[ # 0: water swirl room
     'BRGGGGF.S........FGRRGGF..FFFFFB',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
     ],[ # 5: deforestation room
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBg',
     'BOOOFFFF......B.........SSSSSGGB',
     'BFFGGG.....GG.BFFF.....GGGGSSGGB',
     'B.FGFFG...G..GBFF..S.....GGGGG.B',
@@ -371,7 +371,7 @@ greenRandomRooms = [[ # 0: water swirl room
     ]]
 
 redMap = [
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBr',
     'BWWWWWWWW..............WWWWWWWWB',
     'BWWWWWW..................WWWWWWB',
     'BWWWWW....................WWWWWB',
