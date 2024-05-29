@@ -40,6 +40,7 @@ class Player(pygame.sprite.Sprite):
         self.weaponAnimationSpeed = 15
         self.swordUsed = False
         self.spearUsed = False
+        self.bonus = 0
 
         self.tutorial = Tutorial(self.game)
 
@@ -436,12 +437,20 @@ class Player(pygame.sprite.Sprite):
                 item = self.game.activeNPC.interaction()
                 if item == 'trident':
                     self.activeWeaponList.append('trident')
+                    self.game.activeNPC.resetInventory('trident')
                 elif item == 'bubble':
                     self.activeWeaponList.append('bubble')
-                elif item == 'speedPotion':
+                    self.game.activeNPC.resetInventory('bubble')
+                elif item == 'speedPotion': #minecraft potion drinking sound effect https://quicksounds.com/sound/107/minecraft-potion-drinking
+                    pygame.mixer.Channel(4).set_volume(0.05 * self.game.soundVol)
+                    pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/Minecraft Potion Drinking - QuickSounds (mp3cut.net).mp3'))
                     self.speed += 3
                 elif item == 'strengthPotion':
-                    self.damage += 30
+                    pygame.mixer.Channel(4).set_volume(0.05 * self.game.soundVol)
+                    pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/Minecraft Potion Drinking - QuickSounds (mp3cut.net).mp3'))
+                    self.bonus += 10
+                elif item == 'healthPotion':
+                    self.game.inventory.add_item('potion', 1)
                 #pygame.time.wait(250)
             elif npcIndex != -1:
                 # interacted = True
@@ -531,12 +540,18 @@ class Player(pygame.sprite.Sprite):
                     item = self.game.activeNPC.interaction()
                     if item == 'trident':
                         self.activeWeaponList.append('trident')
+                        self.game.activeNPC.resetInventory('trident')
                     elif item == 'bubble':
                         self.activeWeaponList.append('bubble')
-                    elif item == 'speedPotion':
+                        self.game.activeNPC.resetInventory('bubble')
+                    elif item == 'speedPotion': #potion sounds https://quicksounds.com/sound/107/minecraft-potion-drinking
+                        pygame.mixer.Channel(4).set_volume(0.05 * self.game.soundVol)
+                        pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/Minecraft Potion Drinking - QuickSounds (mp3cut.net).mp3'))
                         self.speed += 3
                     elif item == 'strengthPotion':
-                        self.damage += 30
+                        pygame.mixer.Channel(4).set_volume(0.05 * self.game.soundVol)
+                        pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/Minecraft Potion Drinking - QuickSounds (mp3cut.net).mp3'))
+                        self.bonus += 10
                     elif item == 'healthPotion':
                         self.game.inventory.add_item('potion', 1)
                     self.game.activeNPC.interaction()
@@ -794,7 +809,7 @@ class Player(pygame.sprite.Sprite):
                 self.weaponNum += 1
                 self.weaponNum %= len(self.weaponList)
             self.weapon.type = self.weaponList[self.weaponNum]
-            self.weapon.updateDamage()
+            self.weapon.updateDamage(self.bonusDamage)
             if self.weapon.type == 'swordfish':
                 self.weaponAnimationSpeed = 15
             elif self.weapon.type == 'trident':
@@ -876,7 +891,7 @@ class NPC(pygame.sprite.Sprite):
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
-        self.totalItemCost = [{'flower': 20}, {'ore': 10}, {'flower': 10}]
+        self.totalItemCost = [{'flower': 2}, {'ore': 4}, {'flower': 4}]
         self.totalItemList = ['healthPotion', 'strengthPotion', 'speedPotion']
         self.totalItemDesc = ['Restores health (Consumable) ', 'Increases strength ', 'Increases movement speed ']
 
@@ -893,12 +908,12 @@ class NPC(pygame.sprite.Sprite):
 
         #If the weapons haven't been bought yet, give it priority in what items show
         if 'trident' not in self.game.player.activeWeaponList:
-            self.itemCost.append({'ore': 8})
+            self.itemCost.append({'ore': 12})
             self.itemList.append('trident')
             self.itemDesc.append('Throwing weapon ')
             self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/trident2.png'), (200, 200)))
         if 'bubble' not in self.game.player.activeWeaponList:
-            self.itemCost.append({'flower': 0})
+            self.itemCost.append({'flower': 4})
             self.itemList.append('bubble')
             self.itemDesc.append('Burst gun ')
             self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/bubblegun.png'), (200, 200)))
@@ -928,15 +943,21 @@ class NPC(pygame.sprite.Sprite):
         #Would you rather cum in the sink or sink in the cum? That is indeed the question for which we must all ponder and arrive at our own answers.
         #change this later
         self.dialogueList = {'01:First Meet':[{'Meetings': 1},
-                                                "Testing dialogue ",
                                                 "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
                                                 "Boom Boom Boom Boom ",
-                                                "%Choices; What do you want to do?; Shop; Leave; Meow ",
-                                                "Drink it now, drink it now, drink it now "],
+                                                "%Choices; What do you want to do?; Shop; Leave; Meow "],
                              '02:Second Meet': [{'Meetings':2},
                                                 "Hi again... ",
                                                 "%Choices; What do you want to do?; Shop; Leave; Meow "]
                             }
+        
+        self.choiceList = {'01:Shop': ["Hope your purchase helps you not die!"],
+                           '01:Leave': ["Byeeeeee "],
+                           '01:Meow': ["Meow!"],
+                           '02:Shop': ["I better see you again! >:("],
+                           '02:Leave': ["Bye again "],
+                           '02:Meow': ["Woof Woof Woof RGHHHHH", "I mean... Meow!"]
+                          }
         
         #What needs to be done:
         #For Choices strings, make it a list instead, depending on choice do selectedRect for next dialogue and then next dialogue after the choices string
@@ -1003,6 +1024,11 @@ class NPC(pygame.sprite.Sprite):
             #If there are choices displayed on the screen
             if len(self.TextBox.choiceRectList) > 0:
                 self.choiceResponse()
+                selection = self.dialogueList[self.dialogueStage][self.dialogueStageIndex].split(';')
+                selection = selection[self.TextBox.selectedRect+2]
+                selection = f'{self.dialogueStage[0:2]}:{selection.strip()}'
+                for line in self.choiceList[selection]:
+                    self.dialogueList[self.dialogueStage].append(line)
                 self.dialogueStageIndex += 1
                 if self.dialogueStageIndex == len(self.dialogueList[self.dialogueStage]) and self.game.state != 'shopping':
                     self.TextBox.kill()
@@ -1010,8 +1036,8 @@ class NPC(pygame.sprite.Sprite):
                     self.game.state = 'explore'
                     self.game.play_music('stop')
                     self.game.play_music('village')
-                else:
-                    #self.interaction()
+                elif self.TextBox.selectedRect != 0:
+                    self.interaction()
                     return -1
             #If the next dialogue to display is a choice list
             elif nextDialogue.find('%Choices') != -1:
@@ -1027,10 +1053,19 @@ class NPC(pygame.sprite.Sprite):
                 self.dialogueStageIndex += 1
         #When finished with dialogue
         elif self.game.state == 'dialogue':
+            index = -1
+            for i in range(len(self.dialogueList[self.dialogueStage])):
+                text = self.dialogueList[self.dialogueStage][i]
+                if isinstance(text, str) and text.find('%Choices') != -1:
+                    index = i+1
+            if index != -1:
+                self.dialogueList[self.dialogueStage] = self.dialogueList[self.dialogueStage][0:index]
+            self.selectedItem = -1
             self.TextBox.kill()
             self.updateDialogue()
             self.game.state = 'explore'
             self.game.play_music('stop')
+            self.game.play_music('village')
         self.itemRects = []
         return -1
 
@@ -1136,6 +1171,21 @@ class NPC(pygame.sprite.Sprite):
                 pygame.draw.rect(self.game.screen, BLUE, itemRect, 2, 2)
             else:
                 pygame.draw.rect(self.game.screen, WHITE, itemRect, 2, 2)
+
+    #Authored: Max Chiu 5/27/24
+    def resetInventory(self, item):
+        index = self.itemList.index(item)
+        self.itemCost.pop(index)
+        self.itemList.pop(index)
+        self.itemDesc.pop(index)
+        self.itemImgs.pop(index)
+        while len(self.itemList) < 4:
+            randomInd = random.randint(0, len(self.totalItemList)-1)
+            if self.totalItemList[randomInd] not in self.itemList:
+                self.itemCost.insert(index, self.totalItemCost[randomInd])
+                self.itemList.insert(index, self.totalItemList[randomInd])
+                self.itemDesc.insert(index, self.totalItemDesc[randomInd])
+                self.itemImgs.insert(index, self.totalItemImgs[randomInd])
         
 
 
@@ -1267,7 +1317,6 @@ class Enemy(pygame.sprite.Sprite):
     #Authored: Max Chiu 4/18/2024
     # Does damage to the enemy based on type of the attack it is hit with
     def dealtDamage(self, damage, type):
-        # print(self.hitInvincible)
         if not self.hitInvulnerable:
             if type == 'bubble':
                 self.health -= damage
@@ -1726,7 +1775,7 @@ class Boss(pygame.sprite.Sprite):
         self.attackLimiter = 100
         self.attacking = False
         self.doneAttacking = True
-        self.attackList = ['wave', 'barrage', 'quickbarrage']
+        self.attackList = ['wave', 'barrage', 'quickbarrage', 'cluster']
         self.chosenAttack = ''
 
         self.attackPause = 16
@@ -1735,6 +1784,11 @@ class Boss(pygame.sprite.Sprite):
         self.attackDuration = 150
         self.reachedDestination = False
         self.currentDestination = (0, 0)
+
+        self.upLeftClusterLoc = (WIDTH * 0.22, HEIGHT * 0.22)
+        self.upRightClusterLoc = (WIDTH * 0.68, HEIGHT * 0.22)
+        self.downLeftClusterLoc = (WIDTH * 0.22, HEIGHT * 0.68)
+        self.downRightClusterLoc = (WIDTH * 0.68, HEIGHT * 0.68)
 
 
         self.moving = False
@@ -1823,18 +1877,22 @@ class Boss(pygame.sprite.Sprite):
             if self.attackTimer >= self.attackLimiter:
                 self.attackTimer = 0
                 randomNum = random.randint(0, 100)
-                if randomNum >= 20 and randomNum <= 45:
+                if randomNum >= 20 and randomNum <= 40:
                     self.chosenAttack = self.attackList[0]
-                elif randomNum > 65:
+                elif randomNum > 77:
                     self.chosenAttack = self.attackList[1]
-                elif randomNum > 45 and randomNum <= 65:
+                elif randomNum > 35 and randomNum <= 55:
                     self.chosenAttack = self.attackList[2]
+                elif randomNum > 55 and randomNum <= 77:
+                    self.chosenAttack = self.attackList[3]
         if self.chosenAttack == self.attackList[0]:
             self.attackWave()
         elif self.chosenAttack == self.attackList[1]:
             self.attackBarrage()
         elif self.chosenAttack == self.attackList[2]:
             self.attackBarrageQuick()
+        elif self.chosenAttack == self.attackList[3]:
+            self.attackCluster()
         #print(self.chosenAttack)
         pass
 
@@ -1850,7 +1908,7 @@ class Boss(pygame.sprite.Sprite):
         if self.doneAttacking and self.reachedDestination:
             self.doneAttacking = False
             for attack in range(20):
-                BossAttack(self.game, self.x + attack * (self.width // 20), self.y + self.height * 1.05, 160, (math.cos(math.pi / (57.7 / ((attack + 1) * 18))), math.sin(math.pi / (57.7 / ((attack+1) * 18)))))
+                BossAttack(self.game, self.x + attack * (self.width // 20), self.y + self.height * 1.05, 110, (math.cos(math.pi / (57.7 / ((attack + 1) * 18)) + self.attackDurationCounter % 15), math.sin(math.pi / (57.7 / ((attack+1) * 18)) + self.attackDurationCounter % 15)))
         self.attackPauseCount += 1
         if self.attackPauseCount >= self.attackPause:
             self.attackPauseCount = 0
@@ -1885,7 +1943,7 @@ class Boss(pygame.sprite.Sprite):
         self.attackDurationCounter += 1
         if self.doneAttacking == True:
             self.doneAttacking = False
-            BossAttack(self.game, self.x + self.width * 0.5, self.y + self.height * 1.1, 160, self.getDirection(self.game.player.rect.center))
+            BossAttack(self.game, self.x + self.width * 0.5, self.y + self.height * 1.1, 130, self.getDirection(self.game.player.rect.center), 6)
         self.attackPauseCount += 1
         if self.attackPauseCount >= self.attackPause:
             self.attackPauseCount = 0
@@ -1893,6 +1951,43 @@ class Boss(pygame.sprite.Sprite):
         if self.attackDurationCounter >= self.attackDuration:
             self.attackDurationCounter = 0
             self.resetStatus()
+
+    def attackCluster(self):
+        self.attackDuration = 350
+        self.moving = False
+        self.attacking = True
+        self.doneAttacking = False
+        self.directionX = 0
+        self.directionY = 0
+        self.attackDurationCounter += 1
+        print("doing attack cluster")
+        self.attackClustersBurst()
+        if self.attackDurationCounter >= self.attackDuration:
+            self.attackDurationCounter = 0
+            self.resetStatus()
+
+    def attackClustersBurst(self):
+        self.attackPause = self.attackDuration / 3
+        print(self.attackPauseCount)
+        self.attackPauseCount += 1
+        if self.attackPauseCount >= self.attackPause - 10:
+            for attack in range(12):
+                if attack < 3:
+                    BossAttack(self.game, self.upLeftClusterLoc[0], self.upLeftClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 36)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack+1) * 36)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
+                elif attack >= 3 and attack < 6:
+                    BossAttack(self.game, self.downLeftClusterLoc[0], self.downLeftClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 36)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack + 1) * 36)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
+                elif attack >= 6 and attack < 9:
+                    BossAttack(self.game, self.upRightClusterLoc[0], self.upRightClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 36)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack + 1) * 36)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
+                else:
+                    BossAttack(self.game, self.downRightClusterLoc[0], self.downRightClusterLoc[1], 90, (math.cos(math.pi / (57.7 / ((attack + 1) * 36)) + self.attackDurationCounter % self.attackDuration // 3), math.sin(math.pi / (57.7 / ((attack + 1) * 36)) + self.attackDurationCounter % self.attackDuration // 3)), 4)
+        if self.attackPauseCount >= self.attackPause:
+            self.attackPauseCount = 0
+        elif self.attackPauseCount == 0 or self.attackPauseCount == 1:
+            BossAttackIndicator(self.game, self.upLeftClusterLoc[0], self.upLeftClusterLoc[1], TILESIZE, TILESIZE, 'circle', self.attackPause - 10)
+            BossAttackIndicator(self.game, self.upRightClusterLoc[0], self.upRightClusterLoc[1], TILESIZE, TILESIZE,'circle', self.attackPause - 10)
+            BossAttackIndicator(self.game, self.downLeftClusterLoc[0], self.downLeftClusterLoc[1], TILESIZE, TILESIZE,'circle', self.attackPause - 10)
+            BossAttackIndicator(self.game, self.downRightClusterLoc[0], self.downRightClusterLoc[1], TILESIZE, TILESIZE,'circle', self.attackPause - 10)
+
 
 
     def animate(self):
@@ -2037,19 +2132,23 @@ class Particle(pygame.sprite.Sprite):
 
 
 class BossAttack(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, damage, direction):
+    def __init__(self, game, x, y, damage, direction, speed=4, moving = True):
         self.game = game
         self.x = x
         self.y = y
         self.damage = damage
         self.direction = direction
-        self.speed = 4
+        self.speed = speed
+        self.moving = moving
         self.image = self.game.bossAttacks[0]
         self.groups = self.game.all_sprites, self.game.attacks
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+        self.decayTimer = 180
+        if not self.moving:
+            self.decayTimer = 40
 
     def setPosition(self, newX, newY):
         self.x = newX
@@ -2066,6 +2165,7 @@ class BossAttack(pygame.sprite.Sprite):
     def update(self):
         self.move()
         self.collision()
+        self.decay()
         pass
 
     def collision(self):
@@ -2076,7 +2176,36 @@ class BossAttack(pygame.sprite.Sprite):
                 self.kill()
         pass
 
-        
+    def decay(self):
+        self.decayTimer -= 1
+        if self.decayTimer <= 0:
+            self.kill()
+
+class BossAttackIndicator(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, width, height, shape, decay):
+        self.game = game
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.groups = self.game.all_sprites, self.game.non_background
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        if shape == 'circle':
+            self.image = pygame.transform.scale(pygame.image.load('Sprites/items/bubble.png').convert_alpha(), (TILESIZE, TILESIZE))
+        else:
+            self.image = pygame.Surface((self.width, self.height))
+            self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.decayLength = decay
+
+    def update(self):
+        self.decayLength -= 1
+        if self.decayLength <= 0:
+            self.kill()
+
+
 class Teleport(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game

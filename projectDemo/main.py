@@ -38,7 +38,8 @@ class Game():
                        'Everroot Forest - PLEASE COMMIT SOMETHING',
                        'Everroot Forest - Why Hello There',
                        'Everroot Forest - Pure Bliss',
-                       'Everroot Forest - This Is The One']
+                       'Everroot Forest - This Is The One', 
+                       'Everroot Forest - SAVE BEFORE PULLING']
         titleNum = random.randint(0, len(windowTitle) - 1)
         pygame.display.set_caption(windowTitle[titleNum])
         self.clock = pygame.time.Clock() 
@@ -101,11 +102,10 @@ class Game():
             mixer.music.load('Music/enemy-music.mp3')
             mixer.music.set_volume(0.065 * self.musicVol)
             mixer.music.play(100)
-        elif songType == 'boss': # Add boss music to be played when facing a boss, perhaps use music Jose recommended? - Eddie
-            # mixer.music.load('Music/boss_music_final.mp3')
-            # mixer.music.set_volume(0.065 * self.musicVol)
-            # mixer.music.play(100)
-            pass
+        elif songType == 'boss':
+            mixer.music.load('Music/boss_music_final.mp3')
+            mixer.music.set_volume(0.080 * self.musicVol)
+            mixer.music.play(100)
         elif songType == 'death':
             mixer.music.load('Music/Bleach_-_Never_meant_to_belong.mp3')
             mixer.music.set_volume(0.070 * self.musicVol)
@@ -437,7 +437,7 @@ class Game():
                         # maintains the previously equipped weapon from the previous screen
                         self.player.weaponNum = priorWeaponNum
                         self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
-                        self.player.weapon.updateDamage()
+                        self.player.weapon.updateDamage(self.player.bonus)
             # [2, 7] and [2, 12] are currently the two locations in the maplist where the boss room is located
             if (self.map == [2, 12] or self.map == [2, 7]):
                 self.boss = Boss(self, WIDTH * 0.4, HEIGHT * 0.4)
@@ -788,7 +788,7 @@ class Game():
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE))]
         self.bossImageList = [[pygame.image.load('Sprites/npcs/boss/bossHead.png'), pygame.image.load('Sprites/npcs/boss/bossidea4_5.png')], [pygame.image.load('Sprites/npcs/boss/bossattack.png'), pygame.image.load('Sprites/npcs/boss/bossattack_2.png'), pygame.image.load('Sprites/npcs/boss/bossattack_3.png')]]
         self.particleList = [[pygame.image.load('Sprites/particles_vfx/bossparticles1.png'), pygame.image.load('Sprites/particles_vfx/bossparticles2.png'), pygame.image.load('Sprites/particles_vfx/bossparticles3.png')], [pygame.image.load('Sprites/particles_vfx/genparticles1.png'), pygame.image.load('Sprites/particles_vfx/genparticles2.png'), pygame.image.load('Sprites/particles_vfx/genparticles3.png')]]
-        self.bossAttacks = [pygame.transform.scale(pygame.image.load('Sprites/items/bubbleCluster.png').convert_alpha(), (TILESIZE, TILESIZE))]
+        self.bossAttacks = [pygame.transform.scale(pygame.image.load('Sprites/items/bubbleCluster.png').convert_alpha(), (TILESIZE, TILESIZE)), pygame.transform.scale(pygame.image.load('Sprites/items/bubble.png').convert_alpha(), (TILESIZE * 3, TILESIZE * 3))]
 
 g = Game()
 g.intro_screen()
