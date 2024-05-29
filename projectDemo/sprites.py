@@ -441,7 +441,7 @@ class Player(pygame.sprite.Sprite):
                 elif item == 'bubble':
                     self.activeWeaponList.append('bubble')
                     self.game.activeNPC.resetInventory('bubble')
-                elif item == 'speedPotion':
+                elif item == 'speedPotion': #minecraft potion drinking sound effect https://quicksounds.com/sound/107/minecraft-potion-drinking
                     pygame.mixer.Channel(4).set_volume(0.05 * self.game.soundVol)
                     pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/Minecraft Potion Drinking - QuickSounds (mp3cut.net).mp3'))
                     self.speed += 3
@@ -544,7 +544,7 @@ class Player(pygame.sprite.Sprite):
                     elif item == 'bubble':
                         self.activeWeaponList.append('bubble')
                         self.game.activeNPC.resetInventory('bubble')
-                    elif item == 'speedPotion':
+                    elif item == 'speedPotion': #potion sounds https://quicksounds.com/sound/107/minecraft-potion-drinking
                         pygame.mixer.Channel(4).set_volume(0.05 * self.game.soundVol)
                         pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/Minecraft Potion Drinking - QuickSounds (mp3cut.net).mp3'))
                         self.speed += 3
