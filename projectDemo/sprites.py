@@ -442,8 +442,12 @@ class Player(pygame.sprite.Sprite):
                     self.activeWeaponList.append('bubble')
                     self.game.activeNPC.resetInventory('bubble')
                 elif item == 'speedPotion':
+                    pygame.mixer.Channel(4).set_volume(0.05 * self.game.soundVol)
+                    pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/Minecraft Potion Drinking - QuickSounds (mp3cut.net).mp3'))
                     self.speed += 3
                 elif item == 'strengthPotion':
+                    pygame.mixer.Channel(4).set_volume(0.05 * self.game.soundVol)
+                    pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/Minecraft Potion Drinking - QuickSounds (mp3cut.net).mp3'))
                     self.bonus += 10
                 elif item == 'healthPotion':
                     self.game.inventory.add_item('potion', 1)
@@ -536,12 +540,18 @@ class Player(pygame.sprite.Sprite):
                     item = self.game.activeNPC.interaction()
                     if item == 'trident':
                         self.activeWeaponList.append('trident')
+                        self.game.activeNPC.resetInventory('trident')
                     elif item == 'bubble':
                         self.activeWeaponList.append('bubble')
+                        self.game.activeNPC.resetInventory('bubble')
                     elif item == 'speedPotion':
+                        pygame.mixer.Channel(4).set_volume(0.05 * self.game.soundVol)
+                        pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/Minecraft Potion Drinking - QuickSounds (mp3cut.net).mp3'))
                         self.speed += 3
                     elif item == 'strengthPotion':
-                        self.damage += 30
+                        pygame.mixer.Channel(4).set_volume(0.05 * self.game.soundVol)
+                        pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/Minecraft Potion Drinking - QuickSounds (mp3cut.net).mp3'))
+                        self.bonus += 10
                     elif item == 'healthPotion':
                         self.game.inventory.add_item('potion', 1)
                     self.game.activeNPC.interaction()
@@ -1026,7 +1036,7 @@ class NPC(pygame.sprite.Sprite):
                     self.game.state = 'explore'
                     self.game.play_music('stop')
                     self.game.play_music('village')
-                elif self.selectedItem != 0:
+                elif self.TextBox.selectedRect != 0:
                     self.interaction()
                     return -1
             #If the next dialogue to display is a choice list
