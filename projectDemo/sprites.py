@@ -40,6 +40,7 @@ class Player(pygame.sprite.Sprite):
         self.weaponAnimationSpeed = 15
         self.swordUsed = False
         self.spearUsed = False
+        self.bonus = 0
 
         self.tutorial = Tutorial(self.game)
 
@@ -443,7 +444,7 @@ class Player(pygame.sprite.Sprite):
                 elif item == 'speedPotion':
                     self.speed += 3
                 elif item == 'strengthPotion':
-                    self.damage += 30
+                    self.bonus += 10
                 elif item == 'healthPotion':
                     self.game.inventory.add_item('potion', 1)
                 #pygame.time.wait(250)
@@ -798,7 +799,7 @@ class Player(pygame.sprite.Sprite):
                 self.weaponNum += 1
                 self.weaponNum %= len(self.weaponList)
             self.weapon.type = self.weaponList[self.weaponNum]
-            self.weapon.updateDamage()
+            self.weapon.updateDamage(self.bonusDamage)
             if self.weapon.type == 'swordfish':
                 self.weaponAnimationSpeed = 15
             elif self.weapon.type == 'trident':
@@ -880,7 +881,7 @@ class NPC(pygame.sprite.Sprite):
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
-        self.totalItemCost = [{'flower': 8}, {'ore': 6}, {'flower': 3}]
+        self.totalItemCost = [{'flower': 2}, {'ore': 4}, {'flower': 4}]
         self.totalItemList = ['healthPotion', 'strengthPotion', 'speedPotion']
         self.totalItemDesc = ['Restores health (Consumable) ', 'Increases strength ', 'Increases movement speed ']
 

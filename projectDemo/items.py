@@ -88,13 +88,13 @@ class Weapon(pygame.sprite.Sprite):
                 self.ammo -= 1
                 self.timer = self.pause
 
-    def updateDamage(self):
+    def updateDamage(self, bonus):
         if self.type == 'bubble':
-            self.damage = 10
+            self.damage = 10 + bonus
         elif self.type == 'swordfish':
-            self.damage = 20
+            self.damage = 20 + bonus
         elif self.type == 'trident':
-            self.damage = 35
+            self.damage = 35 + bonus
 
         
     #Author: Max Chiu 4/12/2024
@@ -264,7 +264,7 @@ class MeleeAttack(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         #self.image = pygame.transform.scale(pygame.image.load(swordfish_imgs[0]), (TILESIZE//1.5, TILESIZE//1.5))
 
-        self.weapon.updateDamage()
+        self.weapon.updateDamage(self.player.bonus)
 
         self.x = self.player.x
         self.y = self.player.y
