@@ -440,7 +440,13 @@ class Game():
                         self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
                         self.player.weapon.updateDamage(self.player.bonusDamage)
             # [2, 7] and [2, 12] are currently the two locations in the maplist where the boss room is located
-            if (self.map == [2, 12] or self.map == [2, 7]):
+            #if (self.map == [2, 12] or self.map == [2, 7]):
+            #    self.boss = Boss(self, WIDTH * 0.4, HEIGHT * 0.4)
+            #    self.bossActive = True
+            #    self.play_music('boss')
+            #else:
+            #    self.bossActive = False
+            if (settings.currentTileMap[mapNumber][0][-1] == 'r'):
                 self.boss = Boss(self, WIDTH * 0.4, HEIGHT * 0.4)
                 self.bossActive = True
                 self.play_music('boss')
