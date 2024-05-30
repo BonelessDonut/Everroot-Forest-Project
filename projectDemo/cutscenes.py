@@ -62,6 +62,10 @@ class CutsceneManager:
     def finished(self):
         return self.done
 
+    def restartCutscene(self):
+        self.done = False
+        self.clear_scenes()
+
 
 # Base class for scenes
 class Scene:
@@ -73,7 +77,7 @@ class Scene:
 
     def printSkip(self, screen):
         text = "Press Space to skip a cutscene"
-        render_text = pygame.font.SysFont('Arial', 24).render(text, True, GRAY)
+        render_text = pygame.font.SysFont('Arial', 24).render(text, True, WHITE)
         text_rect = render_text.get_rect(center=(WIDTH // 2, HEIGHT // 1.1))
         screen.blit(render_text, text_rect)
 
@@ -181,6 +185,7 @@ def playIntroScene(cutscene_manager):
               pygame.image.load('Sprites/protag/protagThrowUp.png'),
               pygame.image.load('Sprites/protag/protagThrowDown.png'),
               pygame.image.load('Sprites/protag/protagRangedDown.png')]
+    cutscene_manager.restartCutscene()
     '''
     cutscene_manager.add_scene(DialogueScene(sampleDialogueScene[0][0], sampleDialogueScene[1][0]))
     cutscene_manager.add_scene(DialogueScene(sampleDialogueScene[0][1], sampleDialogueScene[1][1]))
@@ -205,9 +210,9 @@ def playIntroScene(cutscene_manager):
         current_ticks = pygame.time.get_ticks()
         elapsedTime = (current_ticks - start_ticks) / 1000
         for event in pygame.event.get():
-            if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 cutscene_manager.game.cutsceneSkip = True
-            if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 pygame.font.quit()
                 pygame.quit()
                 sys.exit()
@@ -229,11 +234,11 @@ def playIntroScene(cutscene_manager):
 
 def playGameOver(cutscene_manager):
     cutscene_manager.game.play_music('death')
-    cutscene_manager.clear_scenes()
+    cutscene_manager.restartCutscene()
     cutscene_manager.add_scene(ImageScene('You Died. Press R to restart or exit with Space / Escape', 300, [pygame.image.load('Sprites/deth.jpg').convert_alpha()], 0, WHITE, BLACK, False))
     cutscene_manager.start()
     sceneTimeDuration = 300
-    start_ticks = 0
+    start_ticks = pygame.time.get_ticks()
     elapsedTime = 0
     cutscene_manager.game.finishedScene = False
     while not cutscene_manager.game.finishedScene:
@@ -242,13 +247,13 @@ def playGameOver(cutscene_manager):
         current_ticks = pygame.time.get_ticks()
         elapsedTime = (current_ticks - start_ticks) / 1000
         for event in pygame.event.get():
-            if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 cutscene_manager.game.cutsceneSkip = True
-            if event.type == pygame.KEYUP and event.key == pygame.K_r:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                 cutscene_manager.game.__init__()
                 #cutscene_manager.game.new()
                 cutscene_manager.game.intro_screen()
-            if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 pygame.font.quit()
                 pygame.quit()
                 sys.exit()
@@ -262,39 +267,48 @@ def playGameOver(cutscene_manager):
             cutscene_manager.game.finishedScene = True
             cutscene_manager.game.cutsceneSkip = False
             cutscene_manager.game.play_music('stop')
-            pygame.quit()
-            sys.exit()
+            cutscene_manager.game.__init__()
+            # cutscene_manager.game.new()
+            cutscene_manager.game.intro_screen()
+            # pygame.quit()
+            # sys.exit()
     pass
 
 def playGameWon(cutscene_manager):
     cutscene_manager.game.play_music('win')
-    cutscene_manager.clear_scenes()
+    cutscene_manager.restartCutscene()
     cutscene_manager.add_scene(ImageScene('You defeated the ceo of pollution and saved Everroot Forest. Nice job!', 15,
                                           [pygame.image.load('Sprites/hudImages/title3.png').convert_alpha()], 0, WHITE, SWAMPGREEN, True))
     cutscene_manager.add_scene(ImageScene('Now just to find that place...', 10,
-                                          [pygame.image.load('Sprites/hudImages/title3.png').convert_alpha()], 0, WHITE, SWAMPGREEN,
+                                          [pygame.image.load('Sprites/hudImages/title2.png').convert_alpha()], 0, WHITE, SWAMPGREEN,
                                           True))
     cutscene_manager.add_scene(ImageScene('Thanks for playing!', 200,
                                           [pygame.image.load('Sprites/hudImages/title3.png').convert_alpha()], 0, WHITE, SWAMPGREEN,
                                           True))
     cutscene_manager.start()
     sceneTimeDuration = 225
-    start_ticks = 0
+    start_ticks = pygame.time.get_ticks()
     elapsedTime = 0
     cutscene_manager.game.finishedScene = False
+    cutscene_manager.game.cutsceneSkip = False
     while not cutscene_manager.game.finishedScene:
         cutscene_manager.update()
         cutscene_manager.draw(cutscene_manager.game.screen)
         current_ticks = pygame.time.get_ticks()
         elapsedTime = (current_ticks - start_ticks) / 1000
+        #print(elapsedTime)
+        #print(start_ticks)
+        #print(current_ticks)
+        #print(cutscene_manager.finished())
+        #print(cutscene_manager.game.cutsceneSkip)
         for event in pygame.event.get():
-            if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 cutscene_manager.game.cutsceneSkip = True
-            if event.type == pygame.KEYUP and event.key == pygame.K_r:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                 cutscene_manager.game.__init__()
                 # cutscene_manager.game.new()
                 cutscene_manager.game.intro_screen()
-            if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 pygame.font.quit()
                 pygame.quit()
                 sys.exit()
@@ -311,8 +325,11 @@ def playGameWon(cutscene_manager):
             # cutscene_manager.game.createTilemap(None)
             cutscene_manager.game.cutsceneSkip = False
             cutscene_manager.game.play_music('stop')
-            pygame.quit()
-            sys.exit()
+            cutscene_manager.game.__init__()
+            # cutscene_manager.game.new()
+            cutscene_manager.game.intro_screen()
+            # pygame.quit()
+            # sys.exit()
 
 def transition_Out(game):
 

@@ -47,7 +47,7 @@ class Game():
         self.player = None
         self.inventory = None
         self.weaponsHud = None
-        self.state = 'opening'
+        self.state = 'menu'
         self.boss = None
         self.bossActive = False
         self.bossDefeated = False
@@ -76,6 +76,7 @@ class Game():
         self.tutorialsActive = False
         
         self.running = True
+
         self.finishedScene = False
         self.cutsceneSkip = False
         self.musicVol = 10
@@ -723,6 +724,25 @@ class Game():
     def intro_screen(self):
         #Play the intro screen
         #To be created later
+        while self.state == 'menu':
+            self.screen.blit(pygame.transform.scale(pygame.image.load('Sprites/hudImages/title3.png').convert_alpha(), (WIDTH, HEIGHT)), self.renderOffset)
+            text = "Press Space to Play"
+            render_text = pygame.font.Font('Fonts/minecraft-font/MinecraftRegular-Bmg3.otf', 70).render(text, True, RED)
+            text_rect = render_text.get_rect(center=(WIDTH // 2, HEIGHT // 1.4))
+            pygame.draw.rect(self.screen, (10, 10, 10, 70), text_rect)
+            self.screen.blit(render_text, text_rect)
+            pygame.display.update()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.font.quit()
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    pygame.font.quit()
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    self.state = 'opening'
         cutscenes.playIntroScene(self.cutsceneManage) # starts the intro scene using the cutscene manager
         if self.finishedScene: # after the introduction finishes
             self.state = 'explore'

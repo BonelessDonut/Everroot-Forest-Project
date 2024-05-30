@@ -1721,7 +1721,7 @@ class Boss(pygame.sprite.Sprite):
 
         self.speed = PLAYER_SPEED * 0.35
 
-        self.maxHealth = 500
+        self.maxHealth = 10
         self.currentHealth = self.maxHealth
         self.healthBarLength = WIDTH * 0.6
         self.healthBarHeight = HEIGHT * 0.05
