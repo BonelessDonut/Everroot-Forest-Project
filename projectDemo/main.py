@@ -82,6 +82,10 @@ class Game():
         self.soundVol = 10
         self.startPlayerMaxHealth = 1000
         self.priorPlayerHealth = self.startPlayerMaxHealth
+
+        #list of rooms that's visited by the player, starts off with all demo rooms.
+        self.visited = [(2,0), (2,1), (1,1), (3, 1), (2,2)]
+        self.notVisited = [(2, 3), (3, 3), (4, 3), (2, 4), (4, 4), (5, 4), (1, 5), (2, 5), (3, 5), (5, 5), (2, 6), (3, 6), (4, 6), (5, 6), (2, 7), (1, 8), (0, 9), (1, 9), (2, 9), (3, 9), (0, 10), (3, 10), (4, 10), (0, 11), (2, 11), (3, 11), (2, 12)]
     
     #written by Rachel Tang 4/19/24
     #used this website: https://www.educative.io/answers/how-to-play-an-audio-file-in-pygame
@@ -200,6 +204,15 @@ class Game():
                 mapNumber = mapList[self.map[0]-1][self.map[1]] 
                 self.map[0] -= 1
 
+            position = (self.map[0], self.map[1])
+            print(position)
+            print(position not in self.visited)
+            if position not in self.visited:
+                self.visited.append(position)
+                print(self.notVisited)
+                self.notVisited.remove(position)
+                print(self.notVisited)
+            
             purpleRoomsIndexes = []
             greenRoomsIndexes = [0, 1, 2, 3, 4]
 
@@ -437,7 +450,7 @@ class Game():
                         # maintains the previously equipped weapon from the previous screen
                         self.player.weaponNum = priorWeaponNum
                         self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
-                        self.player.weapon.updateDamage(self.player.bonus)
+                        self.player.weapon.updateDamage(self.player.bonusDamage)
             # [2, 7] and [2, 12] are currently the two locations in the maplist where the boss room is located
             if (self.map == [2, 12] or self.map == [2, 7]):
                 self.boss = Boss(self, WIDTH * 0.4, HEIGHT * 0.4)
@@ -527,6 +540,8 @@ class Game():
                 self.player.switchWeapons()
             if event.type == pygame.KEYUP and event.key == pygame.K_p and (self.state != 'shopping' and self.state != 'dialogue'): # pauses the game with P
                 self.pause()
+            if event.type == pygame.KEYUP and event.key == pygame.K_m and (self.state != 'shopping' and self.state != 'dialogue'):
+                self.showMap()
             if event.type == pygame.KEYUP and event.key == pygame.K_h and not self.player.itemUsed and self.state == 'explore' and self.inventory.get('potion') > 0: # keybind to heal, will have added functionality with potions in the inventory later
                 self.player.getHealth(300)
                 self.inventory.add_item('potion', -1)
@@ -565,6 +580,7 @@ class Game():
             # draws the player's health bar on the screen if needed
             if (self.state == 'explore' or self.state == 'oreMine' or self.state == 'flowerC'):
                 self.player.animateHealth()
+                self.player.showStatus()
             if self.state == 'shopping':
                 self.activeNPC.choiceResponse()
             if self.bossActive:
@@ -617,6 +633,8 @@ class Game():
                 sys.exit()
             if event.type == pygame.KEYUP and event.key == pygame.K_p and (self.state != 'shopping' and self.state != 'dialogue'): # if p is pressed, the pause() function is called to unpause the game
                 self.pause()
+            if event.type == pygame.KEYUP and event.key == pygame.K_m and (self.state != 'shopping' and self.state != 'dialogue' and self.state != 'pause'): # if p is pressed, the pause() function is called to unpause the game
+                self.showMap()
             if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE: # escape closes the game
                 pygame.font.quit()
                 pygame.quit()
@@ -789,6 +807,61 @@ class Game():
         self.bossImageList = [[pygame.image.load('Sprites/npcs/boss/bossHead.png'), pygame.image.load('Sprites/npcs/boss/bossidea4_5.png')], [pygame.image.load('Sprites/npcs/boss/bossattack.png'), pygame.image.load('Sprites/npcs/boss/bossattack_2.png'), pygame.image.load('Sprites/npcs/boss/bossattack_3.png')]]
         self.particleList = [[pygame.image.load('Sprites/particles_vfx/bossparticles1.png'), pygame.image.load('Sprites/particles_vfx/bossparticles2.png'), pygame.image.load('Sprites/particles_vfx/bossparticles3.png')], [pygame.image.load('Sprites/particles_vfx/genparticles1.png'), pygame.image.load('Sprites/particles_vfx/genparticles2.png'), pygame.image.load('Sprites/particles_vfx/genparticles3.png')]]
         self.bossAttacks = [pygame.transform.scale(pygame.image.load('Sprites/items/bubbleCluster.png').convert_alpha(), (TILESIZE, TILESIZE)), pygame.transform.scale(pygame.image.load('Sprites/items/bubble.png').convert_alpha(), (TILESIZE * 3, TILESIZE * 3))]
+        self.mapImg = pygame.transform.scale(pygame.image.load('Sprites/hudImages/Map.png').convert_alpha(), (1080, 405))
+
+    def showMap(self):
+        if self.state == 'explore': # pauses the game if it is not paused already
+            self.state = 'map'
+            # lowers the volume of music when the game is paused
+            pygame.mixer.Channel(1).set_volume(0.025 * self.soundVol)
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/092_Pause_04.wav'))
+            while self.state == 'map':
+                mixer.music.set_volume(0.035 * self.musicVol)
+                # Text to be displayed in the pause screen as a string below
+                #pauseText = (["Game Paused", "Press P again to unpause", "Press ESC to quit at anytime"])
+                # alpha value for the gray screen filter rectangle that is applied when the game is paused
+                # the lines of code below implement and create that rectangle
+                alpha = 4
+                pauseRect = pygame.Surface((WIDTH, HEIGHT))
+                #pauseRect = pauseRect.convert_alpha()
+                pauseRect.set_alpha(alpha)
+                #print(f"Alpha is {pauseRect.get_alpha()}")
+                pauseRect.fill(pygame.Color(100, 100, 100, alpha))
+                self.screen.blit(pauseRect, (0,0))
+                self.screen.blit(self.mapImg, (100,157.5))
+
+                for i in range(len(self.notVisited)):
+                    position = self.notVisited[i]
+                    pygame.draw.rect(self.screen, BLACK, pygame.Rect(100+(6+position[1]*15)*1080/208, 157.5+(6+position[0]*11)*1080/208, 15*1100/208, 11*1100/208))
+                
+                playerPos = self.map
+                playerCoord = (self.player.x*11/1280, self.player.y*7/720)
+                pygame.draw.rect(self.screen, PURPLE, pygame.Rect(100+(6+playerPos[1]*15+playerCoord[0]+1)*1080/208, 157.5+(6+playerPos[0]*11+playerCoord[1]+1)*1080/208, 2*1100/208, 2*1100/208))
+                
+
+
+                #pygame.draw.rect(self.screen, (128, 128, 128, 128), [0, 0, WIDTH, HEIGHT])
+                # putting the pause text on the screen while the game is paused
+                # self.screen.blit(pygame.font.SysFont('Garamond', 55).render(pauseText[0].strip(), False, WHITE),(WIDTH * 0.4225, HEIGHT * 0.1))
+                # self.screen.blit(pygame.font.SysFont('Garamond', 55).render(pauseText[1].strip(), False, WHITE),(WIDTH * 0.3271875, HEIGHT * 0.2277))
+                # self.screen.blit(pygame.font.SysFont('Garamond', 45).render(pauseText[2].strip(), False, ORANGE),(WIDTH * 0.3446875, HEIGHT * 0.34166))
+                # handling events while the game is paused
+                self.pauseEvents()
+                #self.pauseMenuDisplay()
+                pygame.display.update()
+
+                # SOMEWHERE DURING THE PAUSE MENU, ADD TEXT TO EXPLAIN USING THE SPACEBAR TO TOGGLE TUTORIALS
+                # ALSO ADD TEXT TO EXPLAIN USING THE ARROW KEYS TO ADJUST SOUND EFFECT AND MUSIC VOLUME
+                # EITHER REPRESENT THE VOLUME STATUS USING SLIDERS OR JUST DISPLAY THE NUMBER AS A FRACTION OF THE MAX VOLUME
+                
+        else:
+            self.state = 'explore' # unpauses the game
+            # returns the music to the former volume
+            pygame.mixer.Channel(1).set_volume(0.025 * self.soundVol)
+            pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/098_Unpause_04.wav'))
+            mixer.music.set_volume(0.065 * self.musicVol)
+        pass
+
 
 g = Game()
 g.intro_screen()
