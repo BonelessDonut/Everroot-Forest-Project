@@ -205,14 +205,11 @@ class Game():
                 mapNumber = mapList[self.map[0]-1][self.map[1]] 
                 self.map[0] -= 1
 
+            #tracks rooms that have been visited
             position = (self.map[0], self.map[1])
-            print(position)
-            print(position not in self.visited)
             if position not in self.visited:
                 self.visited.append(position)
-                print(self.notVisited)
                 self.notVisited.remove(position)
-                print(self.notVisited)
             
             purpleRoomsIndexes = []
             greenRoomsIndexes = [0, 1, 2, 3, 4]
