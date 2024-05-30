@@ -40,7 +40,7 @@ class Player(pygame.sprite.Sprite):
         self.weaponAnimationSpeed = 15
         self.swordUsed = False
         self.spearUsed = False
-        self.bonus = 0
+        self.bonusDamage = 0
 
         self.tutorial = Tutorial(self.game)
 
@@ -162,6 +162,12 @@ class Player(pygame.sprite.Sprite):
                          pygame.transform.scale(pygame.image.load('Sprites/protag/protagThrowDown.png').convert_alpha(),(self.width, self.height)),
                          pygame.transform.scale(pygame.transform.flip(pygame.image.load('Sprites/protag/protagThrowRight.png').convert_alpha(), True, False),(self.width, self.height)),
                          pygame.transform.scale(pygame.image.load('Sprites/protag/protagThrowRight.png').convert_alpha(),(self.width, self.height))]
+        self.statusList = [pygame.transform.scale(pygame.image.load('Sprites/items/SpeedSymbol.png').convert_alpha(), (30, 30)),
+                           pygame.transform.scale(pygame.image.load('Sprites/items/StrengthSymbol.png').convert_alpha(), (30,30))]
+
+        #list of active status effects
+        self.showList = []
+        self.descFont = pygame.font.Font('Fonts/minecraft-font/MinecraftRegular-Bmg3.otf', 16)
 
         self.clock = clock
         self.timepassed = 0
@@ -285,7 +291,6 @@ class Player(pygame.sprite.Sprite):
 
         elif self.game.state == 'shopping':
             self.mouseRect.center = pygame.mouse.get_pos()
-            interactRect = pygame.Rect(self.rect.left-TILESIZE*0.1, self.rect.top-TILESIZE*0.1, TILESIZE*1.2, TILESIZE*1.2)
             collisionList = self.game.activeNPC.itemRects
             if len(collisionList) > 0:
                 highlighted = self.mouseRect.collidelist(collisionList) 
@@ -365,6 +370,35 @@ class Player(pygame.sprite.Sprite):
         # draws the outline border for the health bar
         pygame.draw.rect(self.game.screen, (255, 255, 255), (10, 10, self.maxHealthBarLength, self.healthBarHeight), 4)
 
+    #Authored Max Chiu 5/30/2024
+    def showStatus(self):
+        self.showList = []
+        if self.speed != PLAYER_SPEED and 'speed' not in self.showList:
+            self.showList.append('speed')
+        if self.bonusDamage != 0 and 'strength' not in self.showList:
+            self.showList.append('strength')
+        for i in range(len(self.showList)):
+            statCoord = (10+self.maxHealthBarLength+10+20+5+50*i, 10+self.healthBarHeight/2+5)
+            pygame.draw.circle(self.game.screen, WHITE, statCoord, 20)
+            pygame.draw.circle(self.game.screen, GREEN, statCoord, 20, 1)
+            if self.showList[i] == 'speed':
+                self.game.screen.blit(self.statusList[0], (statCoord[0]-15, statCoord[1]-15))
+            elif self.showList[i] == 'strength':
+                self.game.screen.blit(self.statusList[1], (statCoord[0]-15, statCoord[1]-15))
+        self.mouseRect.center = pygame.mouse.get_pos()
+        interactRect = pygame.Rect(self.mouseRect.center[0]-TILESIZE*0.05, self.mouseRect.center[1]-TILESIZE*0.05, TILESIZE*0.1, TILESIZE*0.1)
+        for i in range(len(self.showList)):
+            statRect = pygame.Rect(10+self.maxHealthBarLength+10+5+50*i, 5, 40, 40)
+            if pygame.Rect.colliderect(interactRect, statRect):
+                statusText = ''
+                if self.showList[i] == 'speed':
+                    statusText = f'Speed Multiplier: {self.speed/PLAYER_SPEED:.2f}'
+                elif self.showList[i] == 'strength':
+                    statusText = f'Added Strength: {self.bonusDamage}'
+                pygame.draw.rect(self.game.screen, BROWN, pygame.Rect(self.mouseRect.left, self.mouseRect.top, 9*len(statusText)-4.7*(statusText.count('i')+statusText.count('l')), 25))
+                self.game.screen.blit(self.descFont.render(statusText, False, OFFWHITE), (self.mouseRect.left+4, self.mouseRect.top+4))
+
+        
 
     #Method for different Player interactions
     def interact(self):
@@ -448,7 +482,7 @@ class Player(pygame.sprite.Sprite):
                 elif item == 'strengthPotion':
                     pygame.mixer.Channel(4).set_volume(0.05 * self.game.soundVol)
                     pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/Minecraft Potion Drinking - QuickSounds (mp3cut.net).mp3'))
-                    self.bonus += 10
+                    self.bonusDamage += 10
                 elif item == 'healthPotion':
                     self.game.inventory.add_item('potion', 1)
                 #pygame.time.wait(250)
@@ -547,11 +581,11 @@ class Player(pygame.sprite.Sprite):
                     elif item == 'speedPotion': #potion sounds https://quicksounds.com/sound/107/minecraft-potion-drinking
                         pygame.mixer.Channel(4).set_volume(0.05 * self.game.soundVol)
                         pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/Minecraft Potion Drinking - QuickSounds (mp3cut.net).mp3'))
-                        self.speed += 3
+                        self.speed *= 1.1
                     elif item == 'strengthPotion':
                         pygame.mixer.Channel(4).set_volume(0.05 * self.game.soundVol)
                         pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/Minecraft Potion Drinking - QuickSounds (mp3cut.net).mp3'))
-                        self.bonus += 10
+                        self.bonusDamage += 10
                     elif item == 'healthPotion':
                         self.game.inventory.add_item('potion', 1)
                     self.game.activeNPC.interaction()
@@ -2361,7 +2395,7 @@ class Inventory(pygame.sprite.Sprite):
         self.rect.y = self.y
 
         self.font = pygame.font.SysFont("Calibri", 20)
-        self.slots = {"flower":0, "ore":0, "potion": 0}
+        self.slots = {"flower":20, "ore":20, "potion": 0}
 
         for i in range(len(self.hotbar_img)):
             self.image.blit(self.hotbar_img[i], pygame.Rect(25+65*(i),30,0,0))
