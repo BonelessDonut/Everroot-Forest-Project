@@ -66,6 +66,8 @@ Charlenne Tan
 
 Max Chiu
 
+Special Thanks to our Scrum Master with his brilliant feedback: Hung Do
+
 ## License
    Copyright 2024 Everroot Forest
 
