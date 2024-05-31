@@ -264,7 +264,7 @@ class MeleeAttack(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         #self.image = pygame.transform.scale(pygame.image.load(swordfish_imgs[0]), (TILESIZE//1.5, TILESIZE//1.5))
 
-        self.weapon.updateDamage(self.player.bonus)
+        self.weapon.updateDamage(self.player.bonusDamage)
 
         self.x = self.player.x
         self.y = self.player.y
