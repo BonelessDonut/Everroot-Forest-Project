@@ -86,8 +86,8 @@ class Game():
         self.priorPlayerHealth = self.startPlayerMaxHealth
 
         #list of rooms that's visited by the player, starts off with all demo rooms.
-        self.visited = [(2,0), (2,1), (1,1), (3, 1), (2,2)]
-        self.notVisited = [(2, 3), (3, 3), (4, 3), (2, 4), (4, 4), (5, 4), (1, 5), (2, 5), (3, 5), (5, 5), (2, 6), (3, 6), (4, 6), (5, 6), (2, 7), (1, 8), (0, 9), (1, 9), (2, 9), (3, 9), (0, 10), (3, 10), (4, 10), (0, 11), (2, 11), (3, 11), (2, 12)]
+        self.visited = [(2,0), (2,1), (1,1), (3, 1), (2,2), (2, 7)]
+        self.notVisited = [(2, 3), (3, 3), (4, 3), (2, 4), (4, 4), (5, 4), (1, 5), (2, 5), (3, 5), (5, 5), (2, 6), (3, 6), (4, 6), (5, 6), (1, 8), (0, 9), (1, 9), (2, 9), (3, 9), (0, 10), (3, 10), (4, 10), (0, 11), (2, 11), (3, 11), (2, 12)]
 
         #list of npcs
         self.visitedNPCs = []
@@ -336,7 +336,6 @@ class Game():
                 self.play_music('village')
             elif self.currentMapType == 'p' and self.previousMapType != 'p':
                 self.play_music('enemy')
-            print('mapTypes', self.previousMapType, self.currentMapType)
 
             print('mapNumber:', mapNumber)
             # if mapNumber in greenRoomsIndexes:
