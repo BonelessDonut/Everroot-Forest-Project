@@ -1420,8 +1420,8 @@ class Enemy(pygame.sprite.Sprite):
 
         # holds the data for the enemy types
 
-        self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 80, 'health': 100, 'speed': PLAYER_SPEED * 0.5}
-        self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 100, 'health': 70}
+        self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 80, 'health': 80, 'speed': PLAYER_SPEED * 0.5}
+        self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 100, 'health': 60}
 
         self.imagelist = self.pumpkinRobot['down']
         #self.deathImgList = [pygame.transform.scale(pygame.image.load('').convert_alpha(), (self.width, self.height))]
@@ -1994,7 +1994,7 @@ class Boss(pygame.sprite.Sprite):
     def ui(self):
         if self.game.bossActive:
             self.healthbar()
-            bossTitle = "Bro"
+            bossTitle = "CEO of Pollution"
             self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(bossTitle.strip(), False, WHITE),(self.healthBarPos[0], self.healthBarPos[1] - HEIGHT * 0.04))
             #pygame.display.update()#
 
@@ -2306,8 +2306,8 @@ class BossAttack(pygame.sprite.Sprite):
         self.speed = speed
         self.moving = moving
         self._layer = ENEMY_LAYER
-        self.image = self.game.bossAttacks[0]
-        self.groups = self.game.all_sprites, self.game.attacks, self.game.non_background
+        self.image = self.game.bossAttacks[2]
+        self.groups = self.game.all_sprites, self.game.non_background
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.rect = self.image.get_rect()
         self.rect.x = self.x

@@ -172,7 +172,7 @@ class DialogueScene(Scene):
 sampleDialogueScene = [['Everroot Forest. A quaint village nested in the Heart of Nature.',
                         'Korbo was passing through while returning to the Slime Kingdom after a season of scavenging...',
                         'But when they arrived in the village it was strangely quiet...the villagers had all been taken!',
-                        'The Ceo of Polution had come to poison everything in the Heart of Nature, starting with the peaceful villagers!',
+                        'The Ceo of Pollution came to poison everything in the Heart of Nature, starting with the peaceful villagers!',
                         'The Slime Kingdom would be next, so they must be stopped here...'],
                        [6, 7, 7, 8, 9]]
 
@@ -278,7 +278,7 @@ def playGameOver(cutscene_manager):
 def playGameWon(cutscene_manager):
     cutscene_manager.game.play_music('win')
     cutscene_manager.restartCutscene()
-    cutscene_manager.add_scene(ImageScene('You defeated the ceo of pollution and saved Everroot Forest. Nice job!', 10,
+    cutscene_manager.add_scene(ImageScene('You defeated the Ceo of Pollution and saved Everroot Forest. Nice job!', 10,
                                           [pygame.image.load('Sprites/scenes/villageLongshot.png').convert_alpha()], 0, WHITE, SWAMPGREEN, True))
     cutscene_manager.add_scene(ImageScene('Now just to find that place...', 12,
                                           [pygame.image.load('Sprites/scenes/villageSceneFull.png').convert_alpha()], 0, WHITE, SWAMPGREEN,

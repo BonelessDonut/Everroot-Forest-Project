@@ -234,6 +234,13 @@ class Bullet(pygame.sprite.Sprite):
                     self.game.player.getDamage(self.damage)
                     self.kill()
                     self.timepassed = 0
+            weaponHit = self.rect.collidelist(list(attack.rect for attack in self.game.attacks))
+            if weaponHit != -1:
+                self.timepassed += self.clock.get_time()
+
+                if self.timepassed > 50:
+                    self.kill()
+                    self.timepassed = 0
 
 
             
@@ -541,7 +548,6 @@ class MeleeAttack(pygame.sprite.Sprite):
         # This could be done in a variety of ways, like making a list of every enemy object (the Enemy class) and using
         # pygame.sprite.collide_rect() to check to see if any enemies have been hit, then decreasing their health appropriately if hit
         betweenBlocks = False
-
 
         for enemy in self.game.enemies:
             if pygame.sprite.collide_rect(self, enemy):
