@@ -493,7 +493,7 @@ class Player(pygame.sprite.Sprite):
                 elif item == 'speedPotion': #minecraft potion drinking sound effect https://quicksounds.com/sound/107/minecraft-potion-drinking
                     pygame.mixer.Channel(4).set_volume(0.05 * self.game.soundVol)
                     pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/Minecraft Potion Drinking - QuickSounds (mp3cut.net).mp3'))
-                    self.speed += 3
+                    self.speed *= 1.1
                 elif item == 'sharpTrident':
                     self.bonusDamage[2] += 10
                 elif item == 'bulletPen':
@@ -920,7 +920,7 @@ class WalkableBlock(pygame.sprite.Sprite):
 
 
 class NPC(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, mapPos):
         self.game = game
         self._layer = PLAYER_LAYER
         self.groups = self.game.all_sprites, self.game.npcs, self.game.non_background
@@ -929,6 +929,9 @@ class NPC(pygame.sprite.Sprite):
         self.y = y * TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
+
+        #attribute checking which room it's in
+        self.mapPos = (mapPos[0], mapPos[1])
 
         self.meetings = 0
         self.name = 'Dubidubidu'
