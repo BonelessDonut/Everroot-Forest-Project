@@ -1015,22 +1015,34 @@ class NPC(pygame.sprite.Sprite):
         #Always leave a space/punctuation at the end of the quote!
         #Would you rather cum in the sink or sink in the cum? That is indeed the question for which we must all ponder and arrive at our own answers.
         #change this later
-        self.dialogueList = {'01:First Meet':[{'Meetings': 1},
-                                                "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
-                                                "Boom Boom Boom Boom ",
-                                                "%Choices; What do you want to do?; Shop; Leave; Meow "],
-                             '02:Second Meet': [{'Meetings':2},
-                                                "Hi again... ",
-                                                "%Choices; What do you want to do?; Shop; Leave; Meow "]
+
+        if self.name == 'le chat':
+            self.dialogueList = {'01:First Meet':[{'Meetings': 1},
+                                                    "Meow! My name is le chat, the guardian of the forest!! ",
+                                                    "Are you here to help save the forest from the CEO of pollution? ",
+                                                    "%Choices; Want to save the forest?; Yes; No...; I speak for the trees ",
+                                                    "The Evil CEO of pollution is taking all of our flowers and ores. Without it, the forest's ecosystem is thrown all out of wack! ",
+                                                    "So, since you're the best fighter of all of us (you do have a sword after all), I'm entrusting you to defeat him! ",
+                                                    "Just in case you forgot how to fight though, use WASD to move, J to attack using the sword and trident, and arrow keys to attack using the bubble gun.",
+                                                    "In order to get other weapons, you need to collect flowers and ores using Space then trade it in the shop (via me and my friends) ",
+                                                    "In the shop, only the health potion can be saved for later, and is drunk using H. The other potions/upgrades give you a permanent upgrade ",
+                                                    "And uh... I think that's it! Thanks for helping save me and my friends' home!! "
+                                                    "%Choices; What do you want to do?; Shop; Leave; Meow "],
+                                '02:Second Meet': [{'Meetings':2},
+                                                    "Hi again... ",
+                                                    "%Choices; What do you want to do?; Shop; Leave; Meow "]
+                                }
+            
+            self.choiceList = {'01:Yes':["Meow! That's amazing! Because we really need your help! "],
+                            '01:No...':["Oh... that's awkward ", "Um... I'll just keep talking and pretend you didn't say that "],
+                            '01:I speak for the trees':["I LOVE the Lorax! Then, you should also know the trees are asking for our help!"],
+                            '01:Shop': ["Hope your purchase helps you not die!"],
+                            '01:Leave': ["Byeeeeee "],
+                            '01:Meow': ["Meow!"],
+                            '02:Shop': ["You better not die! >:("],
+                            '02:Leave': ["Bye again "],
+                            '02:Meow': ["Woof Woof Woof RGHHHHH", "I mean... Meow!"]
                             }
-        
-        self.choiceList = {'01:Shop': ["Hope your purchase helps you not die!"],
-                           '01:Leave': ["Byeeeeee "],
-                           '01:Meow': ["Meow!"],
-                           '02:Shop': ["I better see you again! >:("],
-                           '02:Leave': ["Bye again "],
-                           '02:Meow': ["Woof Woof Woof RGHHHHH", "I mean... Meow!"]
-                          }
         
         #What needs to be done:
         #For Choices strings, make it a list instead, depending on choice do selectedRect for next dialogue and then next dialogue after the choices string
@@ -1100,8 +1112,9 @@ class NPC(pygame.sprite.Sprite):
                 selection = self.dialogueList[self.dialogueStage][self.dialogueStageIndex].split(';')
                 selection = selection[self.TextBox.selectedRect+2]
                 selection = f'{self.dialogueStage[0:2]}:{selection.strip()}'
-                for line in self.choiceList[selection]:
-                    self.dialogueList[self.dialogueStage].append(line)
+                for i in range(len(self.choiceList[selection])-1, -1, -1):
+                    line = self.choiceList[selection][i]
+                    self.dialogueList[self.dialogueStage].insert(self.dialogueStageIndex+1,line)
                 self.dialogueStageIndex += 1
                 if self.dialogueStageIndex == len(self.dialogueList[self.dialogueStage]) and self.game.state != 'shopping':
                     self.TextBox.kill()
@@ -1148,7 +1161,7 @@ class NPC(pygame.sprite.Sprite):
         self.TextBox.choiceRectList = []
         #variable for each letter width of the font
         textWidth = 9
-        if self.TextBox.selectedRect == 0:
+        if self.TextBox.selectedRect == 0 and self.dialogueStageIndex == len(self.dialogueList[self.dialogueStage])-1:
             self.game.state = 'shopping'
 
             # displays the count of flowers when in the shop
@@ -2366,7 +2379,7 @@ class TextBox(pygame.sprite.Sprite):
             #If normal dialogue
             if type(text) == str:
                 try:
-                    cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9]', text[maxLength-1::-1]).end()+1
+                    cutoffIndex = len(text[:maxLength])-re.search("[^a-zA-Z0-9()']", text[maxLength-1::-1]).end()+1
                 except AttributeError:
                     cutoffIndex = maxLength
                 #print("cutoffIndex is ", cutoffIndex)
