@@ -172,7 +172,7 @@ class DialogueScene(Scene):
 sampleDialogueScene = [['Everroot Forest. A quaint village nested in the Heart of Nature.',
                         'Korbo was passing through while returning to the Slime Kingdom after a season of scavenging...',
                         'But when they arrived in the village it was strangely quiet...the villagers had all been taken!',
-                        'The Ceo of Pollution had come to poison everything in the Heart of Nature, starting with the peaceful villagers!',
+                        'The Ceo of Pollution came to poison everything in the Heart of Nature, starting with the peaceful villagers!',
                         'The Slime Kingdom would be next, so they must be stopped here...'],
                        [6, 7, 7, 8, 9]]
 
