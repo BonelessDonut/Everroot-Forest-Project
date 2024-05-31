@@ -20,7 +20,8 @@ Everroot Forest
 
 ## Description
 Our idea is an exciting dungeon crawler game where you fight enemies and collect flowers and ores to give to the spirits of nature. Travel throughout the different rooms using different combinations of melee and ranged weapons. Talk to different NPCs to collect new ites, upgrade them, and buy different consumable items. Finally, defeat the boss to bring peace back to the world. This game is meant to be reminiscent of games such as Legend of Zelda and Hades.
-    ## Features:
+
+  Features:
     - Explore a dungeon
     - Fight various different enemies
     - Collect flowers and ores to save the spirits of nature
