@@ -86,9 +86,16 @@ class Game():
         self.priorPlayerHealth = self.startPlayerMaxHealth
 
         #list of rooms that's visited by the player, starts off with all demo rooms.
-        self.visited = [(2,0), (2,1), (1,1), (3, 1), (2,2), (2, 7)]
-        self.notVisited = [(2, 3), (3, 3), (4, 3), (2, 4), (4, 4), (5, 4), (1, 5), (2, 5), (3, 5), (5, 5), (2, 6), (3, 6), (4, 6), (5, 6), (1, 8), (0, 9), (1, 9), (2, 9), (3, 9), (0, 10), (3, 10), (4, 10), (0, 11), (2, 11), (3, 11), (2, 12)]
+        #self.visited = [(2,0), (2,1), (1,1), (3, 1), (2,2), (2, 7)]
+        self.visited = [(2, 1), (2, 7)]
+        self.notVisited = [(2, 0), (1,1), (3, 1), (2,2), (2, 3), (3, 3), (4, 3), (2, 4), (4, 4), (5, 4), (1, 5), (2, 5), (3, 5), (5, 5), (2, 6), (3, 6), (4, 6), (5, 6), (1, 8), (0, 9), (1, 9), (2, 9), (3, 9), (0, 10), (3, 10), (4, 10), (0, 11), (2, 11), (3, 11), (2, 12)]
 
+        #list of flowers
+        self.aliveFlowers = {}
+        #list of ores
+        self.aliveOres = {}
+        #list of enemies
+        self.aliveEnemies = {}
         #list of npcs
         self.visitedNPCs = []
     
@@ -153,13 +160,13 @@ class Game():
                     elif (settings.currentTileMap[0][row])[col] == "P": # player
                         self.player = Player(self, col, row, self.clock)
                     elif (settings.currentTileMap[0][row])[col] == "F": # flower
-                        Flower(self, col, row, self.clock)
+                        self.aliveFlowers[(2, 1)] = self.aliveFlowers.get((2, 1), []) + [Flower(self, col, row, self.clock)]
                     elif (settings.currentTileMap[0][row])[col] == 'O': # ore
-                        Ore(self, col, row, self.clock)
+                        self.aliveOres[(2, 1)] = self.aliveOres.get((2, 1), []) + [Ore(self, col, row, self.clock)]
                     elif (settings.currentTileMap[0][row])[col] == 'N': # NPC
                         self.visitedNPCs.append(NPC(self, col, row, (2,1)))
                     elif (settings.currentTileMap[0][row])[col] == 'E': # melee enemy
-                        Enemy(self, col, row, 'melee')
+                        self.aliveEnemies[(2, 1)] = self.aliveEnemies.get((2, 1), []) + [Enemy(self, col, row, 'melee')]
                     elif (settings.currentTileMap[0][row])[col] == 'D': # ranged enemy
                         Enemy(self, col, row, 'ranged')
                     elif (settings.currentTileMap[0][row])[col] == 'T': # teleport/door
@@ -196,8 +203,6 @@ class Game():
 
             mapNumber = mapList[self.map[0]][self.map[1]] 
             self.previousMapType = currentTileMap[mapNumber][0][-1]
-            print(mapNumber, self.previousMapType)
-
             # figures out which preloaded map to move the player to. 
             # looks at the direction the player moves in and moves to the appropriate map tile
             if prevPosition[0] == 31:
@@ -337,7 +342,6 @@ class Game():
             elif self.currentMapType == 'p' and self.previousMapType != 'p':
                 self.play_music('enemy')
 
-            print('mapNumber:', mapNumber)
             # if mapNumber in greenRoomsIndexes:
             #     print('greenRoomsIndexes', greenRoomsIndexes)
             #     print('mapTypesA', self.previousMapType, self.currentMapType)
@@ -404,12 +408,12 @@ class Game():
                 
             # print(self.map, mapNumber)
 
-            if mapNumber == -1:
-                for i in mapList:
-                    print(i) 
-            print('Current Map:')
-            for i in currentTileMap[mapNumber]:
-                print(i)
+            # if mapNumber == -1:
+            #     for i in mapList:
+            #         print(i) 
+            # print('Current Map:')
+            # for i in currentTileMap[mapNumber]:
+            #     print(i)
 
 
             self.all_sprites.add(self.inventory)
@@ -418,6 +422,7 @@ class Game():
             self.all_sprites.add(self.player.weapon)
             self.non_background.add(self.player)
 
+            position = (self.map[0], self.map[1])
             for row in range(len(settings.currentTileMap[mapNumber])):
                 #print(f"{row} ", end="")
                 for col in range(len(settings.currentTileMap[mapNumber][row])):
@@ -435,9 +440,19 @@ class Game():
                     elif (settings.currentTileMap[mapNumber][row])[col] == "G": # growth
                         WalkableBlock(self, col, row, 1)
                     elif (settings.currentTileMap[mapNumber][row])[col] == "F": # flower
-                        Flower(self, col, row, self.clock)
+                        if position in self.notVisited:
+                            self.aliveFlowers[position] = self.aliveFlowers.get(position, []) + [Flower(self, col, row, self.clock)]
+                        else:
+                            for i in range(len(self.aliveFlowers[position])):
+                                self.all_sprites.add(self.aliveFlowers[position][i])
+                                self.flowers.add(self.aliveFlowers[position][i])
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'O': # ore
-                        Ore(self, col, row, self.clock)
+                        if position in self.notVisited:
+                            self.aliveOres[position] = self.aliveOres.get(position, []) + [Ore(self, col, row, self.clock)]
+                        else:
+                            for i in range(len(self.aliveOres[position])):
+                                self.all_sprites.add(self.aliveOres[position][i])
+                                self.ores.add(self.aliveOres[position][i])
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'N': # NPC
                         position = (self.map[0], self.map[1])
                         if position in self.notVisited:
@@ -448,9 +463,19 @@ class Game():
                                     self.all_sprites.add(self.visitedNPCs[i])
                                     self.npcs.add(self.visitedNPCs[i])
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'E': # melee enemy
-                        Enemy(self, col, row, 'melee')
+                        if position in self.notVisited:
+                            self.aliveEnemies[position] = self.aliveEnemies.get(position, []) + [Enemy(self, col, row, 'melee')]
+                        else:
+                            for i in range(len(self.aliveEnemies[position])):
+                                self.all_sprites.add(self.aliveEnemies[position][i])
+                                self.enemies.add(self.aliveEnemies[position][i])
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'D': # ranged enemy
-                        Enemy(self, col, row, 'ranged')
+                        if position in self.notVisited:
+                            self.aliveEnemies[position] = self.aliveEnemies.get(position, []) + [Enemy(self, col, row, 'ranged')]
+                        else:
+                            for i in range(len(self.aliveEnemies[position])):
+                                self.all_sprites.add(self.aliveEnemies[position][i])
+                                self.enemies.add(self.aliveEnemies[position][i])
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'T': # teleport door
                         # teleports the player's position on the screen when they move rooms
                         Teleport(self, col, row)
@@ -909,6 +934,24 @@ class Game():
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/098_Unpause_04.wav'))
             mixer.music.set_volume(0.065 * self.musicVol)
         pass
+
+    def updateAliveLists(self, spriteType, originalPos):
+        position = (self.map[0], self.map[1])
+        try:
+            if spriteType == 'flower':
+                for i in range(len(self.aliveFlowers[position])):
+                    if self.aliveFlowers[position][i].originalPos == originalPos:
+                        self.aliveFlowers[position].pop(i)
+            elif spriteType == 'ore':
+                for i in range(len(self.aliveOres[position])):
+                    if self.aliveOres[position][i].originalPos == originalPos:
+                        self.aliveOres[position].pop(i)
+            elif spriteType == 'enemy':
+                for i in range(len(self.aliveEnemies[position])):
+                    if self.aliveEnemies[position][i].defaultPos == originalPos:
+                        self.aliveEnemies[position].pop(i)
+        except IndexError:
+            pass
 
 
 g = Game()

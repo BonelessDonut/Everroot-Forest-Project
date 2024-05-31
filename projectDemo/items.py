@@ -644,6 +644,8 @@ class Flower(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
 
+        self.originalPos = (self.x, self.y)
+
         self.clock = clock
         self.timepassed = 0
         self.expireTime = random.random()*20+40
@@ -678,6 +680,7 @@ class Flower(pygame.sprite.Sprite):
         elif self.timepassed > self.expireTime and self.game.state == 'explore':
             if self.state == 'dying' and self.imgindex == 3:
                 self.kill()
+                self.game.updateAliveLists('flower', self.originalPos)
             else:
                 self.state = 'dying'
             self.anim()
@@ -699,6 +702,7 @@ class Flower(pygame.sprite.Sprite):
             if self.state == 'cutting':
                 self.kill()
                 self.game.inventory.add_item('flower', 1)
+                self.game.updateAliveLists('flower', self.originalPos)
                 pygame.mixer.Channel(3).set_volume(0.01 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
 
@@ -713,6 +717,8 @@ class Ore(pygame.sprite.Sprite):
         self.y = y*TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
+
+        self.originalPos = (self.x, self.y)
 
         self.clock = clock
         self.timepassed = 0
@@ -745,6 +751,7 @@ class Ore(pygame.sprite.Sprite):
         elif self.timepassed > self.expireTime and self.game.state == 'explore':
             if self.state == 'dying' and self.imgindex == 4:
                 self.kill()
+                self.game.updateAliveLists('ore', self.originalPos)
             else:
                 self.state = 'dying'
             self.killAnim()
@@ -768,6 +775,7 @@ class Ore(pygame.sprite.Sprite):
             if self.state == 'mining':
                 self.kill()
                 self.game.inventory.add_item('ore', 1)
+                self.game.updateAliveLists('ore', self.originalPos)
                 pygame.mixer.Channel(3).set_volume(0.01 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
         pass

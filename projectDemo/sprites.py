@@ -1301,7 +1301,7 @@ class Enemy(pygame.sprite.Sprite):
         self.stunned = False
         self.stunCount = 0
         self.stunTimer = 8
-        self.attackTimer = 2
+        self.attackTimer = 4
 
         self.name = 'Udibudibudib'
 
@@ -1410,6 +1410,7 @@ class Enemy(pygame.sprite.Sprite):
                 pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/03_Claw_03.wav'))
             if self.health <= 0:
                 self.kill()
+                self.game.updateAliveLists('enemy', self.defaultPos)
                 pygame.mixer.Channel(4).set_volume(0.065 * self.game.soundVol)
                 pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/69_Enemy_death_01.wav'))
             # print(f"enemy (self) health is {self.health}")
