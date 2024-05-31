@@ -952,10 +952,18 @@ class NPC(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(pygame.image.load(self.imagelist[self.npcImgNum]).convert_alpha(), (self.width, self.height))
         self.avatarImgList = [pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (920*0.24, 170*0.73)),
                               pygame.transform.scale(pygame.image.load(self.imagelist[1]).convert_alpha(), (920*0.24, 170*0.73)),
-                              pygame.transform.scale(pygame.image.load(self.imagelist[2]).convert_alpha(), (920*0.24, 170*0.73))]
+                              pygame.transform.scale(pygame.image.load(self.imagelist[2]).convert_alpha(), (920*0.24, 170*0.73)),
+                              pygame.transform.scale(pygame.image.load('Sprites/npcs/NPCs-Char/catNPCno4.png').convert_alpha(), (920*0.3, 170*0.73))]
         self.avatarImg = self.avatarImgList[self.npcImgNum]
         self.nameList = ['bucket', 'heart', 'leaf']
         self.name = self.nameList[self.npcImgNum]
+        if mapPos == (2, 1):
+            self.npcImgNum = 3
+            self.width = 2.5*TILESIZE
+            self.height = 2*TILESIZE
+            self.name = 'le chat'
+            self.avatarImg = self.avatarImgList[3]
+            self.image = pygame.transform.scale(pygame.image.load('Sprites/npcs/NPCs-Char/catNPCno4.png').convert_alpha(), (self.width, self.height))
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
@@ -1298,7 +1306,7 @@ class Enemy(pygame.sprite.Sprite):
         self.stunned = False
         self.stunCount = 0
         self.stunTimer = 8
-        self.attackTimer = 2
+        self.attackTimer = 4
 
         self.name = 'Udibudibudib'
 
@@ -1407,6 +1415,7 @@ class Enemy(pygame.sprite.Sprite):
                 pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/03_Claw_03.wav'))
             if self.health <= 0:
                 self.kill()
+                self.game.updateAliveLists('enemy', self.defaultPos)
                 pygame.mixer.Channel(4).set_volume(0.065 * self.game.soundVol)
                 pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/69_Enemy_death_01.wav'))
             # print(f"enemy (self) health is {self.health}")
