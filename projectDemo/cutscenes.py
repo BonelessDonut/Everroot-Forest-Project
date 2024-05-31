@@ -278,7 +278,7 @@ def playGameOver(cutscene_manager):
 def playGameWon(cutscene_manager):
     cutscene_manager.game.play_music('win')
     cutscene_manager.restartCutscene()
-    cutscene_manager.add_scene(ImageScene('You defeated the ceo of pollution and saved Everroot Forest. Nice job!', 10,
+    cutscene_manager.add_scene(ImageScene('You defeated the Ceo of Pollution and saved Everroot Forest. Nice job!', 10,
                                           [pygame.image.load('Sprites/scenes/villageLongshot.png').convert_alpha()], 0, WHITE, SWAMPGREEN, True))
     cutscene_manager.add_scene(ImageScene('Now just to find that place...', 12,
                                           [pygame.image.load('Sprites/scenes/villageSceneFull.png').convert_alpha()], 0, WHITE, SWAMPGREEN,
