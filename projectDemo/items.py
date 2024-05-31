@@ -234,6 +234,13 @@ class Bullet(pygame.sprite.Sprite):
                     self.game.player.getDamage(self.damage)
                     self.kill()
                     self.timepassed = 0
+            weaponHit = self.rect.collidelist(list(attack.rect for attack in self.game.attacks))
+            if weaponHit != -1:
+                self.timepassed += self.clock.get_time()
+
+                if self.timepassed > 50:
+                    self.kill()
+                    self.timepassed = 0
 
 
             
@@ -542,7 +549,6 @@ class MeleeAttack(pygame.sprite.Sprite):
         # pygame.sprite.collide_rect() to check to see if any enemies have been hit, then decreasing their health appropriately if hit
         betweenBlocks = False
 
-
         for enemy in self.game.enemies:
             if pygame.sprite.collide_rect(self, enemy):
                 #print('here')
@@ -644,6 +650,8 @@ class Flower(pygame.sprite.Sprite):
         self.width = TILESIZE
         self.height = TILESIZE
 
+        self.originalPos = (self.x, self.y)
+
         self.clock = clock
         self.timepassed = 0
         self.expireTime = random.random()*20+40
@@ -678,6 +686,7 @@ class Flower(pygame.sprite.Sprite):
         elif self.timepassed > self.expireTime and self.game.state == 'explore':
             if self.state == 'dying' and self.imgindex == 3:
                 self.kill()
+                self.game.updateAliveLists('flower', self.originalPos)
             else:
                 self.state = 'dying'
             self.anim()
@@ -699,6 +708,7 @@ class Flower(pygame.sprite.Sprite):
             if self.state == 'cutting':
                 self.kill()
                 self.game.inventory.add_item('flower', 1)
+                self.game.updateAliveLists('flower', self.originalPos)
                 pygame.mixer.Channel(3).set_volume(0.01 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
 
@@ -713,6 +723,8 @@ class Ore(pygame.sprite.Sprite):
         self.y = y*TILESIZE
         self.width = TILESIZE
         self.height = TILESIZE
+
+        self.originalPos = (self.x, self.y)
 
         self.clock = clock
         self.timepassed = 0
@@ -745,6 +757,7 @@ class Ore(pygame.sprite.Sprite):
         elif self.timepassed > self.expireTime and self.game.state == 'explore':
             if self.state == 'dying' and self.imgindex == 4:
                 self.kill()
+                self.game.updateAliveLists('ore', self.originalPos)
             else:
                 self.state = 'dying'
             self.killAnim()
@@ -768,6 +781,7 @@ class Ore(pygame.sprite.Sprite):
             if self.state == 'mining':
                 self.kill()
                 self.game.inventory.add_item('ore', 1)
+                self.game.updateAliveLists('ore', self.originalPos)
                 pygame.mixer.Channel(3).set_volume(0.01 * self.game.soundVol)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('Music/sound_effects/mixkit_game_treasure_coin.wav'))
         pass

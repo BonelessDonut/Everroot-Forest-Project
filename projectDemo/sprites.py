@@ -331,7 +331,7 @@ class Player(pygame.sprite.Sprite):
                 self.game.screenshake = amount // 5
             if self.targetHealth <=0:
                 self.targetHealth = 0 # target health cannot go below zero
-            pygame.mixer.Channel(1).set_volume(0.035 * self.game.soundVol)
+            pygame.mixer.Channel(1).set_volume(0.050 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/77_flesh_02.wav'))
 
     def getHealth(self, amount):
@@ -660,6 +660,11 @@ class Player(pygame.sprite.Sprite):
             self.game.createTilemap((tpSprite.x//TILESIZE, tpSprite.y//TILESIZE))
             #pygame.time.wait(50)
 
+        #Checks for endgates - hitboxes that signify the game should end and credits should play
+        endgateIndex = interactRect.collidelist(list(endgate.rect for endgate in self.game.endgates))
+        if endgateIndex != -1:
+            self.game.game_won()
+
 
     
 
@@ -934,16 +939,28 @@ class NPC(pygame.sprite.Sprite):
         self.mapPos = (mapPos[0], mapPos[1])
 
         self.meetings = 0
-        self.name = 'Dubidubidu'
+
 
         self.xChange = 0
         self.yChange = 0
 
-        self.imagelist = ['Sprites/npcs/sampleNPC/hkprotagdown.jpg',
-                          'Sprites/npcs/sampleNPC/hkprotagleft.jpg',
-                          'Sprites/npcs/sampleNPC/hkprotagright.jpg',
-                          'Sprites/npcs/sampleNPC/hkprotagdown.jpg']
-        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (self.width, self.height))
+
+        if mapPos == (2, 1):
+            self.npcImgNum = 3
+            self.width = 2.5*TILESIZE
+            self.height = 2*TILESIZE
+            self.name = 'le chat'
+            self.avatarImg = self.game.avatarImgList[-1]
+            self.image = pygame.transform.scale(pygame.image.load('Sprites/npcs/NPCs-Char/catNPCno4.png').convert_alpha(), (self.width, self.height))
+        else:
+            self.npcImgNum = random.randint(0, len(self.game.npcImageList) -1)
+            self.image = pygame.transform.scale(pygame.image.load(self.game.npcImageList[self.npcImgNum]).convert_alpha(), (self.width, self.height))
+            self.avatarImg = self.game.avatarImgList[self.npcImgNum]
+            self.name = self.game.nameList[self.npcImgNum]
+
+            self.game.npcImageList.pop(self.npcImgNum)
+            self.game.avatarImgList.pop(self.npcImgNum)
+            self.game.nameList.pop(self.npcImgNum)
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
@@ -1000,23 +1017,100 @@ class NPC(pygame.sprite.Sprite):
         #Always leave a space/punctuation at the end of the quote!
         #Would you rather cum in the sink or sink in the cum? That is indeed the question for which we must all ponder and arrive at our own answers.
         #change this later
-        self.dialogueList = {'01:First Meet':[{'Meetings': 1},
-                                                "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
-                                                "Boom Boom Boom Boom ",
-                                                "%Choices; What do you want to do?; Shop; Leave; Meow "],
-                             '02:Second Meet': [{'Meetings':2},
-                                                "Hi again... ",
-                                                "%Choices; What do you want to do?; Shop; Leave; Meow "]
+
+        if self.name == 'le chat':
+            self.dialogueList = {'01:First Meet':[{'Meetings': 1},
+                                                    "Meow! My name is le chat, the guardian of the forest!! ",
+                                                    "You're the Slime Kingdom's reinforcements right? ",
+                                                    "%Choices; Want to save the forest?; Yes; No...; I speak for the trees ",
+                                                    "The Evil CEO of pollution is taking all of our flowers and ores. Without it, the forest's ecosystem is thrown all out of wack! ",
+                                                    "So, since you're the best fighter of all of us (you do have a sword after all), I'm entrusting you to defeat him! ",
+                                                    "Just in case you forgot how to fight though, use WASD to move, J to attack using the sword and trident, and arrow keys to attack using the bubble gun.",
+                                                    "In order to get other weapons, you need to collect flowers and ores using Space then trade it in the shop (via me and my friends) ",
+                                                    "But be careful, if you take too long to collect the flowers and ores, they'll start decomposing from the Evil CEO's pollution (heard he doesn't shower) ",
+                                                    "In the shop, only the health potion can be saved for later, and is drunk using H. The other potions/upgrades give you a permanent upgrade ",
+                                                    "And uh... I think that's it! Thanks for helping save me and my friends' home!! "
+                                                    "%Choices; What do you want to do?; Shop; Leave; Meow "],
+                                '02:Second Meet': [{'Meetings':2},
+                                                    "Hi again... ",
+                                                    "%Choices; What do you want to do?; Shop; Leave; Meow "]
+                                }
+            
+            self.choiceList = {'01:Yes':["Meow! That's amazing! Because we really need your help! "],
+                            '01:No...':["Oh... that's awkward ", "Um... I'll just keep talking and pretend you didn't say that "],
+                            '01:I speak for the trees':["I LOVE the Lorax! Then, you should also know the trees are asking for our help!"],
+                            '01:Shop': ["Hope your purchase helps you not die! "],
+                            '01:Leave': ["Byeeeeee "],
+                            '01:Meow': ["Meow! "],
+                            '02:Shop': ["You better not die! >:( "],
+                            '02:Leave': ["Good luck!! "],
+                            '02:Meow': ["Woof Woof Woof RGHHHHH", "I mean... Meow! "]
                             }
         
-        self.choiceList = {'01:Shop': ["Hope your purchase helps you not die!"],
-                           '01:Leave': ["Byeeeeee "],
-                           '01:Meow': ["Meow!"],
-                           '02:Shop': ["I better see you again! >:("],
-                           '02:Leave': ["Bye again "],
-                           '02:Meow': ["Woof Woof Woof RGHHHHH", "I mean... Meow!"]
-                          }
+        elif self.name == 'leaf':
+            self.dialogueList = {'01:First Meet':[{'Meetings': 1},
+                                                    "Ouch! You can’t cut me!! I am the great Leaf, not a flower >:| ",
+                                                    "%Choices; What do you say?; Sorry... I needed to gather resources.; Oh. My bad.; I thought you were a flower! ",
+                                                    "But I guess I have to do my job... ",
+                                                    "What would you like to do? Shop ore leaf ",
+                                                    "%Choices; What do you want to do?; Shop; Leaf "],
+                                '02:Second Meet': [{'Meetings':2},
+                                                    "You’re back? You guys just won’t leaf me alone!! ",
+                                                    "What do you want? Don’t even shop, just leaf",
+                                                    "%Choices; What do you want to do?; Shop; Leaf "],
+                                '03:Third Meet': [{'Meetings':3},
+                                                  "...No "]
+                                }
+            
+            self.choiceList = {'01:Sorry... I need to gather resources. What can I trade with what I have?': ["So rude… slimes these days, I’m just trying to leaf in peace."],
+                            '01:Oh. My bad.':["So rude… slimes these days, I’m just trying to leaf in peace."],
+                            '01:I thought you were a flower!':["So rude… slimes these days, I’m just trying to leaf in peace."],
+                            '01:Shop': ["Don't come back!! "],
+                            '01:Leaf': ["Good "],
+                            '02:Shop': ["Leaf me alone!! "],
+                            '02:Leaf': ["Good riddance "]
+                            }
+            
+        elif self.name == 'bucket':
+            self.dialogueList = {'01:First Meet':[{'Meetings': 1},
+                                                    "Hello there! I am the guardian of the grounds, Bucket. I see you’re on a mission to save our forest from the CEO of pollution! ",
+                                                    "Some ground rules (not actually, I just like saying ground) ",
+                                                    "Be careful of Heart, underneath that smile is an evil nature ",
+                                                    "You should probably leave Leaf alone, they are quite the grumpy one, constantly mumbling about leafing them alone. ",
+                                                    "Come to me to trade! I am definitely the nicest of the bunch :) ",
+                                                    "Please shop until your bucket list is all checked off! ",
+                                                    "%Choices; What do you want to do?; Shop; Leave "],
+                                '02:Second Meet': [{'Meetings':2},
+                                                    "Welcome back!! Are you here to fill your bucket? ",
+                                                    "%Choices; What do you want to do?; Shop; Leave "]
+                                }
+            
+            self.choiceList = {
+                            '01:Shop': ["Good Luck! "],
+                            '01:Leave': ["Come back soon! "],
+                            '02:Shop': ["Come back as many times as you want "],
+                            '02:Leave': ["You're welcome back anytime! "]
+                            }
+            
+        elif self.name == 'heart':
+            self.dialogueList = {'01:First Meet':[{'Meetings': 1},
+                                                    "Oh... ew ",
+                                                    "I mean Hi! How are you? How can I help you? ",
+                                                    "Actually don’t answer that, doesn’t matter ",
+                                                    "Did you come to fight the evil CEO? ",
+                                                    "Oh, YOU are going to need all the help you can get ",
+                                                    "Try not to die too fast ",
+                                                    "%Choices; What do you want to do?; Shop; Leave "],
+                                '02:Second Meet': [{'Meetings':2},
+                                                    "Heart's closed off. Goodbye! "]
+                                }
+            
+            self.choiceList = {
+                            '01:Shop': ["Stay alive! ... or not "],
+                            '01:Leave': ["Come back soon! (I hope you won't tho!) "]
+                            }
         
+
         #What needs to be done:
         #For Choices strings, make it a list instead, depending on choice do selectedRect for next dialogue and then next dialogue after the choices string
         #Probably do in choiceResponse method.
@@ -1052,7 +1146,7 @@ class NPC(pygame.sprite.Sprite):
             pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
             self.meetings += 1
-            self.TextBox = TextBox(self.game)
+            self.TextBox = TextBox(self.game, self)
             self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 28, 'Garamond', self.name)
             self.dialogueStageIndex += 1
             self.game.state = 'dialogue'
@@ -1085,8 +1179,9 @@ class NPC(pygame.sprite.Sprite):
                 selection = self.dialogueList[self.dialogueStage][self.dialogueStageIndex].split(';')
                 selection = selection[self.TextBox.selectedRect+2]
                 selection = f'{self.dialogueStage[0:2]}:{selection.strip()}'
-                for line in self.choiceList[selection]:
-                    self.dialogueList[self.dialogueStage].append(line)
+                for i in range(len(self.choiceList[selection])-1, -1, -1):
+                    line = self.choiceList[selection][i]
+                    self.dialogueList[self.dialogueStage].insert(self.dialogueStageIndex+1,line)
                 self.dialogueStageIndex += 1
                 if self.dialogueStageIndex == len(self.dialogueList[self.dialogueStage]) and self.game.state != 'shopping':
                     self.TextBox.kill()
@@ -1100,13 +1195,13 @@ class NPC(pygame.sprite.Sprite):
             #If the next dialogue to display is a choice list
             elif nextDialogue.find('%Choices') != -1:
                 self.TextBox.kill()
-                self.TextBox = TextBox(self.game)
+                self.TextBox = TextBox(self.game, self)
                 choicesList = nextDialogue.split(';')
                 self.TextBox.newText(choicesList[1:], 28, 'Garamond', self.name)
             #Displaying normal dialogue
             else:
                 self.TextBox.kill()
-                self.TextBox = TextBox(self.game)
+                self.TextBox = TextBox(self.game, self)
                 self.TextBox.newText(nextDialogue, 28, 'Garamond', self.name)
                 self.dialogueStageIndex += 1
         #When finished with dialogue
@@ -1133,7 +1228,7 @@ class NPC(pygame.sprite.Sprite):
         self.TextBox.choiceRectList = []
         #variable for each letter width of the font
         textWidth = 9
-        if self.TextBox.selectedRect == 0:
+        if self.TextBox.selectedRect == 0 and self.dialogueStageIndex == len(self.dialogueList[self.dialogueStage])-1:
             self.game.state = 'shopping'
 
             # displays the count of flowers when in the shop
@@ -1286,7 +1381,7 @@ class Enemy(pygame.sprite.Sprite):
         self.stunned = False
         self.stunCount = 0
         self.stunTimer = 8
-        self.attackTimer = 2
+        self.attackTimer = 4
 
         self.name = 'Udibudibudib'
 
@@ -1322,8 +1417,8 @@ class Enemy(pygame.sprite.Sprite):
 
         # holds the data for the enemy types
 
-        self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 80, 'health': 100, 'speed': PLAYER_SPEED * 0.5}
-        self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 100, 'health': 70}
+        self.pumpkinRobot = {'down': self.pumpkinImgDown, 'damage': 80, 'health': 80, 'speed': PLAYER_SPEED * 0.5}
+        self.rangedPumpkin = {'image': self.rangedImgL,  'damage': 100, 'health': 60}
 
         self.imagelist = self.pumpkinRobot['down']
         #self.deathImgList = [pygame.transform.scale(pygame.image.load('').convert_alpha(), (self.width, self.height))]
@@ -1395,6 +1490,7 @@ class Enemy(pygame.sprite.Sprite):
                 pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/03_Claw_03.wav'))
             if self.health <= 0:
                 self.kill()
+                self.game.updateAliveLists('enemy', self.defaultPos)
                 pygame.mixer.Channel(4).set_volume(0.065 * self.game.soundVol)
                 pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/69_Enemy_death_01.wav'))
             # print(f"enemy (self) health is {self.health}")
@@ -1805,12 +1901,14 @@ class Boss(pygame.sprite.Sprite):
         self._layer = ENEMY_LAYER
         self.x = x
         self.y = y
-        self.width = TILESIZE * 2
-        self.height = TILESIZE * 2.5
+        self.width = TILESIZE * 3
+        self.height = self.width * 5/4
 
         self.speed = PLAYER_SPEED * 0.35
 
-        self.maxHealth = 500
+        #self.maxHealth = 500
+        # Lowered max health for testing and demonstration purposes
+        self.maxHealth = 100
         self.currentHealth = self.maxHealth
         self.healthBarLength = WIDTH * 0.6
         self.healthBarHeight = HEIGHT * 0.05
@@ -1893,9 +1991,9 @@ class Boss(pygame.sprite.Sprite):
     def ui(self):
         if self.game.bossActive:
             self.healthbar()
-            bossTitle = "Bro"
+            bossTitle = "CEO of Pollution"
             self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(bossTitle.strip(), False, WHITE),(self.healthBarPos[0], self.healthBarPos[1] - HEIGHT * 0.04))
-            pygame.display.update()#
+            #pygame.display.update()#
 
     # Function should create the boss's healthbar on the screen, including the max length and the current percentage of health remaining. The boss's name would also be displayed right above the healthbar.
     def healthbar(self):
@@ -2131,7 +2229,9 @@ class Boss(pygame.sprite.Sprite):
         self.game.bossDefeated = True
         self.particles.kill()
         self.kill()
-        self.game.game_won()
+        # self.game.game_won()
+        GameEndTeleport(self.game, 15, 3)
+        GameEndTeleport(self.game, 16, 3)
         pass
 
 class Particle(pygame.sprite.Sprite):
@@ -2202,8 +2302,9 @@ class BossAttack(pygame.sprite.Sprite):
         self.direction = direction
         self.speed = speed
         self.moving = moving
-        self.image = self.game.bossAttacks[0]
-        self.groups = self.game.all_sprites, self.game.attacks
+        self._layer = ENEMY_LAYER
+        self.image = self.game.bossAttacks[2]
+        self.groups = self.game.all_sprites, self.game.non_background
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -2280,14 +2381,34 @@ class Teleport(pygame.sprite.Sprite):
         self.y = y * TILESIZE
 
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(BLUE)
+        self.image = self.game.tileList[0][1]
+        #self.image = pygame.Surface([self.width, self.height])
+        #self.image.fill(BLUE)
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+class GameEndTeleport(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = GROUND_LAYER
+        self.groups = self.game.all_sprites, self.game.endgates
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.width = TILESIZE
+        self.height = TILESIZE
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.image = self.game.tileList[0][2]
+        # self.image = pygame.Surface([self.width, self.height])
+        # self.image.fill(BLUE)
         self.rect.x = self.x
         self.rect.y = self.y
 
 class TextBox(pygame.sprite.Sprite):
-    def __init__(self, game):
+    def __init__(self, game, npc):
         self.game = game
+        self.npc = npc
         self._layer = TEXT_LAYER
         self.groups = self.game.all_sprites, self.game.user_interface
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -2301,13 +2422,14 @@ class TextBox(pygame.sprite.Sprite):
         self.area = pygame.Rect(0, 3, self.width*0.70, self.height*0.6)
         self.avatarBox = pygame.Rect(self.width*0.7134, self.height*0.13, self.width*0.24, self.height*0.73)
         self.image = pygame.transform.scale(pygame.image.load('Sprites/textbox2.png').convert_alpha(), (self.width, self.height*1.20))
-        self.imagelist = os.listdir('Sprites/npcs/chipichipichapachapa')
-        self.imgindex = 3
+        #self.imagelist = os.listdir('Sprites/npcs/chipichipichapachapa')
+        #self.imgindex = 3
 
         self.selectedRect = 0
         self.choiceRectList = []
 
-        image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
+        #image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
+        image = self.npc.avatarImg
         self.image.blit(image, self.avatarBox)
         #To see where the text and avatar area rectangles cover, uncomment below lines
         #pygame.draw.rect(self.image, RED, self.area)
@@ -2348,7 +2470,7 @@ class TextBox(pygame.sprite.Sprite):
             #If normal dialogue
             if type(text) == str:
                 try:
-                    cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9]', text[maxLength-1::-1]).end()+1
+                    cutoffIndex = len(text[:maxLength])-re.search("[^a-zA-Z0-9()']", text[maxLength-1::-1]).end()+1
                 except AttributeError:
                     cutoffIndex = maxLength
                 #print("cutoffIndex is ", cutoffIndex)
@@ -2379,9 +2501,9 @@ class TextBox(pygame.sprite.Sprite):
     
         
     def update(self):
-        self.imgindex = (self.imgindex+1)%392 
+        #self.imgindex = (self.imgindex+1)%392
         self.timepassed += self.clock.get_time()/1000
-        image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
+        image = self.npc.avatarImg
         self.image.blit(image, self.avatarBox)
         self.image.blit(pygame.font.SysFont('Courier', 25).render(self.name, False, (255, 255, 255)),(self.avatarBox.x + self.avatarBox.width / 2 - len(self.name) * TILESIZE / 5.5, self.height * 0.89))
         if len(self.choiceRectList) > 0:
@@ -2515,6 +2637,8 @@ class WeaponDisplay(pygame.sprite.Sprite):
             if self not in self.game.all_sprites:
                 self.groups = self.game.all_sprites, self.game.user_interface
                 self.add(self.game.all_sprites, self.game.user_interface)
+            if self.game.player.weapon.type == 'bubble':
+                self.displayRangedAmmo()
             for i in range(len(self.weaponList)):
                 if self.weaponList[i]['name'] in self.game.player.activeWeaponList:
                     currentImage = pygame.transform.scale(self.weaponList[i]['image'].convert_alpha(), (TILESIZE * 0.8, TILESIZE * 0.8))
@@ -2529,6 +2653,12 @@ class WeaponDisplay(pygame.sprite.Sprite):
         else:
             # removes the weapon hud from the list of sprites to be drawn if it should not be shown
             self.remove(self.game.all_sprites, self.game.user_interface)
+
+    def displayRangedAmmo(self):
+        #print("in displayRangedAmmo func")
+        ammoCount = self.game.player.weapon.ammo // 3
+        for ammo in range(ammoCount):
+            pygame.draw.circle(self.game.screen, PINK, (20 + ammo * 13, 45), 8)
 
     # checks the weapon that is actively equipped and updates the info within the hud to reflect that
     def checkActiveWep(self):

@@ -51,6 +51,8 @@ class Game():
         self.boss = None
         self.bossActive = False
         self.bossDefeated = False
+        self.previousMapType = None
+        self.currentMapType = None
         #Game states:
         #explore - Player can move around
         #dialogue - Player is currently in dialogue, player can't move
@@ -76,7 +78,6 @@ class Game():
         self.tutorialsActive = False
         
         self.running = True
-
         self.finishedScene = False
         self.cutsceneSkip = False
         self.musicVol = 10
@@ -84,10 +85,27 @@ class Game():
         self.startPlayerMaxHealth = 1000
         self.priorPlayerHealth = self.startPlayerMaxHealth
 
-        #list of rooms that's visited by the player, starts off with all demo rooms.
-        self.visited = [(2,0), (2,1), (1,1), (3, 1), (2,2)]
-        self.notVisited = [(2, 3), (3, 3), (4, 3), (2, 4), (4, 4), (5, 4), (1, 5), (2, 5), (3, 5), (5, 5), (2, 6), (3, 6), (4, 6), (5, 6), (2, 7), (1, 8), (0, 9), (1, 9), (2, 9), (3, 9), (0, 10), (3, 10), (4, 10), (0, 11), (2, 11), (3, 11), (2, 12)]
+        self.npcImageList = [
+                          'Sprites/npcs/NPCs-Char/bucket.png',
+                          'Sprites/npcs/NPCs-Char/heart.png',
+                          'Sprites/npcs/NPCs-Char/leaf.png']
+        self.avatarImgList = [pygame.transform.scale(pygame.image.load(self.npcImageList[0]).convert_alpha(), (920*0.24, 170*0.73)),
+                              pygame.transform.scale(pygame.image.load(self.npcImageList[1]).convert_alpha(), (920*0.24, 170*0.73)),
+                              pygame.transform.scale(pygame.image.load(self.npcImageList[2]).convert_alpha(), (920*0.24, 170*0.73)),
+                              pygame.transform.scale(pygame.image.load('Sprites/npcs/NPCs-Char/catNPCno4.png').convert_alpha(), (920*0.3, 170*0.73))]
+        self.nameList = ['bucket', 'heart', 'leaf']
 
+        #list of rooms that's visited by the player, starts off with all demo rooms.
+        #self.visited = [(2,0), (2,1), (1,1), (3, 1), (2,2), (2, 7)]
+        self.visited = [(2, 1), (2, 7)]
+        self.notVisited = [(2, 0), (1,1), (3, 1), (2,2), (2, 3), (3, 3), (4, 3), (2, 4), (4, 4), (5, 4), (1, 5), (2, 5), (3, 5), (5, 5), (2, 6), (3, 6), (4, 6), (5, 6), (1, 8), (0, 9), (1, 9), (2, 9), (3, 9), (0, 10), (3, 10), (4, 10), (0, 11), (2, 11), (3, 11), (2, 12)]
+
+        #list of flowers
+        self.aliveFlowers = {}
+        #list of ores
+        self.aliveOres = {}
+        #list of enemies
+        self.aliveEnemies = {}
         #list of npcs
         self.visitedNPCs = []
     
@@ -108,11 +126,11 @@ class Game():
             mixer.music.play(100)
         elif songType == 'enemy':
             mixer.music.load('Music/enemy-music.mp3')
-            mixer.music.set_volume(0.065 * self.musicVol)
+            mixer.music.set_volume(0.045 * self.musicVol)
             mixer.music.play(100)
         elif songType == 'boss':
             mixer.music.load('Music/boss_music_final.mp3')
-            mixer.music.set_volume(0.080 * self.musicVol)
+            mixer.music.set_volume(0.050 * self.musicVol)
             mixer.music.play(100)
         elif songType == 'death':
             mixer.music.load('Music/Bleach_-_Never_meant_to_belong.mp3')
@@ -137,8 +155,9 @@ class Game():
             for row in range(len(settings.currentTileMap[0])):
                 #print(f"{row} ", end="")   
                 for col in range(len(settings.currentTileMap[0][row])):
+                    WalkableBlock(self, col, row, 1)
                     if (settings.currentTileMap[0][row])[col] == "B": # brick
-                        Block(self, col, row, 0)
+                        Block(self, col, row, 5)
                     elif (settings.currentTileMap[0][row])[col] == "W": # water
                         Block(self, col, row, 1)
                     elif (settings.currentTileMap[0][row])[col] == "S": # sapling
@@ -152,13 +171,13 @@ class Game():
                     elif (settings.currentTileMap[0][row])[col] == "P": # player
                         self.player = Player(self, col, row, self.clock)
                     elif (settings.currentTileMap[0][row])[col] == "F": # flower
-                        Flower(self, col, row, self.clock)
+                        self.aliveFlowers[(2, 1)] = self.aliveFlowers.get((2, 1), []) + [Flower(self, col, row, self.clock)]
                     elif (settings.currentTileMap[0][row])[col] == 'O': # ore
-                        Ore(self, col, row, self.clock)
+                        self.aliveOres[(2, 1)] = self.aliveOres.get((2, 1), []) + [Ore(self, col, row, self.clock)]
                     elif (settings.currentTileMap[0][row])[col] == 'N': # NPC
                         self.visitedNPCs.append(NPC(self, col, row, (2,1)))
                     elif (settings.currentTileMap[0][row])[col] == 'E': # melee enemy
-                        Enemy(self, col, row, 'melee')
+                        self.aliveEnemies[(2, 1)] = self.aliveEnemies.get((2, 1), []) + [Enemy(self, col, row, 'melee')]
                     elif (settings.currentTileMap[0][row])[col] == 'D': # ranged enemy
                         Enemy(self, col, row, 'ranged')
                     elif (settings.currentTileMap[0][row])[col] == 'T': # teleport/door
@@ -193,6 +212,8 @@ class Game():
             priorWeaponNum = self.player.weaponNum
             self.priorPlayerHealth = self.player.targetHealth
 
+            mapNumber = mapList[self.map[0]][self.map[1]] 
+            self.previousMapType = currentTileMap[mapNumber][0][-1]
             # figures out which preloaded map to move the player to. 
             # looks at the direction the player moves in and moves to the appropriate map tile
             if prevPosition[0] == 31:
@@ -208,6 +229,7 @@ class Game():
                 mapNumber = mapList[self.map[0]-1][self.map[1]] 
                 self.map[0] -= 1
             
+
             purpleRoomsIndexes = []
             greenRoomsIndexes = [0, 1, 2, 3, 4]
 
@@ -325,20 +347,26 @@ class Game():
                 mapNumber = len(currentTileMap)-1
                 mapList[self.map[0]][self.map[1]] = mapNumber
 
-            
-            print('mapNumber:', mapNumber)
-            if mapNumber in greenRoomsIndexes:
-                print('greenRoomsIndexes', greenRoomsIndexes)
-                if mapNumber-1 in greenRoomsIndexes:
-                    pass
-                else:    
-                    self.play_music('village')
-            elif mapNumber in purpleRoomsIndexes:
-                print('purpleRoomsIndexes', purpleRoomsIndexes)
-                if mapNumber-1 in purpleRoomsIndexes:
-                    pass
-                else:   
-                    self.play_music('enemy')
+            self.currentMapType = currentTileMap[mapNumber][0][-1]
+            if self.currentMapType == 'g' and self.previousMapType != 'g':
+                self.play_music('village')
+            elif self.currentMapType == 'p' and self.previousMapType != 'p':
+                self.play_music('enemy')
+
+            # if mapNumber in greenRoomsIndexes:
+            #     print('greenRoomsIndexes', greenRoomsIndexes)
+            #     print('mapTypesA', self.previousMapType, self.currentMapType)
+            #     # if mapNumber-1 in greenRoomsIndexes:
+            #     #     pass
+            #     if self.previousMapType != self.currentMapType:
+            #         self.play_music('village')
+            # elif mapNumber in purpleRoomsIndexes:
+            #     print('purpleRoomsIndexes', purpleRoomsIndexes)
+            #     print('mapTypesB', self.previousMapType, self.currentMapType)
+            #     # if mapNumber-1 in purpleRoomsIndexes:
+            #     #     pass
+            #     if self.previousMapType != self.currentMapType:
+            #         self.play_music('enemy')
 
             print('self.map:', self.map, 'mapNumber', mapNumber)
             print('up:', self.map[0]-1 >= 0, end = ' ')
@@ -364,11 +392,25 @@ class Game():
                 row = currentTileMap[mapNumber][0]
                 row = row[0:15] + 'TT' + row[17:]
                 currentTileMap[mapNumber][0] = row
+            try:
+                if mapList[self.map[0]-1][self.map[1]] == -1:
+                    row = currentTileMap[mapNumber][0]
+                    row = row[0:15] + 'BB' + row[17:]
+                    currentTileMap[mapNumber][0] = row
+            except IndexError:
+                pass
             #down
             if self.map[0]+1 <= 5 and mapList[self.map[0]+1][self.map[1]] != -1:
                 row = currentTileMap[mapNumber][17]
                 row = row[0:15] + 'TT' + row[17:]
                 currentTileMap[mapNumber][17] = row
+            try:
+                if mapList[self.map[0]+1][self.map[1]] == -1:
+                    row = currentTileMap[mapNumber][17]
+                    row = row[0:15] + 'BB' + row[17:]
+                    currentTileMap[mapNumber][17] = row
+            except IndexError:
+                pass
             # left
             if self.map[1]-1 >= 0 and mapList[self.map[0]][self.map[1]-1] != -1:
                 # each row needs to be edited individually => row1 and row2
@@ -380,6 +422,16 @@ class Game():
                 currentTileMap[mapNumber][9] = row2
                 # print('row 1:', row1)
                 # print('row 2:', row2)
+            try:
+                if mapList[self.map[0]][self.map[1]-1] == -1:
+                    row1 = currentTileMap[mapNumber][8]
+                    row1 = 'B' + row1[1:]
+                    row2 = currentTileMap[mapNumber][9]
+                    row2 = 'B' + row2[1:]
+                    currentTileMap[mapNumber][8] = row1
+                    currentTileMap[mapNumber][9] = row2
+            except IndexError:
+                pass
             # right
             if self.map[1]+1 <= 12 and mapList[self.map[0]][self.map[1]+1] != -1:
                 row1 = currentTileMap[mapNumber][8]
@@ -388,15 +440,58 @@ class Game():
                 row2 = row2[:-1] + 'T'
                 currentTileMap[mapNumber][8] = row1
                 currentTileMap[mapNumber][9] = row2
-                
+            try:
+                if mapList[self.map[0]][self.map[1] + 1] == -1:
+                    row1 = currentTileMap[mapNumber][8]
+                    row1 = row1[:-1] + 'B'
+                    row2 = currentTileMap[mapNumber][9]
+                    row2 = row2[:-1] + 'B'
+                    currentTileMap[mapNumber][8] = row1
+                    currentTileMap[mapNumber][9] = row2
+            except IndexError:
+                pass
+            try:
+                print(f"up: {mapList[self.map[0] - 1][self.map[1]]}, {(self.map[0]-1, self.map[1])}")
+            except IndexError:
+                print("up: out of map range")
+                row = currentTileMap[mapNumber][0]
+                row = row[0:15] + 'BB' + row[17:]
+                currentTileMap[mapNumber][0] = row
+            try:
+                print(f"down: {mapList[self.map[0] + 1][self.map[1]]}, {(self.map[0] + 1, self.map[1])}")
+            except IndexError:
+                print("down: out of map range")
+                row = currentTileMap[mapNumber][17]
+                row = row[0:15] + 'BB' + row[17:]
+                currentTileMap[mapNumber][17] = row
+            try:
+                print(f"left: {mapList[self.map[0]][self.map[1] - 1]}, {(self.map[0], self.map[1] - 1)}")
+            except IndexError:
+                print("left: out of map range")
+                row1 = currentTileMap[mapNumber][8]
+                row1 = 'B' + row1[1:]
+                row2 = currentTileMap[mapNumber][9]
+                row2 = 'B' + row2[1:]
+                currentTileMap[mapNumber][8] = row1
+                currentTileMap[mapNumber][9] = row2
+            try:
+                print(f"right: {mapList[self.map[0]][self.map[1] + 1]}, {(self.map[0], self.map[1] + 1)}")
+            except IndexError:
+                print("right: out of map range")
+                row1 = currentTileMap[mapNumber][8]
+                row1 = row1[:-1] + 'B'
+                row2 = currentTileMap[mapNumber][9]
+                row2 = row2[:-1] + 'B'
+                currentTileMap[mapNumber][8] = row1
+                currentTileMap[mapNumber][9] = row2
             # print(self.map, mapNumber)
 
-            if mapNumber == -1:
-                for i in mapList:
-                    print(i) 
-            print('Current Map:')
-            for i in currentTileMap[mapNumber]:
-                print(i)
+            # if mapNumber == -1:
+            #     for i in mapList:
+            #         print(i) 
+            # print('Current Map:')
+            # for i in currentTileMap[mapNumber]:
+            #     print(i)
 
 
             self.all_sprites.add(self.inventory)
@@ -405,12 +500,20 @@ class Game():
             self.all_sprites.add(self.player.weapon)
             self.non_background.add(self.player)
 
+            position = (self.map[0], self.map[1])
             for row in range(len(settings.currentTileMap[mapNumber])):
                 #print(f"{row} ", end="")
                 for col in range(len(settings.currentTileMap[mapNumber][row])):
+                    if (settings.currentTileMap[mapNumber][0][-1] == 'r'):
+                        WalkableBlock(self, col, row, 3)
+                    else:
+                        WalkableBlock(self, col, row, 1)
                     # looks at the premade room in settings.py, if a tile is on the map, print the corresponding sprite on the new map
                     if (settings.currentTileMap[mapNumber][row])[col] == "B": # brick
-                        Block(self, col, row, 0)
+                        if (settings.currentTileMap[mapNumber][0][-1] == 'r'):
+                            Block(self, col, row, 4)
+                        else:
+                            Block(self, col, row, 5)
                     elif (settings.currentTileMap[mapNumber][row])[col] == "W": # water
                         Block(self, col, row, 1)
                     elif (settings.currentTileMap[mapNumber][row])[col] == "S": # sapling
@@ -422,9 +525,19 @@ class Game():
                     elif (settings.currentTileMap[mapNumber][row])[col] == "G": # growth
                         WalkableBlock(self, col, row, 1)
                     elif (settings.currentTileMap[mapNumber][row])[col] == "F": # flower
-                        Flower(self, col, row, self.clock)
+                        if position in self.notVisited:
+                            self.aliveFlowers[position] = self.aliveFlowers.get(position, []) + [Flower(self, col, row, self.clock)]
+                        else:
+                            for i in range(len(self.aliveFlowers[position])):
+                                self.all_sprites.add(self.aliveFlowers[position][i])
+                                self.flowers.add(self.aliveFlowers[position][i])
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'O': # ore
-                        Ore(self, col, row, self.clock)
+                        if position in self.notVisited:
+                            self.aliveOres[position] = self.aliveOres.get(position, []) + [Ore(self, col, row, self.clock)]
+                        else:
+                            for i in range(len(self.aliveOres[position])):
+                                self.all_sprites.add(self.aliveOres[position][i])
+                                self.ores.add(self.aliveOres[position][i])
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'N': # NPC
                         position = (self.map[0], self.map[1])
                         if position in self.notVisited:
@@ -435,12 +548,25 @@ class Game():
                                     self.all_sprites.add(self.visitedNPCs[i])
                                     self.npcs.add(self.visitedNPCs[i])
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'E': # melee enemy
-                        Enemy(self, col, row, 'melee')
+                        if position in self.notVisited:
+                            self.aliveEnemies[position] = self.aliveEnemies.get(position, []) + [Enemy(self, col, row, 'melee')]
+                        else:
+                            for i in range(len(self.aliveEnemies[position])):
+                                self.all_sprites.add(self.aliveEnemies[position][i])
+                                self.enemies.add(self.aliveEnemies[position][i])
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'D': # ranged enemy
-                        Enemy(self, col, row, 'ranged')
+                        if position in self.notVisited:
+                            self.aliveEnemies[position] = self.aliveEnemies.get(position, []) + [Enemy(self, col, row, 'ranged')]
+                        else:
+                            for i in range(len(self.aliveEnemies[position])):
+                                self.all_sprites.add(self.aliveEnemies[position][i])
+                                self.enemies.add(self.aliveEnemies[position][i])
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'T': # teleport door
                         # teleports the player's position on the screen when they move rooms
-                        Teleport(self, col, row)
+                        if self.currentMapType != 'r':
+                            Teleport(self, col, row)
+                        else:
+                            Block(self, col, row, 4)
                         if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
                             self.player.setPosition(col-1, row)
                         elif prevPosition[0] == 31 and col == 0 and prevPosition[1] == row:
@@ -516,6 +642,7 @@ class Game():
         self.bullets = pygame.sprite.LayeredUpdates()
         self.particles = pygame.sprite.LayeredUpdates()
         self.user_interface = pygame.sprite.LayeredUpdates()
+        self.endgates = pygame.sprite.LayeredUpdates()
         self.createTilemap(None)
         #self.player = Player(self, 1, 2)
     def events(self):
@@ -755,12 +882,13 @@ class Game():
     def intro_screen(self):
         #Play the intro screen
         #To be created later
+        self.play_music('win')
         while self.state == 'menu':
             self.screen.blit(pygame.transform.scale(pygame.image.load('Sprites/hudImages/title3.png').convert_alpha(), (WIDTH, HEIGHT)), self.renderOffset)
             text = "Press Space to Play"
             render_text = pygame.font.Font('Fonts/minecraft-font/MinecraftRegular-Bmg3.otf', 70).render(text, True, RED)
             text_rect = render_text.get_rect(center=(WIDTH // 2, HEIGHT // 1.4))
-            pygame.draw.rect(self.screen, (10, 10, 10, 70), text_rect)
+            pygame.draw.rect(self.screen, BROWN, text_rect)
             self.screen.blit(render_text, text_rect)
             pygame.display.update()
             for event in pygame.event.get():
@@ -795,11 +923,17 @@ class Game():
         # sets up all the tile images to be placed in the game, then stores them in a list
         # the walkable tiles and unwalkable blocks are stored in two different sub lists that are within the larger list
         self.tileList = [[pygame.transform.scale(pygame.image.load('Sprites/tiles/crossBridge1.png').convert_alpha(),(TILESIZE, TILESIZE)),
-                          pygame.transform.scale(pygame.image.load('Sprites/tiles/growth1.png').convert_alpha(),(TILESIZE, TILESIZE))],
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/growth1.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/metalglass.jpg').convert_alpha(), (TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/brushwalker437.png').convert_alpha(), (TILESIZE, TILESIZE))],
                          [pygame.transform.scale(pygame.image.load('Sprites/tiles/brick1.png').convert_alpha(),(TILESIZE, TILESIZE)),
-                          pygame.transform.scale(pygame.image.load('Sprites/tiles/water1.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          #pygame.transform.scale(pygame.image.load('Sprites/tiles/water1.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/brushwalker137.png').convert_alpha(),(TILESIZE, TILESIZE)),
                           pygame.transform.scale(pygame.image.load('Sprites/tiles/sapling2.png').convert_alpha(),(TILESIZE, TILESIZE)),
-                          pygame.transform.scale(pygame.image.load('Sprites/tiles/rock1.png').convert_alpha(),(TILESIZE, TILESIZE))]]
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/rock1.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/metalwall.png').convert_alpha(), (TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/tree-dark-green-isaiah658.png').convert_alpha(), (TILESIZE, TILESIZE)),
+                          ]]
         # sets up all the images for the hyacinth type flower
         self.hyacinImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth3New.png').convert_alpha(),(TILESIZE, TILESIZE)),
@@ -839,7 +973,7 @@ class Game():
                       pygame.transform.scale(pygame.image.load('Sprites/items/oreIron3.png').convert_alpha(),(TILESIZE, TILESIZE))]
         self.bossImageList = [[pygame.image.load('Sprites/npcs/boss/bossHead.png'), pygame.image.load('Sprites/npcs/boss/bossidea4_5.png')], [pygame.image.load('Sprites/npcs/boss/bossattack.png'), pygame.image.load('Sprites/npcs/boss/bossattack_2.png'), pygame.image.load('Sprites/npcs/boss/bossattack_3.png')]]
         self.particleList = [[pygame.image.load('Sprites/particles_vfx/bossparticles1.png'), pygame.image.load('Sprites/particles_vfx/bossparticles2.png'), pygame.image.load('Sprites/particles_vfx/bossparticles3.png')], [pygame.image.load('Sprites/particles_vfx/genparticles1.png'), pygame.image.load('Sprites/particles_vfx/genparticles2.png'), pygame.image.load('Sprites/particles_vfx/genparticles3.png')]]
-        self.bossAttacks = [pygame.transform.scale(pygame.image.load('Sprites/items/bubbleCluster.png').convert_alpha(), (TILESIZE, TILESIZE)), pygame.transform.scale(pygame.image.load('Sprites/items/bubble.png').convert_alpha(), (TILESIZE * 3, TILESIZE * 3))]
+        self.bossAttacks = [pygame.transform.scale(pygame.image.load('Sprites/items/bubbleCluster.png').convert_alpha(), (TILESIZE, TILESIZE)), pygame.transform.scale(pygame.image.load('Sprites/items/bubble.png').convert_alpha(), (TILESIZE * 3, TILESIZE * 3)), pygame.transform.scale(pygame.image.load('Sprites/items/bossProjectile.png').convert_alpha(), (TILESIZE, TILESIZE))]
         self.mapImg = pygame.transform.scale(pygame.image.load('Sprites/hudImages/Map.png').convert_alpha(), (1080, 405))
 
     def showMap(self):
@@ -870,6 +1004,7 @@ class Game():
                 playerPos = self.map
                 playerCoord = (self.player.x*11/1280, self.player.y*7/720)
                 pygame.draw.rect(self.screen, PURPLE, pygame.Rect(100+(6+playerPos[1]*15+playerCoord[0]+1)*1080/208, 157.5+(6+playerPos[0]*11+playerCoord[1]+1)*1080/208, 2*1100/208, 2*1100/208))
+                #pygame.draw.rect(self.screen, BLACK,pygame.Rect(100 + (6 + playerPos[1] * 15 + playerCoord[0] + 1) * 1080 / 208,157.5 + (6 + playerPos[0] * 11 + playerCoord[1] + 1) * 1080 / 208,2 * 1100 / 208, 2 * 1100 / 208), 1)
                 
 
 
@@ -894,6 +1029,24 @@ class Game():
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_UI_Menu_SFX/098_Unpause_04.wav'))
             mixer.music.set_volume(0.065 * self.musicVol)
         pass
+
+    def updateAliveLists(self, spriteType, originalPos):
+        position = (self.map[0], self.map[1])
+        try:
+            if spriteType == 'flower':
+                for i in range(len(self.aliveFlowers[position])):
+                    if self.aliveFlowers[position][i].originalPos == originalPos:
+                        self.aliveFlowers[position].pop(i)
+            elif spriteType == 'ore':
+                for i in range(len(self.aliveOres[position])):
+                    if self.aliveOres[position][i].originalPos == originalPos:
+                        self.aliveOres[position].pop(i)
+            elif spriteType == 'enemy':
+                for i in range(len(self.aliveEnemies[position])):
+                    if self.aliveEnemies[position][i].defaultPos == originalPos:
+                        self.aliveEnemies[position].pop(i)
+        except IndexError:
+            pass
 
 
 g = Game()

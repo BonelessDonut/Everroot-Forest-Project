@@ -169,22 +169,23 @@ class DialogueScene(Scene):
 
 
 
-sampleDialogueScene = [['Text 1',
-                        'Text 2',
-                        'Text 3',
-                        'Text 4',
-                        'Text 5'],
+sampleDialogueScene = [['Everroot Forest. A quaint village nested in the Heart of Nature.',
+                        'Korbo was passing through while returning to the Slime Kingdom after a season of scavenging...',
+                        'But when they arrived in the village it was strangely quiet...the villagers had all been taken!',
+                        'The Ceo of Pollution came to poison everything in the Heart of Nature, starting with the peaceful villagers!',
+                        'The Slime Kingdom would be next, so they must be stopped here...'],
                        [6, 7, 7, 8, 9]]
 
 def playIntroScene(cutscene_manager):
     # Create a cutscene manager and add scenes
     cutscene_manager.game.play_music('openingCutscene')
     cutscene_manager.game.state = 'scene'
-    images = [pygame.image.load('Sprites/protag/protagBlobDown.png'),
-              pygame.image.load('Sprites/protag/protagSwingDown.png'),
-              pygame.image.load('Sprites/protag/protagThrowUp.png'),
-              pygame.image.load('Sprites/protag/protagThrowDown.png'),
-              pygame.image.load('Sprites/protag/protagRangedDown.png')]
+    images = [pygame.image.load('Sprites/scenes/villageLongshot.png'),
+              pygame.image.load('Sprites/scenes/villageSceneFull.png'),
+              pygame.image.load('Sprites/scenes/villageSceneKorbo2.png'),
+              pygame.image.load('Sprites/scenes/ceoOfPolution.png'),
+              pygame.image.load('Sprites/scenes/caveKorbo.png')
+              ]
     cutscene_manager.restartCutscene()
     '''
     cutscene_manager.add_scene(DialogueScene(sampleDialogueScene[0][0], sampleDialogueScene[1][0]))
@@ -277,13 +278,13 @@ def playGameOver(cutscene_manager):
 def playGameWon(cutscene_manager):
     cutscene_manager.game.play_music('win')
     cutscene_manager.restartCutscene()
-    cutscene_manager.add_scene(ImageScene('You defeated the ceo of pollution and saved Everroot Forest. Nice job!', 15,
-                                          [pygame.image.load('Sprites/hudImages/title3.png').convert_alpha()], 0, WHITE, SWAMPGREEN, True))
-    cutscene_manager.add_scene(ImageScene('Now just to find that place...', 10,
-                                          [pygame.image.load('Sprites/hudImages/title2.png').convert_alpha()], 0, WHITE, SWAMPGREEN,
+    cutscene_manager.add_scene(ImageScene('You defeated the Ceo of Pollution and saved Everroot Forest. Nice job!', 10,
+                                          [pygame.image.load('Sprites/scenes/villageLongshot.png').convert_alpha()], 0, WHITE, SWAMPGREEN, True))
+    cutscene_manager.add_scene(ImageScene('Now just to find that place...', 12,
+                                          [pygame.image.load('Sprites/scenes/villageSceneFull.png').convert_alpha()], 0, WHITE, SWAMPGREEN,
                                           True))
-    cutscene_manager.add_scene(ImageScene('Thanks for playing!', 200,
-                                          [pygame.image.load('Sprites/hudImages/title3.png').convert_alpha()], 0, WHITE, SWAMPGREEN,
+    cutscene_manager.add_scene(ImageScene('Thanks for playing!', 50,
+                                          [pygame.image.load('Sprites/scenes/villageLongshot.png').convert_alpha()], 0, WHITE, SWAMPGREEN,
                                           True))
     cutscene_manager.start()
     sceneTimeDuration = 225

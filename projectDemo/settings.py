@@ -17,6 +17,7 @@ LIGHTGRAY = (189, 184, 177)
 DARKGRAY = (169, 162, 152)
 OFFWHITE = (232, 231, 228)
 PURPLE = (82,71,150)
+PINK = (255, 192, 203)
 
 FPS = 60
 
@@ -40,7 +41,7 @@ mapList = [[-1, -1, -1, -1, -1, -1, -1, -1, -1, -3, -2, -3, -1, -1,],
 #tiles to represent the world, each 'B' represents a block, the 'P' is the player's position
 #There are 32 horizontal tiles (width of 1280 / 40) and 18 vertical tiles (height of 720 / 40))
 currentTileMap = [[ #index 0
-    'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBB1',
+    'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBBg',
     'BSSBBBBBBBBB.GGGGG...SSSSSSS...B',
     'BSSBB.....BB..GGG...SSSS.SS..SSB',
     'BSSBB.....BB...GGG.........SS..B',
@@ -59,14 +60,14 @@ currentTileMap = [[ #index 0
     'B....SSSS......GGG..SSSSS...SSSB',
     'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBB'
 ], [ #index 1
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB2',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBg',
     'BSSSSSSSSSSSSSS........SSSS....B',
     'BSSSSSSS................SSSWWWWB',
     'BSS.......BBF.BB......O...SSWWWB',
     'B.........BB..BB............SWWB',
     'B...........BBBB.............CCB',
     'B...F..............B.B.........B',
-    'BGGGGGGGGGGG.N..WRS...G...G..G.B',
+    'BGGGGGGGGGGG....WRS...G...G..G.B',
     'TGGGGGGGGGGGGGGGG.GGGG.GGG.GG.GT',
     'TGGGGGGGGGGGGGG.GGG.GGG.G.G..G.T',
     'BGGGGGGGGG.....G..G...G....G...B',
@@ -79,11 +80,11 @@ currentTileMap = [[ #index 0
 
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ], [#index 2
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB3',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBg',
     'B..RR..........................B',
     'B.R..R.........................B',
     'B...R.....BBF.BB......O........B',
-    'B..R......BB..BB......N........B',
+    'B..R......BB..BB...............B',
     'B.RRRR.........................B',
     'B.......B........B.............B',
     'B.......B........B.............B',
@@ -98,7 +99,7 @@ currentTileMap = [[ #index 0
     'B..............................B',
     'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBB'
 ], [#index 3
-    'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBB4',
+    'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBBg',
     'B..............................B',
     'B..............................B',
     'B.....................O........B',
@@ -107,7 +108,7 @@ currentTileMap = [[ #index 0
     'B...F..........................B',
     'B............O.................B',
     'B............O.................B',
-    'B......................N.......B',
+    'B..............................B',
     'B..............................B',
     'B.........................O....B',
     'B..............O...............B',
@@ -117,7 +118,7 @@ currentTileMap = [[ #index 0
     'B..............O...............B',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ], [#index 4
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB5',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBg',
     'BBBBB..........................B',
     'B..............................B',
     'B.........BBF.BB......O........B',
@@ -145,10 +146,10 @@ purpleRandomRooms = [[
     'B........BB.....E....BB........B',
     'B....BBBBBB..........BBBBBB....B',
     'B..............................B',
-    'B..........E...BB...E..........B',
+    'B..........D...BB...E..........B',
     'B.............B..B.............B',
     'B.............B..B.............B',
-    'B..........E...BB...E..........B',
+    'B..........E...BB...D..........B',
     'B..............................B',
     'B....BBBBBB..........BBBBBB....B',
     'B........BB....E.....BB........B',
@@ -159,19 +160,19 @@ purpleRandomRooms = [[
 ], [
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBp',
     'BBBBBB....................BBBBBB',
-    'BBB.....E............E.......BBB',
+    'BBB.....E............D.......BBB',
     'BB............................BB',
     'BB.......BBBBBBBBBBBBBB.......BB',
-    'B.........E..........E.........B',
+    'B.........D..........E.........B',
     'B..............................B',
     'B..............BB..............B',
     'B....BB.....BBBBBBBB.....BB....B',
     'B....BB.....BBBBBBBB.....BB....B',
     'B..............BB..............B',
     'B..............................B',
-    'B.........E..........E.........B',
+    'B.........E..........D.........B',
     'BB.......BBBBBBBBBBBBBB.......BB',
-    'BB........E...................BB',
+    'BB........D...................BB',
     'BBB..................E.......BBB',
     'BBBBBB....................BBBBBB',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
@@ -179,18 +180,18 @@ purpleRandomRooms = [[
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBp',
     'B..............................B',
     'B..............................B',
-    'B..........E.............E.....B',
+    'B..........D.............E.....B',
     'B.....BBBBBB........B..BB......B',
     'B...BBBB..BBBB.....B....BB.....B',
     'B..................B.....B.....B',
     'B..................BB...BB.....B',
-    'B.......E......E....BBBBB......B',
+    'B.......E......D....BBBBB......B',
     'B.....BBBBB...........E........B',
     'B....BB...BB...................B',
     'B....B.....B...................B',
     'B....BB....B......BBBB..BBBB...B',
     'B.....BB..B.........BBBBBB.....B',
-    'B.....E.............E..........B',
+    'B.....E.............D..........B',
     'B..............................B',
     'B..............................B',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
@@ -204,7 +205,7 @@ purpleRandomRooms = [[
     'B.......BB...........BB........B',
     'B.......BB...........BB........B',
     'B........B....B.B....B.........B',
-    'B........E....BBB....E.........B',
+    'B........D....BBB....D.........B',
     'B..............B...............B',
     'B.....B.................B......B',
     'B.....BB...............BB......B',
@@ -239,12 +240,12 @@ purpleRandomRooms = [[
     'BBB........B........B........BBB',
     'BBB.E......BBBBBBBBBB........BBB',
     'BB....BB....BBBBBBBB....BB....BB',
-    'B.....BB..E..........E..BB.....B',
+    'B.....BB..E..........D..BB.....B',
     'B.....BB................BB.....B',
     'B....BB................,.BB....B',
     'B....BB..................BB....B',
     'B.....BB................BB.....B',
-    'B.....BB..E..........E..BB.....B',
+    'B.....BB..D..........E..BB.....B',
     'BB....BB....BBBBBBBB....BB....BB',
     'BBB........BBBBBBBBBB......E.BBB',
     'BBB........B........B........BBB',
