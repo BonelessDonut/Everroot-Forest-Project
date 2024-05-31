@@ -382,11 +382,25 @@ class Game():
                 row = currentTileMap[mapNumber][0]
                 row = row[0:15] + 'TT' + row[17:]
                 currentTileMap[mapNumber][0] = row
+            try:
+                if mapList[self.map[0]-1][self.map[1]] == -1:
+                    row = currentTileMap[mapNumber][0]
+                    row = row[0:15] + 'BB' + row[17:]
+                    currentTileMap[mapNumber][0] = row
+            except IndexError:
+                pass
             #down
             if self.map[0]+1 <= 5 and mapList[self.map[0]+1][self.map[1]] != -1:
                 row = currentTileMap[mapNumber][17]
                 row = row[0:15] + 'TT' + row[17:]
                 currentTileMap[mapNumber][17] = row
+            try:
+                if mapList[self.map[0]+1][self.map[1]] == -1:
+                    row = currentTileMap[mapNumber][17]
+                    row = row[0:15] + 'BB' + row[17:]
+                    currentTileMap[mapNumber][17] = row
+            except IndexError:
+                pass
             # left
             if self.map[1]-1 >= 0 and mapList[self.map[0]][self.map[1]-1] != -1:
                 # each row needs to be edited individually => row1 and row2
@@ -398,6 +412,16 @@ class Game():
                 currentTileMap[mapNumber][9] = row2
                 # print('row 1:', row1)
                 # print('row 2:', row2)
+            try:
+                if mapList[self.map[0]][self.map[1]-1] == -1:
+                    row1 = currentTileMap[mapNumber][8]
+                    row1 = 'B' + row1[1:]
+                    row2 = currentTileMap[mapNumber][9]
+                    row2 = 'B' + row2[1:]
+                    currentTileMap[mapNumber][8] = row1
+                    currentTileMap[mapNumber][9] = row2
+            except IndexError:
+                pass
             # right
             if self.map[1]+1 <= 12 and mapList[self.map[0]][self.map[1]+1] != -1:
                 row1 = currentTileMap[mapNumber][8]
@@ -406,7 +430,50 @@ class Game():
                 row2 = row2[:-1] + 'T'
                 currentTileMap[mapNumber][8] = row1
                 currentTileMap[mapNumber][9] = row2
-
+            try:
+                if mapList[self.map[0]][self.map[1] + 1] == -1:
+                    row1 = currentTileMap[mapNumber][8]
+                    row1 = row1[:-1] + 'B'
+                    row2 = currentTileMap[mapNumber][9]
+                    row2 = row2[:-1] + 'B'
+                    currentTileMap[mapNumber][8] = row1
+                    currentTileMap[mapNumber][9] = row2
+            except IndexError:
+                pass
+            try:
+                print(f"up: {mapList[self.map[0] - 1][self.map[1]]}, {(self.map[0]-1, self.map[1])}")
+            except IndexError:
+                print("up: out of map range")
+                row = currentTileMap[mapNumber][0]
+                row = row[0:15] + 'BB' + row[17:]
+                currentTileMap[mapNumber][0] = row
+            try:
+                print(f"down: {mapList[self.map[0] + 1][self.map[1]]}, {(self.map[0] + 1, self.map[1])}")
+            except IndexError:
+                print("down: out of map range")
+                row = currentTileMap[mapNumber][17]
+                row = row[0:15] + 'BB' + row[17:]
+                currentTileMap[mapNumber][17] = row
+            try:
+                print(f"left: {mapList[self.map[0]][self.map[1] - 1]}, {(self.map[0], self.map[1] - 1)}")
+            except IndexError:
+                print("left: out of map range")
+                row1 = currentTileMap[mapNumber][8]
+                row1 = 'B' + row1[1:]
+                row2 = currentTileMap[mapNumber][9]
+                row2 = 'B' + row2[1:]
+                currentTileMap[mapNumber][8] = row1
+                currentTileMap[mapNumber][9] = row2
+            try:
+                print(f"right: {mapList[self.map[0]][self.map[1] + 1]}, {(self.map[0], self.map[1] + 1)}")
+            except IndexError:
+                print("right: out of map range")
+                row1 = currentTileMap[mapNumber][8]
+                row1 = row1[:-1] + 'B'
+                row2 = currentTileMap[mapNumber][9]
+                row2 = row2[:-1] + 'B'
+                currentTileMap[mapNumber][8] = row1
+                currentTileMap[mapNumber][9] = row2
             # print(self.map, mapNumber)
 
             # if mapNumber == -1:
