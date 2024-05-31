@@ -196,6 +196,7 @@ class Game():
 
             mapNumber = mapList[self.map[0]][self.map[1]] 
             self.previousMapType = currentTileMap[mapNumber][0][-1]
+            print(mapNumber, self.previousMapType)
 
             # figures out which preloaded map to move the player to. 
             # looks at the direction the player moves in and moves to the appropriate map tile
@@ -211,8 +212,6 @@ class Game():
             elif prevPosition[1] == 0:
                 mapNumber = mapList[self.map[0]-1][self.map[1]] 
                 self.map[0] -= 1
-
-            self.currentMapType = currentTileMap[mapNumber][0][-1]
             
 
             purpleRoomsIndexes = []
@@ -332,7 +331,13 @@ class Game():
                 mapNumber = len(currentTileMap)-1
                 mapList[self.map[0]][self.map[1]] = mapNumber
 
-            
+            self.currentMapType = currentTileMap[mapNumber][0][-1]
+            if self.currentMapType == 'g' and self.previousMapType != 'g':
+                self.play_music('village')
+            elif self.currentMapType == 'p' and self.previousMapType != 'p':
+                self.play_music('enemy')
+            print('mapTypes', self.previousMapType, self.currentMapType)
+
             print('mapNumber:', mapNumber)
             # if mapNumber in greenRoomsIndexes:
             #     print('greenRoomsIndexes', greenRoomsIndexes)
@@ -348,12 +353,6 @@ class Game():
             #     #     pass
             #     if self.previousMapType != self.currentMapType:
             #         self.play_music('enemy')
-
-            if self.currentMapType == 'g' and self.previousMapType != 'g':
-                self.play_music('village')
-            elif self.currentMapType == 'p' and self.previousMapType != 'p':
-                self.play_music('enemy')
-            print('mapTypes', self.previousMapType, self.currentMapType)
 
             print('self.map:', self.map, 'mapNumber', mapNumber)
             print('up:', self.map[0]-1 >= 0, end = ' ')
