@@ -934,7 +934,7 @@ class NPC(pygame.sprite.Sprite):
         self.mapPos = (mapPos[0], mapPos[1])
 
         self.meetings = 0
-        self.name = 'Dubidubidu'
+
 
         self.xChange = 0
         self.yChange = 0
@@ -949,6 +949,8 @@ class NPC(pygame.sprite.Sprite):
                               pygame.transform.scale(pygame.image.load(self.imagelist[1]).convert_alpha(), (920*0.24, 170*0.73)),
                               pygame.transform.scale(pygame.image.load(self.imagelist[2]).convert_alpha(), (920*0.24, 170*0.73))]
         self.avatarImg = self.avatarImgList[self.npcImgNum]
+        self.nameList = ['bucket', 'heart', 'leaf']
+        self.name = self.nameList[self.npcImgNum]
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1

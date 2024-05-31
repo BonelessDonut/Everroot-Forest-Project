@@ -774,7 +774,7 @@ class Game():
             text = "Press Space to Play"
             render_text = pygame.font.Font('Fonts/minecraft-font/MinecraftRegular-Bmg3.otf', 70).render(text, True, RED)
             text_rect = render_text.get_rect(center=(WIDTH // 2, HEIGHT // 1.4))
-            pygame.draw.rect(self.screen, (10, 10, 10, 70), text_rect)
+            pygame.draw.rect(self.screen, BROWN, text_rect)
             self.screen.blit(render_text, text_rect)
             pygame.display.update()
             for event in pygame.event.get():
