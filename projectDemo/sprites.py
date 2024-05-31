@@ -1113,7 +1113,7 @@ class NPC(pygame.sprite.Sprite):
                                                   "...No "]
                                 }
             
-            self.choiceList = {'01:Sorry... I need to gather resources. What can I trade with what I have?': ["So rude… slimes these days, I’m just trying to leaf in peace."],
+            self.choiceList = {'01:Sorry... I needed to gather resources. What can I trade with what I have?': ["So rude… slimes these days, I’m just trying to leaf in peace."],
                             '01:Oh. My bad.':["So rude… slimes these days, I’m just trying to leaf in peace."],
                             '01:I thought you were a flower!':["So rude… slimes these days, I’m just trying to leaf in peace."],
                             '01:Shop': ["Don't come back!! "],
