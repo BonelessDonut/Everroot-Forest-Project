@@ -51,7 +51,7 @@ class Game():
         self.boss = None
         self.bossActive = False
         self.bossDefeated = False
-        self.pastMapType = None
+        self.previousMapType = None
         self.currentMapType = None
         #Game states:
         #explore - Player can move around
@@ -128,7 +128,6 @@ class Game():
     def createTilemap(self, prevPosition):
         #Only for initial map creation
         # -1, -1 is the convention to make known that the map doesnt currently exist
-        #currentTileMap = green
         if self.map == [-1, -1]:
             # 1, 1 : the map now exists from the list in settings.py
             self.map = [2, 1]
@@ -213,6 +212,7 @@ class Game():
                 self.visited.append(position)
                 self.notVisited.remove(position)
             
+
             purpleRoomsIndexes = []
             greenRoomsIndexes = [0, 1, 2, 3, 4]
 
