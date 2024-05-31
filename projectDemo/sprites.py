@@ -1024,12 +1024,13 @@ class NPC(pygame.sprite.Sprite):
         if self.name == 'le chat':
             self.dialogueList = {'01:First Meet':[{'Meetings': 1},
                                                     "Meow! My name is le chat, the guardian of the forest!! ",
-                                                    "Are you here to help save the forest from the CEO of pollution? ",
+                                                    "You're the Slime Kingdom's reinforcements right? ",
                                                     "%Choices; Want to save the forest?; Yes; No...; I speak for the trees ",
                                                     "The Evil CEO of pollution is taking all of our flowers and ores. Without it, the forest's ecosystem is thrown all out of wack! ",
                                                     "So, since you're the best fighter of all of us (you do have a sword after all), I'm entrusting you to defeat him! ",
                                                     "Just in case you forgot how to fight though, use WASD to move, J to attack using the sword and trident, and arrow keys to attack using the bubble gun.",
                                                     "In order to get other weapons, you need to collect flowers and ores using Space then trade it in the shop (via me and my friends) ",
+                                                    "But be careful, if you take too long to collect the flowers and ores, they'll start decomposing from the Evil CEO's pollution (heard he doesn't shower) ",
                                                     "In the shop, only the health potion can be saved for later, and is drunk using H. The other potions/upgrades give you a permanent upgrade ",
                                                     "And uh... I think that's it! Thanks for helping save me and my friends' home!! "
                                                     "%Choices; What do you want to do?; Shop; Leave; Meow "],
@@ -1041,14 +1042,78 @@ class NPC(pygame.sprite.Sprite):
             self.choiceList = {'01:Yes':["Meow! That's amazing! Because we really need your help! "],
                             '01:No...':["Oh... that's awkward ", "Um... I'll just keep talking and pretend you didn't say that "],
                             '01:I speak for the trees':["I LOVE the Lorax! Then, you should also know the trees are asking for our help!"],
-                            '01:Shop': ["Hope your purchase helps you not die!"],
+                            '01:Shop': ["Hope your purchase helps you not die! "],
                             '01:Leave': ["Byeeeeee "],
-                            '01:Meow': ["Meow!"],
-                            '02:Shop': ["You better not die! >:("],
-                            '02:Leave': ["Bye again "],
-                            '02:Meow': ["Woof Woof Woof RGHHHHH", "I mean... Meow!"]
+                            '01:Meow': ["Meow! "],
+                            '02:Shop': ["You better not die! >:( "],
+                            '02:Leave': ["Good luck!! "],
+                            '02:Meow': ["Woof Woof Woof RGHHHHH", "I mean... Meow! "]
                             }
         
+        elif self.name == 'leaf':
+            self.dialogueList = {'01:First Meet':[{'Meetings': 1},
+                                                    "Ouch! You can’t cut me!! I am the great Leaf, not a flower >:| ",
+                                                    "%Choices; What do you say?; Sorry... I needed to gather resources.; Oh. My bad.; I thought you were a flower! ",
+                                                    "But I guess I have to do my job... ",
+                                                    "What would you like to do? Shop ore leaf ",
+                                                    "%Choices; What do you want to do?; Shop; Leaf "],
+                                '02:Second Meet': [{'Meetings':2},
+                                                    "You’re back? You guys just won’t leaf me alone!! ",
+                                                    "What do you want? Don’t even shop, just leaf",
+                                                    "%Choices; What do you want to do?; Shop; Leaf "],
+                                '03:Third Meet': [{'Meetings':3},
+                                                  "...No "]
+                                }
+            
+            self.choiceList = {'01:Sorry... I need to gather resources. What can I trade with what I have?': ["So rude… slimes these days, I’m just trying to leaf in peace."],
+                            '01:Oh. My bad.':["So rude… slimes these days, I’m just trying to leaf in peace."],
+                            '01:I thought you were a flower!':["So rude… slimes these days, I’m just trying to leaf in peace."],
+                            '01:Shop': ["Don't come back!! "],
+                            '01:Leaf': ["Good "],
+                            '02:Shop': ["Leaf me alone!! "],
+                            '02:Leaf': ["Good riddance "]
+                            }
+            
+        elif self.name == 'bucket':
+            self.dialogueList = {'01:First Meet':[{'Meetings': 1},
+                                                    "Hello there! I am the guardian of the grounds, Bucket. I see you’re on a mission to save our forest from the CEO of pollution! ",
+                                                    "Some ground rules (not actually, I just like saying ground) ",
+                                                    "Be careful of Heart, underneath that smile is an evil nature ",
+                                                    "You should probably leave Leaf alone, they are quite the grumpy one, constantly mumbling about leafing them alone. ",
+                                                    "Come to me to trade! I am definitely the nicest of the bunch :) ",
+                                                    "Please shop until your bucket list is all checked off! ",
+                                                    "%Choices; What do you want to do?; Shop; Leave "],
+                                '02:Second Meet': [{'Meetings':2},
+                                                    "Welcome back!! Are you here to fill your bucket? ",
+                                                    "%Choices; What do you want to do?; Shop; Leave "]
+                                }
+            
+            self.choiceList = {
+                            '01:Shop': ["Good Luck! "],
+                            '01:Leave': ["Come back soon! "],
+                            '02:Shop': ["Come back as many times as you want "],
+                            '02:Leave': ["You're welcome back anytime! "]
+                            }
+            
+        elif self.name == 'heart':
+            self.dialogueList = {'01:First Meet':[{'Meetings': 1},
+                                                    "Oh... ew ",
+                                                    "I mean Hi! How are you? How can I help you? ",
+                                                    "Actually don’t answer that, doesn’t matter ",
+                                                    "Did you come to fight the evil CEO? ",
+                                                    "Oh, YOU are going to need all the help you can get ",
+                                                    "Try not to die too fast ",
+                                                    "%Choices; What do you want to do?; Shop; Leave "],
+                                '02:Second Meet': [{'Meetings':2},
+                                                    "Heart's closed off. Goodbye! "]
+                                }
+            
+            self.choiceList = {
+                            '01:Shop': ["Stay alive! ... or not "],
+                            '01:Leave': ["Come back soon! (I hope you won't tho!) "]
+                            }
+        
+
         #What needs to be done:
         #For Choices strings, make it a list instead, depending on choice do selectedRect for next dialogue and then next dialogue after the choices string
         #Probably do in choiceResponse method.
