@@ -85,6 +85,16 @@ class Game():
         self.startPlayerMaxHealth = 1000
         self.priorPlayerHealth = self.startPlayerMaxHealth
 
+        self.npcImageList = [
+                          'Sprites/npcs/NPCs-Char/bucket.png',
+                          'Sprites/npcs/NPCs-Char/heart.png',
+                          'Sprites/npcs/NPCs-Char/leaf.png']
+        self.avatarImgList = [pygame.transform.scale(pygame.image.load(self.npcImageList[0]).convert_alpha(), (920*0.24, 170*0.73)),
+                              pygame.transform.scale(pygame.image.load(self.npcImageList[1]).convert_alpha(), (920*0.24, 170*0.73)),
+                              pygame.transform.scale(pygame.image.load(self.npcImageList[2]).convert_alpha(), (920*0.24, 170*0.73)),
+                              pygame.transform.scale(pygame.image.load('Sprites/npcs/NPCs-Char/catNPCno4.png').convert_alpha(), (920*0.3, 170*0.73))]
+        self.nameList = ['bucket', 'heart', 'leaf']
+
         #list of rooms that's visited by the player, starts off with all demo rooms.
         #self.visited = [(2,0), (2,1), (1,1), (3, 1), (2,2), (2, 7)]
         self.visited = [(2, 1), (2, 7)]

@@ -15,6 +15,7 @@ class Player(pygame.sprite.Sprite):
     itemUsed = False
 
 
+
     def __init__(self, game, x, y, clock):
         self.game = game
         self._layer = PLAYER_LAYER
@@ -25,6 +26,7 @@ class Player(pygame.sprite.Sprite):
         self.width = TILESIZE * 0.98
         self.height = TILESIZE * 0.98
         self.speed = PLAYER_SPEED
+
 
         # The weapons available to the player are stored in a list
 
@@ -43,6 +45,7 @@ class Player(pygame.sprite.Sprite):
         #bubble, swordfish, trident
         self.bonusDamage = [0, 0, 0]
 
+
         self.tutorial = Tutorial(self.game)
 
         self.mouseRect = pygame.Rect(0, 0, 40, 40)
@@ -53,6 +56,7 @@ class Player(pygame.sprite.Sprite):
 
         self.imgindex = 0
         self.facing = 'down'
+
 
         self.walkingList = [pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/12_Player_Movement_SFX/03_Step_grass_03.wav')]
         self.walkSoundNum = 0
@@ -84,6 +88,7 @@ class Player(pygame.sprite.Sprite):
         self.invulnerableTimer = 50
 
 
+
         #Shows the file paths for each image, depending on which direction the player is facing
         self.rightImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagLattern(1).png').convert_alpha(), (self.width, self.height)),
                              pygame.transform.scale(pygame.image.load('Sprites/protag/protagLatternAlt(2).png').convert_alpha(), (self.width, self.height)),
@@ -101,6 +106,7 @@ class Player(pygame.sprite.Sprite):
                             pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobDownLeftAlt.png').convert_alpha(), (self.width, self.height)),
                             pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobDownNew.png').convert_alpha(), (self.width, self.height)),
                             pygame.transform.scale(pygame.image.load('Sprites/protag/protagBlobDownRightAltNew.png').convert_alpha(), (self.width, self.height))]
+
 
         #READ ME, ADD SPRITES FOR CUTTING WHILE FACING OTHER DIRECTIONS THAN RIGHT
         self.cutRightImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagCut.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
@@ -122,6 +128,7 @@ class Player(pygame.sprite.Sprite):
         self.cutUpgrade = 0
 
 
+
         #READ ME, ADD SPRITES FOR MINING WHILE FACING OTHER DIRECTIONS THAN RIGHT
         self.mineRightImgList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagMine.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
                                  pygame.transform.scale(pygame.image.load('Sprites/protag/protagMineRed.png').convert_alpha(), (self.width * 1.06, self.height * 1.06)),
@@ -141,10 +148,12 @@ class Player(pygame.sprite.Sprite):
                                 pygame.transform.scale(pygame.image.load('Sprites/protag/protagMinePlatDown.png').convert_alpha(), (self.width * 1.06, self.height * 1.06))]
         self.mineUpgrade = 0
 
+
         self.rangedWeaponList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagRangedRight.png').convert_alpha(), (self.width, self.height)),
                                  pygame.transform.scale(pygame.image.load('Sprites/protag/protagRangedDown.png').convert_alpha(), (self.width, self.height)),
                                  pygame.transform.scale(pygame.image.load('Sprites/protag/protagRangedUp.png').convert_alpha(), (self.width, self.height))]
         self.rangedWeaponList.append(pygame.transform.flip(self.rangedWeaponList[0], True, False))
+
 
         self.swingUpList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingUp.png').convert_alpha(), (self.width, self.height)),
                             pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingUp2.png').convert_alpha(), (self.width, self.height)),
@@ -152,6 +161,7 @@ class Player(pygame.sprite.Sprite):
         self.swingDownList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown.png').convert_alpha(), (self.width, self.height)),
                               pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown2.png').convert_alpha(), (self.width, self.height)),
                               pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingDown3.png').convert_alpha(), (self.width, self.height))]
+
 
         self.swingLeftList = [pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingLeft.png').convert_alpha(), (self.width, self.height)),
                               pygame.transform.scale(pygame.image.load('Sprites/protag/protagSwingLeft2.png').convert_alpha(), (self.width, self.height)),
@@ -168,12 +178,15 @@ class Player(pygame.sprite.Sprite):
                            pygame.transform.scale(pygame.image.load('Sprites/items/SwordfishSymbol.png').convert_alpha(), (30,30)),
                            pygame.transform.scale(pygame.image.load('Sprites/items/BubbleSymbol.png').convert_alpha(), (30,30))]
 
+
         #list of active status effects
         self.showList = []
         self.descFont = pygame.font.Font('Fonts/minecraft-font/MinecraftRegular-Bmg3.otf', 16)
 
+
         self.clock = clock
         self.timepassed = 0
+
 
         self.image = self.downImgList[self.imgindex]
         
@@ -185,6 +198,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+
     #Authored: Max Chiu 5/20/2024
     #Sets the player's position using a tile position (where xTile goes up to 32 and yTile goes up to 18)
     def setPosition(self, xTile, yTile):
@@ -192,6 +206,7 @@ class Player(pygame.sprite.Sprite):
         self.y = yTile*TILESIZE
         self.rect.x = self.x
         self.rect.y = self.y
+
 
 
     # function is supposed to update the player's sprite when they use the ranged attack. doesn't currently work
@@ -204,6 +219,7 @@ class Player(pygame.sprite.Sprite):
             self.image = self.rangedWeaponList[2]
         else:  # self.facing == 'down':
             self.image = self.rangedWeaponList[1]
+
 
 
     def update(self):
@@ -236,6 +252,7 @@ class Player(pygame.sprite.Sprite):
                 # the player is no longer invulnerable
                 self.hitInvulnerable = False
                 self.hitInvulnerableTime = 0
+
 
         # updates the variable that counts how much time is passing
         self.timepassed += self.clock.get_time()/1000
@@ -270,6 +287,7 @@ class Player(pygame.sprite.Sprite):
         self.xChange = 0
         self.yChange = 0
 
+
         # allows the mouse to used for selection during dialogue
         if self.game.state == 'dialogue':
             self.mouseRect.center = pygame.mouse.get_pos()
@@ -278,12 +296,15 @@ class Player(pygame.sprite.Sprite):
             npc = self.game.npcs.get_sprite(npcIndex)
             self.game.activeNPC = npc
             self.game.activeNPC.pastItem = self.game.activeNPC.selectedItem
+
             collisionList = []
             for rect in npc.TextBox.choiceRectList:
                 collisionList.append(pygame.Rect(rect.left, rect.top, rect.width-30, rect.height))
+
             for rect in range(len(collisionList)):
                 collisionList[rect].x = npc.TextBox.x + 60
                 collisionList[rect].y = npc.TextBox.y + 30 + 45*rect
+
             if len(collisionList) > 0:
                 highlighted = self.mouseRect.collidelist(collisionList) 
                 if highlighted == -1:
@@ -356,6 +377,8 @@ class Player(pygame.sprite.Sprite):
             self.health_bar_rect = pygame.Rect(10, 10, self.currentHealth / self.healthRatio - 3, self.healthBarHeight)
             # creates the rectangle for the transition bar
             self.transition_bar_rect = pygame.Rect(self.health_bar_rect.right, 10, self.transitionWidth, self.healthBarHeight)
+
+
         elif self.currentHealth > self.targetHealth: # if health should decrease
             self.currentHealth -= self.healthChangeSpeed # decreases the current health (red bar) by the health bar's speed
             # updates the width of the transition health bar to be the distance between the current health and target health points
@@ -384,6 +407,8 @@ class Player(pygame.sprite.Sprite):
             self.showList.append('swordDamage')
         if self.bonusDamage[2] != 0 and 'sharpTrident' not in self.showList:
             self.showList.append('sharpTrident')
+
+
         for i in range(len(self.showList)):
             statCoord = (10+self.maxHealthBarLength+10+20+5+50*i, 10+self.healthBarHeight/2+5)
             pygame.draw.circle(self.game.screen, WHITE, statCoord, 20)
@@ -396,6 +421,8 @@ class Player(pygame.sprite.Sprite):
                 self.game.screen.blit(self.statusList[2], (statCoord[0]-15, statCoord[1]-15))
             elif self.showList[i] == 'bulletPen':
                 self.game.screen.blit(self.statusList[3], (statCoord[0]-15, statCoord[1]-15))
+
+
         self.mouseRect.center = pygame.mouse.get_pos()
         interactRect = pygame.Rect(self.mouseRect.center[0]-TILESIZE*0.05, self.mouseRect.center[1]-TILESIZE*0.05, TILESIZE*0.1, TILESIZE*0.1)
         for i in range(len(self.showList)):
@@ -415,11 +442,13 @@ class Player(pygame.sprite.Sprite):
 
         
 
+
     #Method for different Player interactions
     def interact(self):
         keys = pygame.key.get_pressed()
         mouses = pygame.mouse.get_pressed()
         interacted = False
+
 
         if self.itemUsed:
             if self.facing == 'right':
@@ -444,6 +473,7 @@ class Player(pygame.sprite.Sprite):
             else:
                 interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE, TILESIZE*1.1)
 
+
             #Gets the index of the flower that the player interacted with
             flowerIndex = interactRect.collidelist(list(flower.rect for flower in self.game.flowers))
             if flowerIndex != -1:
@@ -463,6 +493,7 @@ class Player(pygame.sprite.Sprite):
 
 
 
+
             #Gets the index of the ore that the player interacted with
             oreIndex = interactRect.collidelist(list(ore.rect for ore in self.game.ores))
             if oreIndex != -1:
@@ -478,6 +509,7 @@ class Player(pygame.sprite.Sprite):
                     self.image = self.mineUpImgList[self.mineUpgrade]
                 else:
                     self.image = self.mineDownImgList[self.mineUpgrade]
+
 
             #Gets the index of the npc that the player interacted with
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
@@ -513,11 +545,13 @@ class Player(pygame.sprite.Sprite):
 
             
 
+
         #EDIT AFTER INVENTORY MADE
         elif keys[pygame.K_r] and self.weapon.type == 'bubble':
             self.weapon.reload()
             pygame.mixer.Channel(4).set_volume(0.025 * self.game.soundVol)
             pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/mag-slide-in-80901.mp3'))
+
 
 
         elif self.game.state == 'dialogue' and (keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_UP] or keys[pygame.K_DOWN]):
@@ -531,6 +565,7 @@ class Player(pygame.sprite.Sprite):
             else:
                 interactRect = pygame.Rect(self.rect.left, self.rect.top, TILESIZE, TILESIZE*1.1)
             
+
             #Gets the index of the npc that the player interacted with
             npcIndex = interactRect.collidelist(list(npc.rect for npc in self.game.npcs))
             if npcIndex != -1:
@@ -544,6 +579,7 @@ class Player(pygame.sprite.Sprite):
                     npc.TextBox.selectedRect = npc.TextBox.selectedRect + 1 if npc.TextBox.selectedRect < len(npc.TextBox.choiceRectList)-1 else npc.TextBox.selectedRect
                     pygame.time.wait(150)
 
+
         #Modified: Max Chiu 5/18/2024
         elif self.game.state == 'shopping' and (keys[pygame.K_a] or keys[pygame.K_d] or keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] or keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_UP] or keys[pygame.K_DOWN]):
             npc = self.game.activeNPC
@@ -551,14 +587,17 @@ class Player(pygame.sprite.Sprite):
                 npc.pastItem = npc.selectedItem
                 npc.selectedItem = npc.selectedItem - 1 if (npc.selectedItem > 0 and npc.selectedItem != len(npc.itemList)-1) else npc.selectedItem
                 pygame.time.wait(150)
+
             elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 npc.pastItem = npc.selectedItem
                 npc.selectedItem = npc.selectedItem + 1 if npc.selectedItem < len(npc.itemList)-2 else npc.selectedItem
                 pygame.time.wait(150)
+
             elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
                 npc.pastItem = npc.selectedItem
                 npc.selectedItem = len(npc.itemList)-1
                 pygame.time.wait(150)
+
             elif keys[pygame.K_w] or keys[pygame.K_UP]:
                 if npc.pastItem == 3:
                     npc.pastItem = 1
@@ -581,10 +620,13 @@ class Player(pygame.sprite.Sprite):
                 for rect in range(len(rectCollisionList)):
                     rectCollisionList[rect].x = npc.TextBox.x + 13
                     rectCollisionList[rect].y = npc.TextBox.y + 25 + 30*rect
+
+
                 if len(rectCollisionList) > 0:
                     npc.selectedRect = mouseRect.collidelist(rectCollisionList)
                     npc.interaction()
                     pygame.time.wait(200)
+
             elif self.game.state == 'shopping':
                 interactIndex = mouseRect.collidelist(self.game.activeNPC.itemRects)
                 if interactIndex != -1:
@@ -609,6 +651,8 @@ class Player(pygame.sprite.Sprite):
                         self.game.inventory.add_item('potion', 1)
                     self.game.activeNPC.interaction()
                     #pygame.time.wait(250)
+
+
             else:
                 #Checks if the player is within a square's range of side length 60 pixels of the mouse
                 if ((mouseRect.x-self.rect.x)**2+(mouseRect.y-self.rect.y)**2)**(1/2) <= 60:
@@ -794,6 +838,8 @@ class Player(pygame.sprite.Sprite):
                     self.rect.x = hits[0].rect.right
                 #for sprite in self.game.all_sprites:
                     #sprite.rect.x -= x_diff
+
+
         else:
             hits = pygame.sprite.spritecollide(self, self.game.blocks, False) + pygame.sprite.spritecollide(self, self.game.npcs, False)
             yDiff = 0
@@ -844,6 +890,8 @@ class Player(pygame.sprite.Sprite):
                     self.image = self.swingRightList[1]
                 elif attackInstance.animationPhase == 3:
                     self.image = self.swingRightList[2]
+
+
         elif self.spearUsed:
             # updates the player's image based on the direction they are facing
             if self.facing == 'up':
@@ -944,26 +992,25 @@ class NPC(pygame.sprite.Sprite):
         self.xChange = 0
         self.yChange = 0
 
-        self.imagelist = [
-                          'Sprites/npcs/NPCs-Char/bucket.png',
-                          'Sprites/npcs/NPCs-Char/heart.png',
-                          'Sprites/npcs/NPCs-Char/leaf.png']
-        self.npcImgNum = random.randint(0, len(self.imagelist) -1)
-        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[self.npcImgNum]).convert_alpha(), (self.width, self.height))
-        self.avatarImgList = [pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (920*0.24, 170*0.73)),
-                              pygame.transform.scale(pygame.image.load(self.imagelist[1]).convert_alpha(), (920*0.24, 170*0.73)),
-                              pygame.transform.scale(pygame.image.load(self.imagelist[2]).convert_alpha(), (920*0.24, 170*0.73)),
-                              pygame.transform.scale(pygame.image.load('Sprites/npcs/NPCs-Char/catNPCno4.png').convert_alpha(), (920*0.3, 170*0.73))]
-        self.avatarImg = self.avatarImgList[self.npcImgNum]
-        self.nameList = ['bucket', 'heart', 'leaf']
-        self.name = self.nameList[self.npcImgNum]
+
         if mapPos == (2, 1):
             self.npcImgNum = 3
             self.width = 2.5*TILESIZE
             self.height = 2*TILESIZE
             self.name = 'le chat'
-            self.avatarImg = self.avatarImgList[3]
+            self.avatarImg = self.game.avatarImgList[-1]
             self.image = pygame.transform.scale(pygame.image.load('Sprites/npcs/NPCs-Char/catNPCno4.png').convert_alpha(), (self.width, self.height))
+
+
+        else:
+            self.npcImgNum = random.randint(0, len(self.game.npcImageList) -1)
+            self.image = pygame.transform.scale(pygame.image.load(self.game.npcImageList[self.npcImgNum]).convert_alpha(), (self.width, self.height))
+            self.avatarImg = self.game.avatarImgList[self.npcImgNum]
+            self.name = self.game.nameList[self.npcImgNum]
+
+            self.game.npcImageList.pop(self.npcImgNum)
+            self.game.avatarImgList.pop(self.npcImgNum)
+            self.game.nameList.pop(self.npcImgNum)
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
@@ -990,6 +1037,7 @@ class NPC(pygame.sprite.Sprite):
             self.itemList.append('trident')
             self.itemDesc.append('Throwing Trident ')
             self.itemImgs.append(pygame.transform.scale(pygame.image.load('Sprites/items/trident2.png'), (200, 200)))
+
         if 'bubble' not in self.game.player.activeWeaponList:
             self.itemCost.append({'flower': 4})
             self.itemList.append('bubble')
@@ -1020,23 +1068,100 @@ class NPC(pygame.sprite.Sprite):
         #Always leave a space/punctuation at the end of the quote!
         #Would you rather cum in the sink or sink in the cum? That is indeed the question for which we must all ponder and arrive at our own answers.
         #change this later
-        self.dialogueList = {'01:First Meet':[{'Meetings': 1},
-                                                "Chipichipi Chapachapa Dubidubi Dabadaba Magico Mi Dubi Dubi ",
-                                                "Boom Boom Boom Boom ",
-                                                "%Choices; What do you want to do?; Shop; Leave; Meow "],
-                             '02:Second Meet': [{'Meetings':2},
-                                                "Hi again... ",
-                                                "%Choices; What do you want to do?; Shop; Leave; Meow "]
+
+        if self.name == 'le chat':
+            self.dialogueList = {'01:First Meet':[{'Meetings': 1},
+                                                    "Meow! My name is le chat, the guardian of the forest!! ",
+                                                    "You're the Slime Kingdom's reinforcements right? ",
+                                                    "%Choices; Want to save the forest?; Yes; No...; I speak for the trees ",
+                                                    "The Evil CEO of pollution is taking all of our flowers and ores. Without it, the forest's ecosystem is thrown all out of wack! ",
+                                                    "So, since you're the best fighter of all of us (you do have a sword after all), I'm entrusting you to defeat him! ",
+                                                    "Just in case you forgot how to fight though, use WASD to move, J to attack using the sword and trident, and arrow keys to attack using the bubble gun.",
+                                                    "In order to get other weapons, you need to collect flowers and ores using Space then trade it in the shop (via me and my friends) ",
+                                                    "But be careful, if you take too long to collect the flowers and ores, they'll start decomposing from the Evil CEO's pollution (heard he doesn't shower) ",
+                                                    "In the shop, only the health potion can be saved for later, and is drunk using H. The other potions/upgrades give you a permanent upgrade ",
+                                                    "And uh... I think that's it! Thanks for helping save me and my friends' home!! "
+                                                    "%Choices; What do you want to do?; Shop; Leave; Meow "],
+                                '02:Second Meet': [{'Meetings':2},
+                                                    "Hi again... ",
+                                                    "%Choices; What do you want to do?; Shop; Leave; Meow "]
+                                }
+            
+            self.choiceList = {'01:Yes':["Meow! That's amazing! Because we really need your help! "],
+                            '01:No...':["Oh... that's awkward ", "Um... I'll just keep talking and pretend you didn't say that "],
+                            '01:I speak for the trees':["I LOVE the Lorax! Then, you should also know the trees are asking for our help!"],
+                            '01:Shop': ["Hope your purchase helps you not die! "],
+                            '01:Leave': ["Byeeeeee "],
+                            '01:Meow': ["Meow! "],
+                            '02:Shop': ["You better not die! >:( "],
+                            '02:Leave': ["Good luck!! "],
+                            '02:Meow': ["Woof Woof Woof RGHHHHH", "I mean... Meow! "]
                             }
         
-        self.choiceList = {'01:Shop': ["Hope your purchase helps you not die!"],
-                           '01:Leave': ["Byeeeeee "],
-                           '01:Meow': ["Meow!"],
-                           '02:Shop': ["I better see you again! >:("],
-                           '02:Leave': ["Bye again "],
-                           '02:Meow': ["Woof Woof Woof RGHHHHH", "I mean... Meow!"]
-                          }
+        elif self.name == 'leaf':
+            self.dialogueList = {'01:First Meet':[{'Meetings': 1},
+                                                    "Ouch! You can’t cut me!! I am the great Leaf, not a flower >:| ",
+                                                    "%Choices; What do you say?; Sorry... I needed to gather resources.; Oh. My bad.; I thought you were a flower! ",
+                                                    "But I guess I have to do my job... ",
+                                                    "What would you like to do? Shop ore leaf ",
+                                                    "%Choices; What do you want to do?; Shop; Leaf "],
+                                '02:Second Meet': [{'Meetings':2},
+                                                    "You’re back? You guys just won’t leaf me alone!! ",
+                                                    "What do you want? Don’t even shop, just leaf",
+                                                    "%Choices; What do you want to do?; Shop; Leaf "],
+                                '03:Third Meet': [{'Meetings':3},
+                                                  "...No "]
+                                }
+            
+            self.choiceList = {'01:Sorry... I need to gather resources. What can I trade with what I have?': ["So rude… slimes these days, I’m just trying to leaf in peace."],
+                            '01:Oh. My bad.':["So rude… slimes these days, I’m just trying to leaf in peace."],
+                            '01:I thought you were a flower!':["So rude… slimes these days, I’m just trying to leaf in peace."],
+                            '01:Shop': ["Don't come back!! "],
+                            '01:Leaf': ["Good "],
+                            '02:Shop': ["Leaf me alone!! "],
+                            '02:Leaf': ["Good riddance "]
+                            }
+            
+        elif self.name == 'bucket':
+            self.dialogueList = {'01:First Meet':[{'Meetings': 1},
+                                                    "Hello there! I am the guardian of the grounds, Bucket. I see you’re on a mission to save our forest from the CEO of pollution! ",
+                                                    "Some ground rules (not actually, I just like saying ground) ",
+                                                    "Be careful of Heart, underneath that smile is an evil nature ",
+                                                    "You should probably leave Leaf alone, they are quite the grumpy one, constantly mumbling about leafing them alone. ",
+                                                    "Come to me to trade! I am definitely the nicest of the bunch :) ",
+                                                    "Please shop until your bucket list is all checked off! ",
+                                                    "%Choices; What do you want to do?; Shop; Leave "],
+                                '02:Second Meet': [{'Meetings':2},
+                                                    "Welcome back!! Are you here to fill your bucket? ",
+                                                    "%Choices; What do you want to do?; Shop; Leave "]
+                                }
+            
+            self.choiceList = {
+                            '01:Shop': ["Good Luck! "],
+                            '01:Leave': ["Come back soon! "],
+                            '02:Shop': ["Come back as many times as you want "],
+                            '02:Leave': ["You're welcome back anytime! "]
+                            }
+            
+        elif self.name == 'heart':
+            self.dialogueList = {'01:First Meet':[{'Meetings': 1},
+                                                    "Oh... ew ",
+                                                    "I mean Hi! How are you? How can I help you? ",
+                                                    "Actually don’t answer that, doesn’t matter ",
+                                                    "Did you come to fight the evil CEO? ",
+                                                    "Oh, YOU are going to need all the help you can get ",
+                                                    "Try not to die too fast ",
+                                                    "%Choices; What do you want to do?; Shop; Leave "],
+                                '02:Second Meet': [{'Meetings':2},
+                                                    "Heart's closed off. Goodbye! "]
+                                }
+            
+            self.choiceList = {
+                            '01:Shop': ["Stay alive! ... or not "],
+                            '01:Leave': ["Come back soon! (I hope you won't tho!) "]
+                            }
         
+
         #What needs to be done:
         #For Choices strings, make it a list instead, depending on choice do selectedRect for next dialogue and then next dialogue after the choices string
         #Probably do in choiceResponse method.
@@ -1056,6 +1181,7 @@ class NPC(pygame.sprite.Sprite):
             if check == 'Meetings' and self.meetings < conditions[check]:
                 nextDialogue = False
                 break
+
         if nextDialogue:
             keys = list(self.dialogueList.keys())
             try:
@@ -1076,6 +1202,8 @@ class NPC(pygame.sprite.Sprite):
             self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 28, 'Garamond', self.name)
             self.dialogueStageIndex += 1
             self.game.state = 'dialogue'
+
+
         elif self.game.state == 'shopping':
             pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
@@ -1084,9 +1212,11 @@ class NPC(pygame.sprite.Sprite):
                 self.itemRects = []
                 self.game.state = 'dialogue'
                 return -1
+            
             for req in self.itemCost[self.selectedItem]:
                 if self.game.inventory.get(req) < self.itemCost[self.selectedItem].get(req):
                     purchase = False
+
             if purchase:
                 for req in self.itemCost[self.selectedItem]:
                     self.game.inventory.add_item(req, -1*self.itemCost[self.selectedItem].get(req))
@@ -1100,13 +1230,17 @@ class NPC(pygame.sprite.Sprite):
             pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
             #If there are choices displayed on the screen
+
             if len(self.TextBox.choiceRectList) > 0:
                 self.choiceResponse()
                 selection = self.dialogueList[self.dialogueStage][self.dialogueStageIndex].split(';')
                 selection = selection[self.TextBox.selectedRect+2]
                 selection = f'{self.dialogueStage[0:2]}:{selection.strip()}'
-                for line in self.choiceList[selection]:
-                    self.dialogueList[self.dialogueStage].append(line)
+                for i in range(len(self.choiceList[selection])-1, -1, -1):
+                    line = self.choiceList[selection][i]
+                    self.dialogueList[self.dialogueStage].insert(self.dialogueStageIndex+1,line)
+
+
                 self.dialogueStageIndex += 1
                 if self.dialogueStageIndex == len(self.dialogueList[self.dialogueStage]) and self.game.state != 'shopping':
                     self.TextBox.kill()
@@ -1114,21 +1248,27 @@ class NPC(pygame.sprite.Sprite):
                     self.game.state = 'explore'
                     self.game.play_music('stop')
                     self.game.play_music('village')
+
                 elif self.TextBox.selectedRect != 0:
                     self.interaction()
                     return -1
+                
+
             #If the next dialogue to display is a choice list
             elif nextDialogue.find('%Choices') != -1:
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game, self)
                 choicesList = nextDialogue.split(';')
                 self.TextBox.newText(choicesList[1:], 28, 'Garamond', self.name)
+
             #Displaying normal dialogue
             else:
                 self.TextBox.kill()
                 self.TextBox = TextBox(self.game, self)
                 self.TextBox.newText(nextDialogue, 28, 'Garamond', self.name)
                 self.dialogueStageIndex += 1
+
+                
         #When finished with dialogue
         elif self.game.state == 'dialogue':
             index = -1
@@ -1138,6 +1278,9 @@ class NPC(pygame.sprite.Sprite):
                     index = i+1
             if index != -1:
                 self.dialogueList[self.dialogueStage] = self.dialogueList[self.dialogueStage][0:index]
+
+
+
             self.selectedItem = -1
             self.TextBox.kill()
             self.updateDialogue()
@@ -1153,7 +1296,7 @@ class NPC(pygame.sprite.Sprite):
         self.TextBox.choiceRectList = []
         #variable for each letter width of the font
         textWidth = 9
-        if self.TextBox.selectedRect == 0:
+        if self.TextBox.selectedRect == 0 and self.dialogueStageIndex == len(self.dialogueList[self.dialogueStage])-1:
             self.game.state = 'shopping'
 
             # displays the count of flowers when in the shop
@@ -1406,6 +1549,7 @@ class Enemy(pygame.sprite.Sprite):
                 self.state = 'stunned'
                 pygame.mixer.Channel(4).set_volume(0.06 * self.game.soundVol)
                 pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/15_Impact_flesh_02.wav'))
+
             elif type == 'swordfish' or type == 'trident':
                 self.speed *= 0.7
                 self.hitInvulnerable = True
@@ -1413,6 +1557,7 @@ class Enemy(pygame.sprite.Sprite):
                 self.state = 'knockback'
                 pygame.mixer.Channel(4).set_volume(0.06 * self.game.soundVol)
                 pygame.mixer.Channel(4).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/03_Claw_03.wav'))
+
             if self.health <= 0:
                 self.kill()
                 self.game.updateAliveLists('enemy', self.defaultPos)
@@ -1548,8 +1693,10 @@ class Enemy(pygame.sprite.Sprite):
         if not self.hitInvulnerable and not self.stunned and self.attackType == 'melee':
             self.state = 'chasing' if self.state not in ['chasing', 'searching', 'standing', 'returning'] else self.state
             #print(self.xChange, self.yChange)
+
         if self.state == 'stunned' or self.state == 'knockback':
             return
+        
         if self.state == 'returning':
             #print(len(self.path.collision_rects))
             if self.path.collision_rects == []:
@@ -1817,6 +1964,7 @@ class Pathfinder:
     def emptyPath(self):
         self.collision_rects = []
         self.path = []
+
 
 class Boss(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -2395,7 +2543,7 @@ class TextBox(pygame.sprite.Sprite):
             #If normal dialogue
             if type(text) == str:
                 try:
-                    cutoffIndex = len(text[:maxLength])-re.search('[^a-zA-Z0-9]', text[maxLength-1::-1]).end()+1
+                    cutoffIndex = len(text[:maxLength])-re.search("[^a-zA-Z0-9()']", text[maxLength-1::-1]).end()+1
                 except AttributeError:
                     cutoffIndex = maxLength
                 #print("cutoffIndex is ", cutoffIndex)
