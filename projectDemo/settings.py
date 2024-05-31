@@ -40,7 +40,7 @@ mapList = [[-1, -1, -1, -1, -1, -1, -1, -1, -1, -3, -2, -3, -1, -1,],
 #tiles to represent the world, each 'B' represents a block, the 'P' is the player's position
 #There are 32 horizontal tiles (width of 1280 / 40) and 18 vertical tiles (height of 720 / 40))
 currentTileMap = [[ #index 0
-    'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBB1',
+    'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBBg',
     'BSSBBBBBBBBB.GGGGG...SSSSSSS...B',
     'BSSBB.....BB..GGG...SSSS.SS..SSB',
     'BSSBB.....BB...GGG.........SS..B',
@@ -59,7 +59,7 @@ currentTileMap = [[ #index 0
     'B....SSSS......GGG..SSSSS...SSSB',
     'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBB'
 ], [ #index 1
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB2',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBg',
     'BSSSSSSSSSSSSSS........SSSS....B',
     'BSSSSSSS................SSSWWWWB',
     'BSS.......BBF.BB......O...SSWWWB',
@@ -79,7 +79,7 @@ currentTileMap = [[ #index 0
 
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ], [#index 2
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB3',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBg',
     'B..RR..........................B',
     'B.R..R.........................B',
     'B...R.....BBF.BB......O........B',
@@ -98,7 +98,7 @@ currentTileMap = [[ #index 0
     'B..............................B',
     'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBB'
 ], [#index 3
-    'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBB4',
+    'BBBBBBBBBBBBBBBTTBBBBBBBBBBBBBBBg',
     'B..............................B',
     'B..............................B',
     'B.....................O........B',
@@ -117,7 +117,7 @@ currentTileMap = [[ #index 0
     'B..............O...............B',
     'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
 ], [#index 4
-    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB5',
+    'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBg',
     'BBBBB..........................B',
     'B..............................B',
     'B.........BBF.BB......O........B',

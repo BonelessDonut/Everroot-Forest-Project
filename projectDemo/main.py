@@ -78,7 +78,6 @@ class Game():
         self.tutorialsActive = False
         
         self.running = True
-
         self.finishedScene = False
         self.cutsceneSkip = False
         self.musicVol = 10
@@ -129,7 +128,7 @@ class Game():
     def createTilemap(self, prevPosition):
         #Only for initial map creation
         # -1, -1 is the convention to make known that the map doesnt currently exist
-        currentTileMap = green
+        #currentTileMap = green
         if self.map == [-1, -1]:
             # 1, 1 : the map now exists from the list in settings.py
             self.map = [2, 1]
