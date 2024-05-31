@@ -90,11 +90,11 @@ class Weapon(pygame.sprite.Sprite):
 
     def updateDamage(self, bonus):
         if self.type == 'bubble':
-            self.damage = 10 + bonus
+            self.damage = 10 + bonus[0]
         elif self.type == 'swordfish':
-            self.damage = 20 + bonus
+            self.damage = 20 + bonus[1]
         elif self.type == 'trident':
-            self.damage = 35 + bonus
+            self.damage = 35 + bonus[2]
 
         
     #Author: Max Chiu 4/12/2024
