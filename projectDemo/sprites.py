@@ -331,7 +331,7 @@ class Player(pygame.sprite.Sprite):
                 self.game.screenshake = amount // 5
             if self.targetHealth <=0:
                 self.targetHealth = 0 # target health cannot go below zero
-            pygame.mixer.Channel(1).set_volume(0.035 * self.game.soundVol)
+            pygame.mixer.Channel(1).set_volume(0.050 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/RPG_Essentials_Free/10_Battle_SFX/77_flesh_02.wav'))
 
     def getHealth(self, amount):
@@ -939,11 +939,16 @@ class NPC(pygame.sprite.Sprite):
         self.xChange = 0
         self.yChange = 0
 
-        self.imagelist = ['Sprites/npcs/sampleNPC/hkprotagdown.jpg',
-                          'Sprites/npcs/sampleNPC/hkprotagleft.jpg',
-                          'Sprites/npcs/sampleNPC/hkprotagright.jpg',
-                          'Sprites/npcs/sampleNPC/hkprotagdown.jpg']
-        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (self.width, self.height))
+        self.imagelist = [
+                          'Sprites/npcs/NPCs-Char/bucket.png',
+                          'Sprites/npcs/NPCs-Char/heart.png',
+                          'Sprites/npcs/NPCs-Char/leaf.png']
+        self.npcImgNum = random.randint(0, len(self.imagelist) -1)
+        self.image = pygame.transform.scale(pygame.image.load(self.imagelist[self.npcImgNum]).convert_alpha(), (self.width, self.height))
+        self.avatarImgList = [pygame.transform.scale(pygame.image.load(self.imagelist[0]).convert_alpha(), (920*0.24, 170*0.73)),
+                              pygame.transform.scale(pygame.image.load(self.imagelist[1]).convert_alpha(), (920*0.24, 170*0.73)),
+                              pygame.transform.scale(pygame.image.load(self.imagelist[2]).convert_alpha(), (920*0.24, 170*0.73))]
+        self.avatarImg = self.avatarImgList[self.npcImgNum]
 
         self.dialogueStage = '01:First Meet'
         self.dialogueStageIndex = 1
@@ -1052,7 +1057,7 @@ class NPC(pygame.sprite.Sprite):
             pygame.mixer.Channel(1).set_volume(0.03 * self.game.soundVol)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound('Music/sound_effects/select-sound-121244.mp3'))
             self.meetings += 1
-            self.TextBox = TextBox(self.game)
+            self.TextBox = TextBox(self.game, self)
             self.TextBox.newText(self.dialogueList[self.dialogueStage][self.dialogueStageIndex], 28, 'Garamond', self.name)
             self.dialogueStageIndex += 1
             self.game.state = 'dialogue'
@@ -1100,13 +1105,13 @@ class NPC(pygame.sprite.Sprite):
             #If the next dialogue to display is a choice list
             elif nextDialogue.find('%Choices') != -1:
                 self.TextBox.kill()
-                self.TextBox = TextBox(self.game)
+                self.TextBox = TextBox(self.game, self)
                 choicesList = nextDialogue.split(';')
                 self.TextBox.newText(choicesList[1:], 28, 'Garamond', self.name)
             #Displaying normal dialogue
             else:
                 self.TextBox.kill()
-                self.TextBox = TextBox(self.game)
+                self.TextBox = TextBox(self.game, self)
                 self.TextBox.newText(nextDialogue, 28, 'Garamond', self.name)
                 self.dialogueStageIndex += 1
         #When finished with dialogue
@@ -2286,8 +2291,9 @@ class Teleport(pygame.sprite.Sprite):
         self.rect.y = self.y
 
 class TextBox(pygame.sprite.Sprite):
-    def __init__(self, game):
+    def __init__(self, game, npc):
         self.game = game
+        self.npc = npc
         self._layer = TEXT_LAYER
         self.groups = self.game.all_sprites, self.game.user_interface
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -2301,13 +2307,14 @@ class TextBox(pygame.sprite.Sprite):
         self.area = pygame.Rect(0, 3, self.width*0.70, self.height*0.6)
         self.avatarBox = pygame.Rect(self.width*0.7134, self.height*0.13, self.width*0.24, self.height*0.73)
         self.image = pygame.transform.scale(pygame.image.load('Sprites/textbox2.png').convert_alpha(), (self.width, self.height*1.20))
-        self.imagelist = os.listdir('Sprites/npcs/chipichipichapachapa')
-        self.imgindex = 3
+        #self.imagelist = os.listdir('Sprites/npcs/chipichipichapachapa')
+        #self.imgindex = 3
 
         self.selectedRect = 0
         self.choiceRectList = []
 
-        image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
+        #image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
+        image = self.npc.avatarImg
         self.image.blit(image, self.avatarBox)
         #To see where the text and avatar area rectangles cover, uncomment below lines
         #pygame.draw.rect(self.image, RED, self.area)
@@ -2379,9 +2386,9 @@ class TextBox(pygame.sprite.Sprite):
     
         
     def update(self):
-        self.imgindex = (self.imgindex+1)%392 
+        #self.imgindex = (self.imgindex+1)%392
         self.timepassed += self.clock.get_time()/1000
-        image = pygame.transform.scale(pygame.image.load(f'Sprites/npcs/chipichipichapachapa/{self.imagelist[self.imgindex]}').convert_alpha(), (self.avatarBox.width, self.avatarBox.height))
+        image = self.npc.avatarImg
         self.image.blit(image, self.avatarBox)
         self.image.blit(pygame.font.SysFont('Courier', 25).render(self.name, False, (255, 255, 255)),(self.avatarBox.x + self.avatarBox.width / 2 - len(self.name) * TILESIZE / 5.5, self.height * 0.89))
         if len(self.choiceRectList) > 0:
@@ -2515,6 +2522,8 @@ class WeaponDisplay(pygame.sprite.Sprite):
             if self not in self.game.all_sprites:
                 self.groups = self.game.all_sprites, self.game.user_interface
                 self.add(self.game.all_sprites, self.game.user_interface)
+            if self.game.player.weapon.type == 'bubble':
+                self.displayRangedAmmo()
             for i in range(len(self.weaponList)):
                 if self.weaponList[i]['name'] in self.game.player.activeWeaponList:
                     currentImage = pygame.transform.scale(self.weaponList[i]['image'].convert_alpha(), (TILESIZE * 0.8, TILESIZE * 0.8))
@@ -2529,6 +2538,12 @@ class WeaponDisplay(pygame.sprite.Sprite):
         else:
             # removes the weapon hud from the list of sprites to be drawn if it should not be shown
             self.remove(self.game.all_sprites, self.game.user_interface)
+
+    def displayRangedAmmo(self):
+        #print("in displayRangedAmmo func")
+        ammoCount = self.game.player.weapon.ammo // 3
+        for ammo in range(ammoCount):
+            pygame.draw.circle(self.game.screen, PINK, (20 + ammo * 13, 45), 8)
 
     # checks the weapon that is actively equipped and updates the info within the hud to reflect that
     def checkActiveWep(self):

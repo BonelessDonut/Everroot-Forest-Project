@@ -109,11 +109,11 @@ class Game():
             mixer.music.play(100)
         elif songType == 'enemy':
             mixer.music.load('Music/enemy-music.mp3')
-            mixer.music.set_volume(0.065 * self.musicVol)
+            mixer.music.set_volume(0.045 * self.musicVol)
             mixer.music.play(100)
         elif songType == 'boss':
             mixer.music.load('Music/boss_music_final.mp3')
-            mixer.music.set_volume(0.080 * self.musicVol)
+            mixer.music.set_volume(0.050 * self.musicVol)
             mixer.music.play(100)
         elif songType == 'death':
             mixer.music.load('Music/Bleach_-_Never_meant_to_belong.mp3')
@@ -769,6 +769,7 @@ class Game():
     def intro_screen(self):
         #Play the intro screen
         #To be created later
+        self.play_music('win')
         while self.state == 'menu':
             self.screen.blit(pygame.transform.scale(pygame.image.load('Sprites/hudImages/title3.png').convert_alpha(), (WIDTH, HEIGHT)), self.renderOffset)
             text = "Press Space to Play"
@@ -884,6 +885,7 @@ class Game():
                 playerPos = self.map
                 playerCoord = (self.player.x*11/1280, self.player.y*7/720)
                 pygame.draw.rect(self.screen, PURPLE, pygame.Rect(100+(6+playerPos[1]*15+playerCoord[0]+1)*1080/208, 157.5+(6+playerPos[0]*11+playerCoord[1]+1)*1080/208, 2*1100/208, 2*1100/208))
+                #pygame.draw.rect(self.screen, BLACK,pygame.Rect(100 + (6 + playerPos[1] * 15 + playerCoord[0] + 1) * 1080 / 208,157.5 + (6 + playerPos[0] * 11 + playerCoord[1] + 1) * 1080 / 208,2 * 1100 / 208, 2 * 1100 / 208), 1)
                 
 
 
