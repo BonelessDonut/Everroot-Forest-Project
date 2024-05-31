@@ -138,8 +138,9 @@ class Game():
             for row in range(len(settings.currentTileMap[0])):
                 #print(f"{row} ", end="")   
                 for col in range(len(settings.currentTileMap[0][row])):
+                    WalkableBlock(self, col, row, 1)
                     if (settings.currentTileMap[0][row])[col] == "B": # brick
-                        Block(self, col, row, 0)
+                        Block(self, col, row, 5)
                     elif (settings.currentTileMap[0][row])[col] == "W": # water
                         Block(self, col, row, 1)
                     elif (settings.currentTileMap[0][row])[col] == "S": # sapling
@@ -401,7 +402,7 @@ class Game():
                 row2 = row2[:-1] + 'T'
                 currentTileMap[mapNumber][8] = row1
                 currentTileMap[mapNumber][9] = row2
-                
+
             # print(self.map, mapNumber)
 
             if mapNumber == -1:
@@ -421,9 +422,16 @@ class Game():
             for row in range(len(settings.currentTileMap[mapNumber])):
                 #print(f"{row} ", end="")
                 for col in range(len(settings.currentTileMap[mapNumber][row])):
+                    if (settings.currentTileMap[mapNumber][0][-1] == 'r'):
+                        WalkableBlock(self, col, row, 3)
+                    else:
+                        WalkableBlock(self, col, row, 1)
                     # looks at the premade room in settings.py, if a tile is on the map, print the corresponding sprite on the new map
                     if (settings.currentTileMap[mapNumber][row])[col] == "B": # brick
-                        Block(self, col, row, 0)
+                        if (settings.currentTileMap[mapNumber][0][-1] == 'r'):
+                            Block(self, col, row, 4)
+                        else:
+                            Block(self, col, row, 5)
                     elif (settings.currentTileMap[mapNumber][row])[col] == "W": # water
                         Block(self, col, row, 1)
                     elif (settings.currentTileMap[mapNumber][row])[col] == "S": # sapling
@@ -453,7 +461,10 @@ class Game():
                         Enemy(self, col, row, 'ranged')
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'T': # teleport door
                         # teleports the player's position on the screen when they move rooms
-                        Teleport(self, col, row)
+                        if self.currentMapType != 'r':
+                            Teleport(self, col, row)
+                        else:
+                            Block(self, col, row, 4)
                         if prevPosition[0] == 0 and col == 31 and prevPosition[1] == row:
                             self.player.setPosition(col-1, row)
                         elif prevPosition[0] == 31 and col == 0 and prevPosition[1] == row:
@@ -529,6 +540,7 @@ class Game():
         self.bullets = pygame.sprite.LayeredUpdates()
         self.particles = pygame.sprite.LayeredUpdates()
         self.user_interface = pygame.sprite.LayeredUpdates()
+        self.endgates = pygame.sprite.LayeredUpdates()
         self.createTilemap(None)
         #self.player = Player(self, 1, 2)
     def events(self):
@@ -809,11 +821,17 @@ class Game():
         # sets up all the tile images to be placed in the game, then stores them in a list
         # the walkable tiles and unwalkable blocks are stored in two different sub lists that are within the larger list
         self.tileList = [[pygame.transform.scale(pygame.image.load('Sprites/tiles/crossBridge1.png').convert_alpha(),(TILESIZE, TILESIZE)),
-                          pygame.transform.scale(pygame.image.load('Sprites/tiles/growth1.png').convert_alpha(),(TILESIZE, TILESIZE))],
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/growth1.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/metalglass.jpg').convert_alpha(), (TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/brushwalker437.png').convert_alpha(), (TILESIZE, TILESIZE))],
                          [pygame.transform.scale(pygame.image.load('Sprites/tiles/brick1.png').convert_alpha(),(TILESIZE, TILESIZE)),
-                          pygame.transform.scale(pygame.image.load('Sprites/tiles/water1.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          #pygame.transform.scale(pygame.image.load('Sprites/tiles/water1.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/brushwalker137.png').convert_alpha(),(TILESIZE, TILESIZE)),
                           pygame.transform.scale(pygame.image.load('Sprites/tiles/sapling2.png').convert_alpha(),(TILESIZE, TILESIZE)),
-                          pygame.transform.scale(pygame.image.load('Sprites/tiles/rock1.png').convert_alpha(),(TILESIZE, TILESIZE))]]
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/rock1.png').convert_alpha(),(TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/metalwall.png').convert_alpha(), (TILESIZE, TILESIZE)),
+                          pygame.transform.scale(pygame.image.load('Sprites/tiles/tree-dark-green-isaiah658.png').convert_alpha(), (TILESIZE, TILESIZE)),
+                          ]]
         # sets up all the images for the hyacinth type flower
         self.hyacinImgL = [pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth.png').convert_alpha(),(TILESIZE, TILESIZE)),
                       pygame.transform.scale(pygame.image.load('Sprites/items/hyacinth3New.png').convert_alpha(),(TILESIZE, TILESIZE)),

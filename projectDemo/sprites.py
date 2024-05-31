@@ -660,6 +660,11 @@ class Player(pygame.sprite.Sprite):
             self.game.createTilemap((tpSprite.x//TILESIZE, tpSprite.y//TILESIZE))
             #pygame.time.wait(50)
 
+        #Checks for endgates - hitboxes that signify the game should end and credits should play
+        endgateIndex = interactRect.collidelist(list(endgate.rect for endgate in self.game.endgates))
+        if endgateIndex != -1:
+            self.game.game_won()
+
 
     
 
@@ -1812,12 +1817,14 @@ class Boss(pygame.sprite.Sprite):
         self._layer = ENEMY_LAYER
         self.x = x
         self.y = y
-        self.width = TILESIZE * 2
-        self.height = TILESIZE * 2.5
+        self.width = TILESIZE * 3
+        self.height = self.width * 5/4
 
         self.speed = PLAYER_SPEED * 0.35
 
-        self.maxHealth = 500
+        #self.maxHealth = 500
+        # Lowered max health for testing and demonstration purposes
+        self.maxHealth = 100
         self.currentHealth = self.maxHealth
         self.healthBarLength = WIDTH * 0.6
         self.healthBarHeight = HEIGHT * 0.05
@@ -1902,7 +1909,7 @@ class Boss(pygame.sprite.Sprite):
             self.healthbar()
             bossTitle = "Bro"
             self.game.screen.blit(pygame.font.SysFont('Garamond', 18).render(bossTitle.strip(), False, WHITE),(self.healthBarPos[0], self.healthBarPos[1] - HEIGHT * 0.04))
-            pygame.display.update()#
+            #pygame.display.update()#
 
     # Function should create the boss's healthbar on the screen, including the max length and the current percentage of health remaining. The boss's name would also be displayed right above the healthbar.
     def healthbar(self):
@@ -2138,7 +2145,9 @@ class Boss(pygame.sprite.Sprite):
         self.game.bossDefeated = True
         self.particles.kill()
         self.kill()
-        self.game.game_won()
+        # self.game.game_won()
+        GameEndTeleport(self.game, 15, 3)
+        GameEndTeleport(self.game, 16, 3)
         pass
 
 class Particle(pygame.sprite.Sprite):
@@ -2209,8 +2218,9 @@ class BossAttack(pygame.sprite.Sprite):
         self.direction = direction
         self.speed = speed
         self.moving = moving
+        self._layer = ENEMY_LAYER
         self.image = self.game.bossAttacks[0]
-        self.groups = self.game.all_sprites, self.game.attacks
+        self.groups = self.game.all_sprites, self.game.attacks, self.game.non_background
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -2287,8 +2297,27 @@ class Teleport(pygame.sprite.Sprite):
         self.y = y * TILESIZE
 
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(BLUE)
+        self.image = self.game.tileList[0][1]
+        #self.image = pygame.Surface([self.width, self.height])
+        #self.image.fill(BLUE)
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+class GameEndTeleport(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = GROUND_LAYER
+        self.groups = self.game.all_sprites, self.game.endgates
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.width = TILESIZE
+        self.height = TILESIZE
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.image = self.game.tileList[0][2]
+        # self.image = pygame.Surface([self.width, self.height])
+        # self.image.fill(BLUE)
         self.rect.x = self.x
         self.rect.y = self.y
 
