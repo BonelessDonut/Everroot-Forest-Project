@@ -22,12 +22,18 @@ Everroot Forest
 Our idea is an exciting dungeon crawler game where you fight enemies and collect flowers and ores to give to the spirits of nature. Travel throughout the different rooms using different combinations of melee and ranged weapons. Talk to different NPCs to collect new ites, upgrade them, and buy different consumable items. Finally, defeat the boss to bring peace back to the world. This game is meant to be reminiscent of games such as Legend of Zelda and Hades.
 
   Features:
-    - Explore a dungeon
-    - Fight various different enemies
-    - Collect flowers and ores to save the spirits of nature
-    - Talk to some of the few, surviving nature spirits
-    - Upgrade your weapons and buy items to fight
-    - Defeat the boss
+
+  - Explore a dungeon
+
+  - Fight various different enemies
+
+  - Collect flowers and ores to save the spirits of nature
+
+  - Talk to some of the few, surviving nature spirits
+
+  - Upgrade your weapons and buy items to fight
+  
+  - Defeat the boss
 
 ## Visuals
 Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
