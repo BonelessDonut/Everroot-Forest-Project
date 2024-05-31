@@ -52,8 +52,11 @@ You can also document commands to lint the code or run tests. These steps help t
 
 ## Authors and acknowledgment
 Eddie Suber
+
 Rachel Tang
+
 Charlenne Tan
+
 Max Chiu
 
 ## License
