@@ -87,6 +87,9 @@ class Game():
         #list of rooms that's visited by the player, starts off with all demo rooms.
         self.visited = [(2,0), (2,1), (1,1), (3, 1), (2,2)]
         self.notVisited = [(2, 3), (3, 3), (4, 3), (2, 4), (4, 4), (5, 4), (1, 5), (2, 5), (3, 5), (5, 5), (2, 6), (3, 6), (4, 6), (5, 6), (2, 7), (1, 8), (0, 9), (1, 9), (2, 9), (3, 9), (0, 10), (3, 10), (4, 10), (0, 11), (2, 11), (3, 11), (2, 12)]
+
+        #list of npcs
+        self.visitedNPCs = []
     
     #written by Rachel Tang 4/19/24
     #used this website: https://www.educative.io/answers/how-to-play-an-audio-file-in-pygame
@@ -153,7 +156,7 @@ class Game():
                     elif (settings.currentTileMap[0][row])[col] == 'O': # ore
                         Ore(self, col, row, self.clock)
                     elif (settings.currentTileMap[0][row])[col] == 'N': # NPC
-                        NPC(self, col, row)
+                        self.visitedNPCs.append(NPC(self, col, row, (2,1)))
                     elif (settings.currentTileMap[0][row])[col] == 'E': # melee enemy
                         Enemy(self, col, row, 'melee')
                     elif (settings.currentTileMap[0][row])[col] == 'D': # ranged enemy
@@ -204,12 +207,6 @@ class Game():
             elif prevPosition[1] == 0:
                 mapNumber = mapList[self.map[0]-1][self.map[1]] 
                 self.map[0] -= 1
-
-            #tracks rooms that have been visited
-            position = (self.map[0], self.map[1])
-            if position not in self.visited:
-                self.visited.append(position)
-                self.notVisited.remove(position)
             
             purpleRoomsIndexes = []
             greenRoomsIndexes = [0, 1, 2, 3, 4]
@@ -429,7 +426,14 @@ class Game():
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'O': # ore
                         Ore(self, col, row, self.clock)
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'N': # NPC
-                        NPC(self, col, row)
+                        position = (self.map[0], self.map[1])
+                        if position in self.notVisited:
+                            self.visitedNPCs.append(NPC(self, col, row, self.map))
+                        else:
+                            for i in range(len(self.visitedNPCs)):
+                                if self.visitedNPCs[i].mapPos == position:
+                                    self.all_sprites.add(self.visitedNPCs[i])
+                                    self.npcs.add(self.visitedNPCs[i])
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'E': # melee enemy
                         Enemy(self, col, row, 'melee')
                     elif (settings.currentTileMap[mapNumber][row])[col] == 'D': # ranged enemy
@@ -449,6 +453,12 @@ class Game():
                         self.player.weaponNum = priorWeaponNum
                         self.player.weapon.type = self.player.weaponList[self.player.weaponNum]
                         self.player.weapon.updateDamage(self.player.bonusDamage)
+            
+            #tracks rooms that have been visited
+            position = (self.map[0], self.map[1])
+            if position not in self.visited:
+                self.visited.append(position)
+                self.notVisited.remove(position)
             # [2, 7] and [2, 12] are currently the two locations in the maplist where the boss room is located
             #if (self.map == [2, 12] or self.map == [2, 7]):
             #    self.boss = Boss(self, WIDTH * 0.4, HEIGHT * 0.4)
