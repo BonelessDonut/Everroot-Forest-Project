@@ -49,7 +49,7 @@ Our idea is an exciting dungeon crawler game where you fight enemies and collect
 After having Python installed along with some IDE to run Python, install both of the dependencies (Pygame and Pathfinding). If you have python installed, you can try
 'pip install pygame' and
 'pip install pathfinding'
-to download the modules. Otherwise, find out how to download other modules using your IDE and download them. After having done so, open the main.py file and run it.
+to download the modules. Otherwise, find out how to download other modules using your IDE and download them. After having done so, open the main.py within the /projectDemo folder file and run it.
 
 ## Roadmap
 If you have ideas for releases in the future, it is a good idea to list them in the README.
