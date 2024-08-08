@@ -68,6 +68,9 @@ Max Chiu
 
 Special Thanks to our Scrum Master with his brilliant feedback: Hung Do
 
+## Additional Notes
+We initially began working on this project as part of a course for school.
+
 ## License
    Copyright 2024 Everroot Forest
 
